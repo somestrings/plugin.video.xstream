@@ -160,9 +160,13 @@ def showHosters():
             hUrl = 'https://topstreamfilm.com/?trembed=' + trembed + '&trid=' + id + '&trtype=' + rtype
             oRequest = cRequestHandler(hUrl)
             sHtmlContent = oRequest.request()
-            pattern = '" src="([^"]+)'
+            pattern = 'tid=([^&]+)'
             isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-            for sUrl in aResult:            
+            for sId in aResult:
+                hUrl = 'https://topstreamfilm.com/?trhide=1&trhex=' + sId[::-1]
+                oRequest = cRequestHandler(hUrl, caching=False)
+                oRequest.request()
+                sUrl = oRequest.getRealUrl()
                 hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
                 hosters.append(hoster)
     if hosters:
