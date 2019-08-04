@@ -56,7 +56,7 @@ def showEntries(entryUrl=False, sGui=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '<div[^>]*class="poster">.*?img[^>]src="([^"]+)"[^>]alt="([^"]+).*?(.*?)<a[^>]href="([^"]+).*?<span>([\d]+)</span>.*?<div[^>]class="texto">([^"]+)</div>'
+    pattern = '<div[^>]*class="poster">.*?(img src="|original-src=")([^"]+).*?alt="([^"]+).*?(.*?)<a[^>]href="([^"]+).*?<span>([\d]+)</span>.*?texto">([^"]+)<'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
@@ -65,7 +65,7 @@ def showEntries(entryUrl=False, sGui=False):
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-    for sThumbnail, sName, sDummy, sUrl, sYear, sDesc in aResult:
+    for sD, sThumbnail, sName, sDummy, sUrl, sYear, sDesc in aResult:
         isTvshow = True if "serie" in sUrl else False
         sThumbnail = sThumbnail + cf
         if sThumbnail.startswith('//'):
