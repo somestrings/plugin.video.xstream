@@ -20,6 +20,8 @@
    <platform>all</platform>
    <news>
    xStream 3.5.9
+- [Foxx] Fix Regex
+- [topstreamfilm] Fix Hoster
 - [moviedream] fix nexpage problem
 - [s.to] Fix Thumbnail
 - [cinemaxx.cc] Fix Episodes
