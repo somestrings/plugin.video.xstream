@@ -187,11 +187,14 @@ def showEpisodes():
 
 
 def showHosters():
+    hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl, ignoreErrors=True).request()
     pattern = '<iframe[^>]src="([^"]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-    hosters = []
+    if not isMatch:
+        pattern = '"partItem" data-id="([\d]+).*?data-controlid="([\d]+).*?e/([^"]+).png'
+        isMatch2, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
         if 'alleserien' in aResult[0]:
             result, hash = cParser().parseSingleResult(sHtmlContent, 'o/([^"]+)')
@@ -210,6 +213,19 @@ def showHosters():
                 for sUrl, sName in aResult:
                     hoster = {'link': sUrl, 'name': sName}
                     hosters.append(hoster)
+    else:
+        if isMatch2:
+            result, token = cParser().parseSingleResult(sHtmlContent, "_token':'([^']+)")
+            for ID, controlid, sName in aResult:
+                oRequest = cRequestHandler('http://alleserien.com/getpart')
+                oRequest.addParameters('_token', token[0])
+                oRequest.addParameters('PartID', ID)
+                oRequest.addParameters('ControlID', controlid)
+                oRequest.setRequestType(1)
+                sHtmlContent = oRequest.request()
+                result, link = cParser().parseSingleResult(sHtmlContent, 'src="([^"]+)')
+                hoster = {'link': link, 'name': sName}
+                hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
