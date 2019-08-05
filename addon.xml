@@ -20,6 +20,7 @@
    <platform>all</platform>
    <news>
    xStream 3.5.9
+- [alleserien] fix hoster
 - [kinox] update domains
 - [Foxx] Fix Regex
 - [topstreamfilm] Fix Hoster
