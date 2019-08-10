@@ -1,5 +1,8 @@
 xStream 3.5.10~nightly
 - [alleserien] fix hoster
+- [kinox] update domains
+- [Foxx] Fix Regex
+- [topstreamfilm] Fix Hoster
 
 xStream 3.5.9
   21.07.2019
