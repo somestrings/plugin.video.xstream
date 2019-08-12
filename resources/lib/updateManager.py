@@ -21,8 +21,8 @@ XSTREAM_DIRNAME = os.path.basename(ROOT_DIR)
 
 
 ## URLRESOLVER
-REMOTE_URLRESOLVER_COMMITS = "https://api.github.com/repos/streamxstream/script.module.urlresolver/commits/master?access_token=9ef2824e2cf6551767b59adda21c30ad8cab5987"
-REMOTE_URLRESOLVER_DOWNLOADS = "https://api.github.com/repos/streamxstream/script.module.urlresolver/zipball/master?access_token=9ef2824e2cf6551767b59adda21c30ad8cab5987"
+REMOTE_URLRESOLVER_COMMITS = "https://api.github.com/repos/streamxstream/script.module.urlresolver/commits/master?access_token=246b0966e00d3a837d0a1257ef272f968482ffc3"
+REMOTE_URLRESOLVER_DOWNLOADS = "https://api.github.com/repos/streamxstream/script.module.urlresolver/zipball/master?access_token=246b0966e00d3a837d0a1257ef272f968482ffc3"
 
 ## XSTREAM
 REMOTE_XSTREAM_COMMITS = "https://api.github.com/repos/streamxstream/plugin.video.xstream/commits/nightly"
