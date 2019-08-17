@@ -90,8 +90,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         sThumbnail = URL_MAIN + sThumbnail + cf
         isTvshow = True if 'serie' in sUrl else False
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
-        oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
+        #oGuiElement.setThumbnail(sThumbnail)
+        #oGuiElement.setFanart(sThumbnail)
         oGuiElement.setMediaType("tvshow" if isTvshow else "movie")
         params.setParam('entryUrl', URL_MAIN + sUrl.replace('../..',''))
         params.setParam('Name', sName)
@@ -128,8 +128,8 @@ def showSeasons():
         oGuiElement.setTVShowTitle(params.getValue('Name'))
         if isDesc:
             oGuiElement.setDescription(sDesc[0])
-        oGuiElement.setThumbnail(params.getValue('sThumbnail'))
-        oGuiElement.setFanart(params.getValue('sThumbnail'))
+        #oGuiElement.setThumbnail(params.getValue('sThumbnail'))
+        #oGuiElement.setFanart(params.getValue('sThumbnail'))
         params.setParam('entryUrl', URL_MAIN + sUrl.replace('../..',''))
         oGui.addFolder(oGuiElement, params, True, total)
     oGui.setView('seasons')
@@ -161,8 +161,8 @@ def showEpisodes():
         oGuiElement.setTVShowTitle(sTVShowTitle)
         if isDesc:
             oGuiElement.setDescription(sDesc[0])
-        oGuiElement.setThumbnail(params.getValue('sThumbnail'))
-        oGuiElement.setFanart(params.getValue('sThumbnail'))
+        #oGuiElement.setThumbnail(params.getValue('sThumbnail'))
+        #oGuiElement.setFanart(params.getValue('sThumbnail'))
         params.setParam('entryUrl', URL_MAIN + sUrl.replace('../..',''))
         oGui.addFolder(oGuiElement, params, False, total)
     oGui.setView('episodes')
