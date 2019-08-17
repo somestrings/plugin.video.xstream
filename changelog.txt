@@ -5,6 +5,7 @@ xStream 3.5.10~nightly
 - [Foxx] Fix Regex
 - [topstreamfilm] Fix Hoster
 - [Update Manager] Resolver nightly Pfad erneuert
+- [settings] Resolver nightly Update sichtbar 
 
 xStream 3.5.9
   21.07.2019
