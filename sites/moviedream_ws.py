@@ -5,6 +5,10 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
+from resources.lib import pyaes
+from resources.lib import m as I11I1IIII1II11111II1I1I1II11I1I
+import hashlib, base64
+
 
 SITE_IDENTIFIER = 'moviedream_ws'
 SITE_NAME = 'MovieDream'
@@ -12,7 +16,6 @@ SITE_ICON = 'moviedream.png'
 URL_MAIN = 'https://moviedream.ws/'
 
 URL_SEARCH = URL_MAIN + 'suchergebnisse.php?text=%s&sprache=Deutsch'
-QUALITY_ENUM = {'SD': 1, 'HD': 4}
 
 
 def load():
@@ -173,20 +176,21 @@ def showHosters():
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '<a[^>]*href="([^"]+)"[^>]*><img[^>]*class="([s|h]d+)linkbutton"'
+    pattern = '''writesout[^>]'([^']+).*?"y":"([^"]+).*?fast":"([^"]+).*?bald":"([^"]+)'''
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     hosters = []
     if not isMatch:
         return hosters
 
-    for sUrl, sQuali in aResult:
+    for password, ciphertext, iv, salt in aResult:
         hoster = {}
+        key = I11I1IIII1II11111II1I1I1II11I1I.I11I1IIII1II11111II1I1I1II11III(salt)
+        decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(key, iv.decode('hex')))
+        decrypted = decrypter.feed(base64.b64decode(ciphertext))  + decrypter.feed()
+        sUrl = decrypted
         if not 'nurhdfilm' in sUrl.lower():
-            hoster['link'] = sUrl
-            hoster['name'] = cParser.urlparse(sUrl)
-            hoster['displayedName'] = '%s %s' % (hoster['name'], sQuali.upper())
-            hoster['quality'] = QUALITY_ENUM[sQuali.upper()]
+            hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
             hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
