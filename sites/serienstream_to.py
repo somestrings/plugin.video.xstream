@@ -226,7 +226,7 @@ def showHosters():
                 sLang = 'Englisch'
             if sLang is '3':
                 sLang = 'Englisch mit Untertitel'
-            if 'br' in sQualy:
+            if 'HD' in sQualy:
                 sQualy = 'HD'
             else:
                 sQualy = 'SD'
