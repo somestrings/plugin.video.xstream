@@ -20,8 +20,13 @@
    <platform>all</platform>
    <news>
    xStream 3.5.10~nightly
+- [s.to] fix hoster Qualy
 - [moviedream] fix hoster tnx kasimodo
 - [alleserien] fix hoster
+- [kinox] update domains
+- [Foxx] Fix Regex
+- [topstreamfilm] Fix Hoster
+- [Update Manager] Resolver nightly Pfad erneuert
    </news>
    <assets>
      <icon>icon.png</icon>
