@@ -14,8 +14,7 @@ SITE_ICON = 'hdstreams_org.png'
 URL_MAIN = 'https://hd-streams.org/'
 URL_FILME = URL_MAIN + 'movies?perPage=54'
 URL_SERIE = URL_MAIN + 'seasons?perPage=54'
-URL_SEARCH = URL_MAIN + 'search?q=%s&movies=true&seasons=true&actors=false&didyoumean=false'
-
+URL_SEARCH = URL_MAIN + 'search?q=%s&movies=true&seasons=true&actors=true&didyoumean=true&extended=true'
 
 def load():
     logger.info("Load %s" % SITE_NAME)
@@ -38,9 +37,11 @@ def showGenre():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = "text: '([^']+)', value: '([^']+)"
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+
     if not isMatch:
         oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
         return
+
     for sName, sID in aResult:
         params.setParam('sUrl', entryUrl + '&genre[]=' + sID)
         oGui.addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
@@ -57,10 +58,12 @@ def showEntries(entryUrl=False, sGui=False):
     pattern += "(?:url[^>]'([^']+)?).*?"
     pattern += 'filename">([^<]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+
     if not isMatch:
         if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
         return
-    cf = createUrl(entryUrl, oRequest)
+
+    cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
     for sUrl, sThumbnail, sName in aResult:
         isMatch, sYear = cParser.parse(sName, "(.*?)\((\d*)\)")
@@ -95,12 +98,14 @@ def showEpisodes():
     sHtmlContent = oRequest.request()
     pattern = 'click="loadEpisode\S([\d]+).*?subheading">([^<]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+
     if not isMatch:
         oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
         return
+
     isMatchDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '<div class="v-card__text">([^<]+)')
     isMatchFanart, sFanart = cParser.parseSingleResult(sHtmlContent, "background-image[^>]*url[^>]'([^']+)")
-    cf = createUrl(sUrl, oRequest)
+    cf = cRequestHandler.createUrl(sUrl, oRequest)
     total = len(aResult)
     for sName, sTitle in aResult:
         oGuiElement = cGuiElement(sName + ' - ' + sTitle, SITE_IDENTIFIER, 'showHosterserie')
@@ -170,7 +175,7 @@ def showSearch():
 
 def _search(oGui, sSearchText):
     if not sSearchText: return
-    showSearchEntries(URL_SEARCH % sSearchText.strip(), oGui, sSearchText)
+    showSearchEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
 
 
 def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
@@ -184,16 +189,22 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
     oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
     oRequest.addHeaderEntry('X-CSRF-TOKEN', token)
     sHtmlContent = oRequest.request()
-    pattern = '"title":"([^"]+).*?url":"([^"]+)'
+    pattern = 'title":"([^"]+).*?url":"([^"]+)(.*?)trailer'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+
     if not isMatch:
         if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
         return
+
+
+    cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-    for sName, sUrl in aResult:
+    for sName, sUrl, sDummy in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isMatch, sYear = cParser.parse(sName, "(.*?)\((\d*)\)")
+        isThumbnail, sThumbnail = cParser.parseSingleResult(sDummy, 'src":"([^"]+)')
+        isDesc, sDesc = cParser.parseSingleResult(sDummy, 'description":"(.*?)","')
+        isYear, sYear = cParser.parse(sName, "(.*?)\((\d*)\)")
         for name, year in sYear:
             sName = name
             sYear = year
@@ -201,9 +212,14 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
         isTvshow = True if "series" in sUrl else False
         if 'season' in sUrl or 'movies' in sUrl:
             oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showEpisodes' if isTvshow else 'showHosters')
-            if sYear:
+            if isYear:
                 oGuiElement.setYear(sYear)
-            params.setParam('entryUrl', sUrl.replace('\/', '/'))
+            if isThumbnail:
+                oGuiElement.setThumbnail(sThumbnail + cf)
+                oGuiElement.setFanart(sThumbnail + cf)
+            if isDesc:
+                oGuiElement.setDescription(sDesc)
+            params.setParam('entryUrl', sUrl)
             oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
         oGui.setEndOfDirectory()
@@ -260,18 +276,3 @@ def getLinks(sUrl, e, h, token, sLang=False):
         b += '0'
     tmp = cUtil.evp_decode(ciphertext, str(b), salt)
     return byteify(json.loads(tmp))
-
-
-def createUrl(sUrl, oRequest):
-    import urlparse
-    parsed_url = urlparse.urlparse(sUrl)
-    netloc = parsed_url.netloc[4:] if parsed_url.netloc.startswith('www.') else parsed_url.netloc
-    cfId = oRequest.getCookie('__cfduid', '.' + netloc)
-    cfClear = oRequest.getCookie('cf_clearance', '.' + netloc)
-    if cfId and cfClear and 'Cookie=Cookie:' not in sUrl:
-        delimiter = '&' if '|' in sUrl else '|'
-        sUrl = delimiter + "Cookie=Cookie: __cfduid=" + cfId.value + "; cf_clearance=" + cfClear.value
-    if 'User-Agent=' not in sUrl:
-        delimiter = '&' if '|' in sUrl else '|'
-        sUrl += delimiter + "User-Agent=" + oRequest.getHeaderEntry('User-Agent')
-    return sUrl
