@@ -1,4 +1,5 @@
 xStream 3.5.10~nightly
+- [hd-streams] fix suche usw.
 - [foxx] fix suche
 - [alleserien] fix suche
 - [s.to] fix hoster Qualy
