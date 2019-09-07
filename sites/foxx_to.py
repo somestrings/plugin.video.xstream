@@ -204,7 +204,7 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl)
     sHtmlContent = oRequest.request()
-    pattern = '-2">.*?href="([^"]+).*?src="([^"]+).*?alt="([^"]+).*?year">([\d]+)(.*?)(?:<div[^>]class="contenido"><p>([^<]+)?)'
+    pattern = '-2">.*?href="([^"]+).*?src="([^"]+).*?alt="([^"]+).*?(.*?)(?:<div[^>]class="contenido"><p>([^<]+)?)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
@@ -213,7 +213,7 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-    for sUrl, sThumbnail, sName, sYear, sDummy, sDesc in aResult:
+    for sUrl, sThumbnail, sName, sDummy, sDesc in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         if sThumbnail and not sThumbnail.startswith('http'):
@@ -226,7 +226,6 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
-        oGuiElement.setYear(sYear)
         if 'de.png' in sDummy:
             oGuiElement.setLanguage('Deutsch')
         if 'en.png' in sDummy:
@@ -238,13 +237,6 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sDesc', sDesc)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
-        pattern = "span[^>]*class=[^>]*current[^>]*>.*?</span><a[^>]*href='([^']+)"
-        isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, pattern)
-        if isMatchNextPage:
-            if sNextUrl.startswith('//'):
-                sNextUrl = 'https:' + sNextUrl
-            params.setParam('sUrl', sNextUrl)
-            oGui.addNextPage(SITE_IDENTIFIER, 'showSearchEntries', params)
         oGui.setEndOfDirectory()
 
 
