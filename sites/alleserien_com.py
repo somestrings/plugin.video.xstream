@@ -13,7 +13,7 @@ SITE_ICON = 'alleserien_com.png'
 URL_MAIN = 'http://alleserien.com'
 URL_SERIEN = URL_MAIN + '/serien'
 URL_FILME = URL_MAIN + '/filme'
-URL_SEARCH = URL_MAIN + '/search?page=1&from=1900&type=Alle&rating=0&sortBy=latest&search=%s'
+URL_SEARCH = URL_MAIN + '/search?search=%s'
 
 
 def load():
