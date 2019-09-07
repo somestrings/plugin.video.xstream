@@ -1,4 +1,6 @@
 xStream 3.5.10~nightly
+- [foxx] fix suche
+- [alleserien] fix suche
 - [s.to] fix hoster Qualy
 - [moviedream] fix hoster tnx kasimodo
 - [alleserien] fix hoster
