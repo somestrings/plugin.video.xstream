@@ -86,10 +86,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '"><a[^>]href="([^"]+)"[^>]title="([^"]+)"><img[^>]src="([^"]+)'
+    pattern = '"><a[^>]href="([^"]+)"[^>]title="([^"]+)"><img[^>]src="([^"]+)(.*?)</span></li>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
-        pattern = '</div><a[^>]href="([^"]+)"[^>]title="([^"]+)">.*?src="([^"]+)'
+        pattern = '</div><a[^>]href="([^"]+)"[^>]title="([^"]+)">.*?src="([^"]+)(.*?)alt'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
@@ -98,17 +98,24 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-    for sUrl, sName, sThumbnail in aResult:
+    for sUrl, sName, sThumbnail, sDummy in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         isTvshow, aResult = cParser.parse(sName, 'S\d\dE\d\d')
         sThumbnail = sThumbnail + cf
         if sThumbnail.startswith('/'):
             sThumbnail = URL_MAIN + sThumbnail
+
+        isYear, sYear = cParser.parseSingleResult(sDummy, 'Jahr:[^>]([\d]+)')
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\d]+)')
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
+        if isDuration:
+            oGuiElement.addItemValue('duration', sDuration)
+        if isYear:
+            oGuiElement.setYear(sYear)
         if sUrl.startswith('//'):
             params.setParam('entryUrl', 'https:' + sUrl)
         else:
