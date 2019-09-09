@@ -1,4 +1,7 @@
 xStream 3.5.10~nightly
+- [kinoger.com] fix hoster add description and duration
+- [filmpalast] add partially year and duration
+- [foxx] add duration
 - [hd-streams.to] add site
 - [hd-streams.org] fix suche usw.
 - [foxx] fix suche
