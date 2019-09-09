@@ -56,7 +56,7 @@ def showEntries(entryUrl=False, sGui=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '<div[^>]*class="poster">.*?(img src="|original-src=")([^"]+).*?alt="([^"]+).*?(.*?)<a[^>]href="([^"]+).*?<span>([\d]+)</span>.*?texto">([^"]+)<'
+    pattern = '<div[^>]*class="poster">.*?(img src="|original-src=")([^"]+).*?alt="([^"]+)(.*?)<a[^>]href="([^"]+)(.*?)texto">([^<]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
@@ -65,7 +65,9 @@ def showEntries(entryUrl=False, sGui=False):
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-    for sD, sThumbnail, sName, sDummy, sUrl, sYear, sDesc in aResult:
+    for sD, sThumbnail, sName, sLang, sUrl, sDummy, sDesc in aResult:
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, '<span>([\d]+)[^>]min')
+        isYear, sYear = cParser.parseSingleResult(sDummy, '</h3.*?<span>([\d]+)')
         isTvshow = True if "serie" in sUrl else False
         sThumbnail = sThumbnail + cf
         if sThumbnail.startswith('//'):
@@ -76,11 +78,14 @@ def showEntries(entryUrl=False, sGui=False):
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
-        if 'German' in sDummy:
+        if 'German' in sLang:
             oGuiElement.setLanguage('Deutsch')
-        if 'English' in sDummy:
+        if 'English' in sLang:
             oGuiElement.setLanguage('Englisch')
-        oGuiElement.setYear(sYear)
+        if isDuration:
+            oGuiElement.addItemValue('duration', sDuration)
+        if isYear:
+            oGuiElement.setYear(sYear)
         oGuiElement.setDescription(sDesc)
         params.setParam('entryUrl', sUrl)
         params.setParam('sName', sName)
@@ -123,7 +128,8 @@ def showSeasons():
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
-        oGuiElement.setDescription(sDesc)
+        if sDesc:
+            oGuiElement.setDescription(sDesc)
         params.setParam('sSeasonNr', int(sSeasonNr))
         oGui.addFolder(oGuiElement, params, True, total)
     oGui.setView('seasons')
@@ -158,7 +164,8 @@ def showEpisodes():
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
-        oGuiElement.setDescription(sDesc)
+        if sDesc:
+            oGuiElement.setDescription(sDesc)
         oGuiElement.setMediaType('episode')
         params.setParam('entryUrl', sUrl.strip())
         oGui.addFolder(oGuiElement, params, False, total)
@@ -213,7 +220,7 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-    for sUrl, sThumbnail, sName, sDummy, sDesc in aResult:
+    for sUrl, sThumbnail, sName, sLang, sDesc in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         if sThumbnail and not sThumbnail.startswith('http'):
@@ -226,9 +233,9 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
-        if 'de.png' in sDummy:
+        if 'de.png' in sLang:
             oGuiElement.setLanguage('Deutsch')
-        if 'en.png' in sDummy:
+        if 'en.png' in sLang:
             oGuiElement.setLanguage('Englisch')
         oGuiElement.setDescription(sDesc)
         params.setParam('entryUrl', sUrl)
