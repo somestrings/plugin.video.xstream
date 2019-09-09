@@ -10,7 +10,7 @@ SITE_IDENTIFIER = 'kinoger_com'
 SITE_NAME = 'Kinoger'
 SITE_ICON = 'kinoger.png'
 
-URL_MAIN = 'http://kinoger.com/'
+URL_MAIN = 'https://kinoger.com/'
 URL_SERIE = URL_MAIN + 'stream/serie/'
 
 
@@ -64,7 +64,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oRequest.addParameters('set_direction_sort', 'dle_direction_main')
     oRequest.setRequestType(1)
     sHtmlContent = oRequest.request()
-    pattern = 'class="title.*?href="([^"]+)">([^<]+).*?src="([^"]+)'
+    pattern = 'class="title.*?href="([^"]+)">([^<]+).*?src="([^"]+)(.*?)</span>'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
 
     if not isMatch:
@@ -73,7 +73,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-    for sUrl, sName, sThumbnail in aResult:
+    for sUrl, sName, sThumbnail, sDummy in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         sThumbnail = sThumbnail + cf
@@ -83,11 +83,17 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             sName = name
             sYear = year
             break
+        isDesc, sDesc = cParser.parseSingleResult(sDummy, '</b>([^"]+)</div>')
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\d]+)')
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
         if isYear:
             oGuiElement.setYear(sYear)
+        if isDesc:
+            oGuiElement.setDescription(sDesc)
+        if isDuration:
+            oGuiElement.addItemValue('duration', sDuration)
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         params.setParam('sThumbnail', sThumbnail)
         params.setParam('TVShowTitle', sName)
@@ -115,12 +121,12 @@ def showSeasons():
     if isMatch:
         pattern = "'([^\]]+)"
         isMatch, aResult = cParser.parse(sContainer, pattern)
-
     if not isMatch:
         oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
         return
 
     i = 0
+    isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '</b>([^"]+)<br><br>')
     total = len(aResult)
     for sSeasonNr in aResult:
         i = i + 1
@@ -130,6 +136,8 @@ def showSeasons():
         if sThumbnail:
             oGuiElement.setThumbnail(sThumbnail)
             oGuiElement.setFanart(sThumbnail)
+        if isDesc:
+            oGuiElement.setDescription(sDesc)
         params.setParam('sNr', i)
         params.setParam('sSeasonNr', sSeasonNr)
         oGui.addFolder(oGuiElement, params, True, total)
@@ -140,6 +148,8 @@ def showSeasons():
 def showEpisodes():
     oGui = cGui()
     params = ParameterHandler()
+    entryUrl = params.getValue('entryUrl')
+    sHtmlContent = cRequestHandler(entryUrl).request()
     sEpisodeNr = params.getValue('sSeasonNr')
     sNr = params.getValue('sNr')
     sThumbnail = params.getValue('sThumbnail')
@@ -152,6 +162,7 @@ def showEpisodes():
         return
 
     i = 0
+    isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '</b>([^"]+)<br><br>')
     total = len(aResult)
     for sEpisodeNr in aResult:
         i = i + 1
@@ -159,6 +170,8 @@ def showEpisodes():
         oGuiElement.setTVShowTitle(sTVShowTitle)
         oGuiElement.setSeason(sNr)
         oGuiElement.setEpisode(i)
+        if isDesc:
+            oGuiElement.setDescription(sDesc)
         if sThumbnail:
             oGuiElement.setThumbnail(sThumbnail)
             oGuiElement.setFanart(sThumbnail)
@@ -169,11 +182,11 @@ def showEpisodes():
 
 
 def showHosters():
+    hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern1 = 'namba.show[^>]\d.*?([\d]+)'
     isNamba, Namba = cParser().parse(sHtmlContent, pattern1)
-    hosters = []
     if isNamba:
         for id in Namba:
             oRequest = cRequestHandler('http://v1.kinoger.pw/vod/' + id)
@@ -185,7 +198,7 @@ def showHosters():
                 hoster = {'link': sUrl[0], 'name': 'Namba'}
                 hosters.append(hoster)
 
-    pattern = '<iframe[^>]src="([^"]+)'
+    pattern = "show[^>]\d,[^>][^>]'([^']+)"
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
 
     if isMatch:
@@ -199,17 +212,15 @@ def showHosters():
                 for sUrl in aResult:
                     hoster = {'link': sUrl, 'name': Qualy(sUrl)}
                     hosters.append(hoster)
-            elif 'newcloud' in sUrl.lower():
-                oRequest = cRequestHandler(sUrl)
-                oRequest.addHeaderEntry('Referer', sUrl)
-                sHtmlContent = oRequest.request()
-                pattern = 'file:"(.*?)"'
-                isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-                pattern = '(http[^",]+)'
-                isMatch, aResult = cParser().parse(sContainer[0], pattern)
-                for sUrl in aResult:
-                    hoster = {'link': sUrl, 'name': 'Newcloud' + Qualy2(sUrl)}
-                    hosters.append(hoster)
+    elif 'hdgo' in sUrl or 'vio' in sUrl:
+        oRequest = cRequestHandler(sUrl)
+        oRequest.addHeaderEntry('Referer', sUrl)
+        sHtmlContent = oRequest.request()
+        pattern = "url:[^>]'([^']+)"
+        isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+        for sUrl in aResult:
+            hoster = {'link': sUrl, 'name':  Qualy(sUrl)}
+            hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
@@ -219,7 +230,7 @@ def getHosterUrl(sUrl=False):
     if sUrl.startswith('//'):
         sUrl = 'https:' + sUrl
     if 'apollostream' in sUrl or 'newcloud' in sUrl or 'kinoger.pw' in sUrl:
-        return [{'streamUrl': sUrl + '|Referer=' + sUrl + '&User-Agent=Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0', 'resolved': True}]
+        return [{'streamUrl': sUrl + '|Referer=' + sUrl + '&Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0', 'resolved': True}]
     else:
         return [{'streamUrl': sUrl , 'resolved': False}]
 
@@ -247,13 +258,3 @@ def Qualy(sUrl):
         return ' 1080p'
     else:
         return ' SD'
-
-def Qualy2(sUrl):
-    if '360p' in sUrl:
-        return ' 360p'
-    elif '480p' in sUrl:
-        return ' 480p'
-    elif '720p' in sUrl:
-        return ' 720p'
-    else:
-        return ' 1080p'
