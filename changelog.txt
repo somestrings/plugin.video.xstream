@@ -1,4 +1,5 @@
 xStream 3.5.11~nightly
+- [Kinoger] add hoster newcloud aka fsst.online
 
 xStream 3.5.10
   09.09.2019
