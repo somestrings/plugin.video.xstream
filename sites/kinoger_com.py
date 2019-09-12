@@ -210,8 +210,21 @@ def showHosters():
                 pattern = "url:[^>]'([^']+)"
                 isMatch, aResult = cParser().parse(sHtmlContent, pattern)
                 for sUrl in aResult:
-                    hoster = {'link': sUrl, 'name': Qualy(sUrl)}
+                    hoster = {'link': sUrl, 'name': Qualy(sUrl) + ' hdgo'}
                     hosters.append(hoster)
+
+            elif 'newcloud' in sUrl or 'fsst.online' in sUrl:
+                oRequest = cRequestHandler(sUrl)
+                oRequest.addHeaderEntry('Referer', sUrl)
+                sHtmlContent = oRequest.request()
+                pattern = 'file:"(.*?)"'
+                isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
+                pattern = '(http[^",]+)'
+                isMatch, aResult = cParser().parse(sContainer[0], pattern)
+                for sUrl in aResult:
+                    hoster = {'link': sUrl, 'name': Qualy2(sUrl) + ' newcloud'}
+                    hosters.append(hoster)
+
     elif 'hdgo' in sUrl or 'vio' in sUrl:
         oRequest = cRequestHandler(sUrl)
         oRequest.addHeaderEntry('Referer', sUrl)
@@ -219,7 +232,7 @@ def showHosters():
         pattern = "url:[^>]'([^']+)"
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
         for sUrl in aResult:
-            hoster = {'link': sUrl, 'name':  Qualy(sUrl)}
+            hoster = {'link': sUrl, 'name': Qualy(sUrl) + ' hdgo'}
             hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
@@ -229,10 +242,7 @@ def showHosters():
 def getHosterUrl(sUrl=False):
     if sUrl.startswith('//'):
         sUrl = 'https:' + sUrl
-    if 'apollostream' in sUrl or 'newcloud' in sUrl or 'kinoger.pw' in sUrl:
-        return [{'streamUrl': sUrl + '|Referer=' + sUrl + '&Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0', 'resolved': True}]
-    else:
-        return [{'streamUrl': sUrl , 'resolved': False}]
+    return [{'streamUrl': sUrl + '|Referer=' + sUrl + '&Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0', 'resolved': True}]
 
 
 def showSearch():
@@ -249,12 +259,23 @@ def _search(oGui, sSearchText):
 
 def Qualy(sUrl):
     if '/1/' in sUrl:
-        return ' 360p'
+        return '360p'
     elif '/2/' in sUrl:
-        return ' 480p'
+        return '480p'
     elif '/3/' in sUrl:
-        return ' 720p'
+        return '720p'
     elif '/4/' in sUrl:
-        return ' 1080p'
+        return '1080p'
     else:
-        return ' SD'
+        return 'SD'
+
+
+def Qualy2(sUrl):
+    if '360p' in sUrl:
+        return '360p'
+    elif '480p' in sUrl:
+        return '480p'
+    elif '720p' in sUrl:
+        return '720p'
+    else:
+        return '1080p'
