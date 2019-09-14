@@ -1,4 +1,4 @@
-![xStream logo](https://raw.githubusercontent.com/lastship/xStream-FAQ/master/Logo%20FAQ.png)
+![xStream logo](https://raw.githubusercontent.com/streamxstream/plugin.video.xstream//nightly/icon.png)
 
 
 ## Willkommen bei xStream für Kodi!
