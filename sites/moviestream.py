@@ -214,4 +214,4 @@ def showSearch():
 
 
 def _search(oGui, sSearchText):
-    showSearchEntries(URL_SEARCH % sSearchText, oGui)
+    showSearchEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
