@@ -33,13 +33,11 @@ def showGenre():
     oGui = cGui()
     params = ParameterHandler()
     sHtmlContent = cRequestHandler(URL_MAIN).request()
-    pattern = '">Kategorien</div>.*?</aside>'
+    pattern = 'Kategorien.*?</aside>'
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-
     if  isMatch:
-        pattern = '<li class="cat.*?href="([^"]+).*?>([^<]+)'
+        pattern = 'href="([^"]+).*?>([^<]+)'
         isMatch, aResult = cParser.parse(sContainer, pattern)
-
     if not isMatch:
         oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
         return
@@ -56,7 +54,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl)
     sHtmlContent = oRequest.request()
-    pattern = 'TPost C">.*?href="([^"]+).*?img[^>]src="([^"]+)(.*?)Title">([^<]+)'
+    pattern = 'TPost C">.*?href="([^"]+).*?img[^>]src="([^"]+)(.*?)Title">([^<]+)(.*?)Description">([^"]+)</p>'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
 
     if not isMatch:
@@ -65,15 +63,23 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-    for sUrl, sThumbnail, dummy, sName in aResult:
+    for sUrl, sThumbnail, sType, sName, sDummy, sDesc in aResult:
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, 'time">([\d(h) \d]+)')
+        isYear, sYear = cParser.parseSingleResult(sDummy, 'date_range">([\d]+)')
         sThumbnail = 'https:' + sThumbnail + cf
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isTvshow = True if 'Season' in dummy or 'TV' in dummy else False
+        isTvshow = True if 'Season' in sType or 'TV' in sType else False
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
+        if isDuration:
+            sDuration = sDuration.replace('h ', '')
+            oGuiElement.addItemValue('duration', int(sDuration) - 40)
+        if isYear:
+            oGuiElement.setYear(sYear)
+        oGuiElement.setDescription(sDesc)
         params.setParam('entryUrl', sUrl)
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
@@ -83,7 +89,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
-        #oGui.setView('tvshow' if 'Season' in dummy or 'TV' in dummy else 'movie')
+        oGui.setView('tvshow' if 'Season' in sType or 'TV' in sType else 'movie')
         oGui.setEndOfDirectory()
 
 
@@ -126,7 +132,6 @@ def showEpisodes():
     if isMatch:
         pattern = 'Num">([\d]+).*?href="([^"]+)'
         isMatch, aResult = cParser.parse(sContainer, pattern)
-
     if not isMatch:
         oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
         return
