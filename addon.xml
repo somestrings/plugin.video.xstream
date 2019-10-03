@@ -20,6 +20,9 @@
    <platform>all</platform>
    <news>
    xStream 3.5.11~nightly
+- [KKiste.co] Add site
+- [MovieStream] fix such filter
+- [hdfilme] fix movie hoster and episodes tnx Ahnz
 - [Kinoger] add hoster newcloud aka fsst.online
    </news>
    <assets>
