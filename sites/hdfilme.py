@@ -136,7 +136,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 def showEpisodes():
     oGui = cGui()
     params = ParameterHandler()
-    sUrl = urlEncode(params.getValue('entryUrl'),':|/')
+    sUrl = urlEncode(params.getValue('entryUrl'),':|/') + '/folge-1'
     sThumbnail = params.getValue('sThumbnail')
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = 'data-episode-id="([\d]+).*?folge.*?([\d]+)'
@@ -189,7 +189,7 @@ def showHosterserie():
 
 
 def showHosters():
-    sUrl = urlEncode(ParameterHandler().getValue('entryUrl'),':|/')
+    sUrl = urlEncode(ParameterHandler().getValue('entryUrl'),':|/') + '/deutsch'
     rUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = 'data-movie-id="(.*?)"[\s\S]*?data-episode-id="(.*?)"' #'data-episode-id="([^"]+).*?load[^>] "([^"]+)"'
