@@ -62,7 +62,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-
     for sUrl, sName, sThumbnail, sDesc, sYear, sDuration in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
@@ -103,7 +102,11 @@ def showHosters():
 
 
 def getHosterUrl(sUrl=False):
-    return [{'streamUrl': sUrl, 'resolved': False}]
+    if 'supervideo' in sUrl:
+        sUrl = supervideo(sUrl)
+        return [{'streamUrl': sUrl, 'resolved': True}]
+    else:
+        return [{'streamUrl': sUrl, 'resolved': False}]
 
 
 def showSearch():
@@ -117,3 +120,14 @@ def showSearch():
 def _search(oGui, sSearchText):
     if not sSearchText: return
     showEntries(URL_MAIN, oGui, sSearchText)
+
+
+def supervideo(sUrl):
+    sHtmlContent = cRequestHandler(sUrl).request()
+    import jsunpacker
+    isMatch, aResult = cParser().parse(sHtmlContent, '(eval\(function.*?)</script>')
+    if isMatch:
+        for packed in aResult:
+            sHtmlContent += jsunpacker.unpack(packed)
+    isMatch, sUrl = cParser().parse(sHtmlContent, 'sources.*?"([^"]+)')
+    return sUrl[0]
