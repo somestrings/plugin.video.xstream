@@ -8,6 +8,7 @@ xStream 3.5.11~nightly
 
 xStream 3.5.10
   09.09.2019
+- [hd-streams.to] Fix
 - [kinoger.com] fix hoster add description and duration
 - [filmpalast] add partially year and duration
 - [foxx] add duration
