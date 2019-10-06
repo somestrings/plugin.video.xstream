@@ -56,7 +56,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '<div class="poster"> <noscript><img src="([^"]+).*?alt="([^"]+).*?href="([^"]+).*?<span>([\d]+).*?texto">([^"]+)<'
+    pattern = '<div class="poster">.*?<img src="([^"]+).*?alt="([^"]+).*?href="([^"]+).*?<span>([\d]+).*?texto">([^"]+)<'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
@@ -83,7 +83,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
-        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, "<span[^>]class=[^>]current.*?</span><a[^>]href='([^']+)")
+        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, '<span[^>]class=[^>]current.*?</span><a[^>]href="([^"]+)')
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
@@ -105,6 +105,7 @@ def showSeasons():
         oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
         return
 
+    isDesc, sDesc = cParser.parse(sHtmlContent, 'class="wp-content">([^"]+)<div')
     total = len(aResult)
     for sSeasonNr in aResult:
         oGuiElement = cGuiElement("Staffel " + sSeasonNr, SITE_IDENTIFIER, 'showEpisodes')
@@ -112,6 +113,8 @@ def showSeasons():
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
+        if isDesc:
+            oGuiElement.setDescription(sDesc[0])
         params.setParam('sSeasonNr', int(sSeasonNr))
         oGui.addFolder(oGuiElement, params, True, total)
     oGui.setView('seasons')
@@ -128,16 +131,15 @@ def showEpisodes():
     pattern = '<span[^>]*class="se-t[^"]*">%s</span>.*?<ul[^>]*class="episodios"[^>]*>(.*?)</ul>' % sSeasonNr
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
 
-    if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
-        return
-    pattern = 'numerando">[^-]*-\s*(\d+)<.*?<a[^>]*href="([^"]+)">([^<]+)'
-    isMatch, aResult = cParser.parse(sContainer, pattern)
+    if isMatch:
+        pattern = 'numerando">[^-]*-\s*(\d+)<.*?<a[^>]*href="([^"]+)">([^<]+)'
+        isMatch, aResult = cParser.parse(sContainer, pattern)
 
     if not isMatch:
         oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
         return
 
+    isDesc, sDesc = cParser.parse(sHtmlContent, 'class="wp-content">([^"]+)<div')
     total = len(aResult)
     for sEpisodeNr, sUrl, sName in aResult:
         oGuiElement = cGuiElement(sEpisodeNr + ' - ' + sName, SITE_IDENTIFIER, 'showHosters')
@@ -145,7 +147,8 @@ def showEpisodes():
         oGuiElement.setEpisode(sEpisodeNr)
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
-        oGuiElement.setDescription(sUrl)
+        if isDesc:
+            oGuiElement.setDescription(sDesc[0])
         oGuiElement.setMediaType('episode')
         params.setParam('entryUrl', sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
