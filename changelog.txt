@@ -1,4 +1,9 @@
 xStream 3.5.11~nightly
+- [cinemaxx.cc] Blazingfast problem
+- [foxx.to] offline
+- [movietown.org] cloudflare problem
+- [mykino.to] fast alle links offline
+- [streamking.eu] offline
 - [KKiste.co] Add supervideo support
 - [topstreamfilm] add description and duration usw
 - [KKiste.co] Add site
@@ -8,11 +13,6 @@ xStream 3.5.11~nightly
 
 xStream 3.5.10
   09.09.2019
-- [cinemaxx.cc] Blazingfast problem
-- [foxx.to] offline
-- [movietown.org] cloudflare problem
-- [mykino.to] fast alle links offline
-- [streamking.eu] offline
 - [hd-streams.to] Fix
 - [kinoger.com] fix hoster add description and duration
 - [filmpalast] add partially year and duration
