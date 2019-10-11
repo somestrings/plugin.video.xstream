@@ -220,12 +220,10 @@ def showHosters():
 
 def getHosterUrl(sUrl=False):
     if 'vivo.php' in sUrl:
-        oRequest = cRequestHandler(sUrl)
+        oRequest = cRequestHandler(sUrl, caching=False)
         oRequest.addHeaderEntry('Referer', URL_MAIN)
-        sHtmlContent = oRequest.request()
-        isMatch, aResult = cParser().parse(sHtmlContent, '<video\s*id="player"[^>]+data-stream="([^"]+)')
-        if isMatch:
-            return [{'streamUrl': aResult[0].decode('base64'), 'resolved': True}]
+        oRequest.request()
+        return [{'streamUrl': oRequest.getRealUrl(), 'resolved': False}]
     else:
         return [{'streamUrl': sUrl, 'resolved': False}]
 
