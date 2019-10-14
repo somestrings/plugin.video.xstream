@@ -20,9 +20,10 @@
 
     <!-- settingtabs begin by 30020 - 30029 -->
     <string id="30020">Allgemein</string>
-    <string id="30021">Site-Plugins</string>
+    <string id="30021">Indexseiten</string>
     <string id="30022">Ansichten</string>
     <string id="30023">Downloads</string>
+    <string id="30024">Konten</string>
 
     <!-- settingsheader begin by 30030 - 30039 -->
     <string id="30030">Update</string>
