@@ -1,4 +1,7 @@
-xStream 3.5.11~nightly
+xStream 3.5.12~nightly
+
+xStream 3.5.11
+  14.10.2019
 - Update settings.xml und Language strings
 - [filmpalast_to] add vivo support
 - [streamking] wieder hinzugefügt
