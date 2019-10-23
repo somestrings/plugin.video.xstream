@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import sys, xbmc, xbmcgui
 from resources.lib import logger
 from resources.lib.config import cConfig
@@ -130,10 +130,10 @@ def get_metahandler():
 
 def parseUrl():
     import urlparse
-    netloc = [urlparse.urlparse(sys.argv[0]).netloc, '']
-    if xbmc.getInfoLabel('Container.PluginName') not in netloc:
-        sys.exit()
-        return
+#    netloc = [urlparse.urlparse(sys.argv[0]).netloc, '']
+#    if xbmc.getInfoLabel('Container.PluginName') not in netloc:
+#        sys.exit()
+#        return
 
     params = ParameterHandler()
     logger.info(params.getAllParameters())
