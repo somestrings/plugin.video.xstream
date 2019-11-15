@@ -1,4 +1,6 @@
 xStream 3.5.12~nightly
+- [hdfilme] fix hoster
+
 
 xStream 3.5.11
   14.10.2019
