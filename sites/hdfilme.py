@@ -166,13 +166,15 @@ def showHosterserie():
     sID = ParameterHandler().getValue('sID')
     rUrl = ParameterHandler().getValue('entryUrl')
     hosters = []
-    oRequest = cRequestHandler(URL_MAIN + '/movie/load-stream/' + sID + '/' + eID +  '?')
+    oRequest = cRequestHandler(str(URL_MAIN + '/movie/load-stream/' + sID + '/' + eID + '?server=1'))
     oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
     oRequest.addHeaderEntry('Referer', rUrl)
     sHtmlContent = oRequest.request()
     pattern = 'urlVideo = "([^"]+)'
     isMatch, hUrl = cParser().parse(sHtmlContent, pattern)
     oRequest = cRequestHandler(hUrl[0])
+    oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
+    oRequest.addHeaderEntry('Referer', rUrl)
     sHtmlContent = oRequest.request()
     url = cParser().urlparse(hUrl[0])
     pattern = 'RESOLUTION=\d+x([\d]+)([^#]+)'
@@ -204,13 +206,14 @@ def showHosters():
             oRequest.addHeaderEntry('Referer', rUrl)
             sHtmlContent = oRequest.request()
             pattern = 'urlVideo = "([^"]+)'
-
             isMatch, hUrl = cParser().parse(sHtmlContent, pattern)
-            sHtmlContent = cRequestHandler(hUrl[0]).request()
+            oRequest = cRequestHandler(hUrl[0])
+            oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
+            oRequest.addHeaderEntry('Referer', rUrl)
+            sHtmlContent = oRequest.request()
             url = cParser().urlparse(hUrl[0])
             pattern = 'RESOLUTION=\d+x([\d]+)([^#]+)'
             isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
             for sQualy, sUrl in aResult:
                 if 'hydrax' in hUrl[0]:
                     hoster = {'link': hUrl[0].replace('playlist.m3u8', '') + sUrl, 'name': sQualy}
@@ -223,8 +226,7 @@ def showHosters():
 
 
 def getHosterUrl(sUrl=False):
-    if 'hydrax' in sUrl:
-        sUrl = sUrl + '|' + 'Origin=https%3A%2F%2Fhdfilme.net%2F&Accept-Language=de-de,de;q=0.8,en-us;q=0.5,en;q=0.3&Accept-Encoding=gzip&Referer=https%3A%2F%2Fhdfilme.net%2F'
+    sUrl = sUrl + '|' + 'Origin=https%3A%2F%2Fhdfilme.net%2F&Accept-Language=de-de,de;q=0.8,en-us;q=0.5,en;q=0.3&Accept-Encoding=gzip&Referer=https%3A%2F%2Fhdfilme.cc%2F'
     return [{'streamUrl': sUrl, 'resolved': True}]
 
 
