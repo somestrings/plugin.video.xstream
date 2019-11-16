@@ -16,7 +16,9 @@ SITE_SETTINGS = '<setting default="movie4k.to" enable="!eq(-2,false)" id="movie4
 oConfig = cConfig()
 DOMAIN = oConfig.getSetting('movie4k_to-domain')
 
-URL_MAIN = 'http://www.' + DOMAIN
+#URL_MAIN = 'http://www.' + DOMAIN
+
+URL_MAIN = 'https://movie4k.me'
 
 URL_MOVIES = URL_MAIN + '/index.php'
 URL_MOVIES_ALL = URL_MAIN + '/movies-all'
