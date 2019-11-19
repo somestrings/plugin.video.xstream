@@ -7,7 +7,7 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 from resources.lib import pyaes
 from resources.lib import m as I11I1IIII1II11111II1I1I1II11I1I
-import hashlib, base64
+import base64
 
 
 SITE_IDENTIFIER = 'moviedream_ws'
@@ -55,7 +55,7 @@ def showGenre():
     entryUrl = params.getValue('sUrl')
     value = params.getValue('value')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = 'href="(?:\.\.\/)*(%s[^"]+)">([^<]+)<\/a><\/li>' % value
+    pattern = 'href="(/%s[^"]+)">([^<]+)' % value
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
