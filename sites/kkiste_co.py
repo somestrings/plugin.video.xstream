@@ -90,7 +90,7 @@ def showHosters():
     hosters = []
     if isMatch:
         for sUrl in aResult:
-            if not 'vod' in sUrl and not 'youtube' in sUrl:
+            if not 'vod' in sUrl and not 'youtube' in sUrl and not 'verystream' in sUrl:
                 if sUrl.startswith('http'):
                     hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
                 else:
@@ -129,5 +129,7 @@ def supervideo(sUrl):
     if isMatch:
         for packed in aResult:
             sHtmlContent += jsunpacker.unpack(packed)
-    isMatch, sUrl = cParser().parse(sHtmlContent, 'sources.*?"([^"]+)')
+        isMatch, sUrl = cParser().parse(sHtmlContent, 'sources.*?"([^"]+)')
+    else:
+        isMatch, sUrl = cParser().parse(sHtmlContent, 'player.updateSrc\({src: \"([^\"]+?)\"')
     return sUrl[0]
