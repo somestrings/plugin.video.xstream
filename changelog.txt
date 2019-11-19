@@ -1,4 +1,6 @@
 xStream 3.5.12~nightly
+- [moviedream] fix genre
+- [kkiste.co] fix hoster supervideo
 - [movie4k] temporärer fix
 - [hdfilme] fix hoster
 
