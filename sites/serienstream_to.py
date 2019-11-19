@@ -160,7 +160,7 @@ def showSeasons():
             oGuiElement.setTVShowTitle(sTVShowTitle)
             oGuiElement.setSeason(sNr)
             params.setParam('sSeason', sNr)
-            params.setParam('sThumbnail', sThumbnail)
+        params.setParam('sThumbnail', sThumbnail)
         params.setParam('sUrl', URL_MAIN + sUrl)
         oGui.addFolder(oGuiElement, params, True, total)
     oGui.setView('seasons')
