@@ -45,7 +45,7 @@ def showGenre():
     oGui.setEndOfDirectory()
 
 
-def showEntries(entryUrl=False, sGui=False, sSearchText=None):
+def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
@@ -63,9 +63,12 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=None):
 
     total = len(aResult)
     for sName, sYear, sThumbnail, sUrl in aResult:
+        if sThumbnail.startswith('/'):
+            sThumbnail = URL_MAIN + sThumbnail
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setTitle(sName + ' (' + sYear + ')')
         oGuiElement.setThumbnail(sThumbnail)
+        oGuiElement.setFanart(sThumbnail)
         oGuiElement.setYear(sYear)
         params.setParam('entryUrl', URL_MAIN + sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
@@ -81,14 +84,17 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=None):
 
 
 def showHosters():
-    oParams = ParameterHandler()
-    sUrl = oParams.getValue('entryUrl')
+    params = ParameterHandler()
+    sUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = "src=[^>]'([^']+)'\s"
-    aResult = cParser().parse(sHtmlContent, pattern)
+    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+    if not isMatch:
+        pattern = 'src=[^>]"(http[^"]+)'
+        isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     hosters = []
-    if aResult[1]:
-        for sUrl in aResult[1]:
+    if isMatch:
+        for sUrl in aResult:
             hoster = {'link': sUrl, 'name': sUrl}
             hosters.append(hoster)
     if hosters:
@@ -97,6 +103,10 @@ def showHosters():
 
 
 def getHosterUrl(sUrl=False):
+    if 'youtube' in sUrl:
+        import xbmc, xbmcgui
+        if not xbmc.getCondVisibility("System.HasAddon(%s)" % "plugin.video.youtube"):
+            xbmc.executebuiltin("InstallAddon(%s)" % "plugin.video.youtube")
     return [{'streamUrl': sUrl, 'resolved': False}]
 
 
