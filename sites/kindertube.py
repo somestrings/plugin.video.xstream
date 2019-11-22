@@ -5,7 +5,6 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 from resources.lib import logger
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.pluginHandler import cPluginHandler
 
 SITE_IDENTIFIER = 'kindertube'
 SITE_NAME = 'Kindertube'
@@ -58,15 +57,16 @@ def showEntries(entryUrl=False, sGui=False):
     for sUrl, sThumbnail, sName in aResult:
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showEpisodes')
         oGuiElement.setThumbnail(URL_MAIN + sThumbnail)
+        oGuiElement.setFanart(URL_MAIN + sThumbnail)
         params.setParam('sEpisodes', sUrl)
         oGui.addFolder(oGuiElement, params, True, total)
     oGui.setEndOfDirectory()
 
 
-def showEpisodes(sEpisodes=False, sGui=False):
-    oGui = sGui if sGui else cGui()
+def showEpisodes():
+    oGui = cGui()
     params = ParameterHandler()
-    if not sEpisodes: sEpisodes = params.getValue('sEpisodes')
+    sEpisodes = params.getValue('sEpisodes')
     sHtmlContent = cRequestHandler(sEpisodes).request()
     pattern = 'data-video="([^"]+).*?<img[^>]*src="([^"]+)".*?</div><span[^>]*class="title">([^<]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
@@ -80,11 +80,15 @@ def showEpisodes(sEpisodes=False, sGui=False):
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'getHosterUrl')
         isMatch, Episodes = cParser.parseSingleResult(sEpisodes, 'de/([^"]+/)')
         oGuiElement.setThumbnail(URL_MAIN + Episodes + sThumbnail)
-        oGuiElement.setDescription(URL_MAIN + Episodes + sThumbnail)
+        oGuiElement.setFanart(URL_MAIN + Episodes + sThumbnail)
         params.setParam('url', 'https://www.youtube.com/watch?v=' + sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
     oGui.setEndOfDirectory()
 
 
 def getHosterUrl(sUrl=False):
+    if 'youtube' in sUrl:
+        import xbmc, xbmcgui
+        if not xbmc.getCondVisibility("System.HasAddon(%s)" % "plugin.video.youtube"):
+            xbmc.executebuiltin("InstallAddon(%s)" % "plugin.video.youtube")
     return [{'streamUrl': sUrl, 'resolved': False}]
