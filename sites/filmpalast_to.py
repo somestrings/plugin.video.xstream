@@ -123,8 +123,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sName', sName)
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
-    if not sGui:
-        pattern = '<a[^>]class="pageing.*?href=([^>]+)>[^>]v'
+    if not sGui and not sSearchText:
+        pattern = "class=[^<]pageing.*?href='([^']+)'>[^>]v"
         isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, pattern)
         if isMatchNextPage:
             if sNextUrl.startswith('/'):
