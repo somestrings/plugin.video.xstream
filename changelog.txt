@@ -1,4 +1,11 @@
 xStream 3.5.12~nightly
+- [kinoger] fix hoster and serien
+- [filmpalast] fix nextpage
+- [flimmerstube] youtube erkennung eingebaut und fix hoster youtube usw
+- [kindertube] youtube erkennung eingebaut usw
+- [iload] seite offline entfernt
+- [freikino] alles offline entfernt
+- [hdstreamfilme]  alles offline entfernt
 - [s.to] fix filme
 - [moviedream] fix genre
 - [kkiste.co] fix hoster supervideo
