@@ -20,7 +20,8 @@
    <platform>all</platform>
    <news>
 xStream 3.5.12~nightly
-- [kinoger] fix hoster and serien
+- [moviedream] fix nextpage
+- [flimmerstube] fix search
 - [filmpalast] fix nextpage
 - [flimmerstube] youtube erkennung eingebaut und fix hoster youtube usw
 - [kindertube] youtube erkennung eingebaut usw
