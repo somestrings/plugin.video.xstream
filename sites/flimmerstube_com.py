@@ -13,7 +13,7 @@ SITE_GLOBAL_SEARCH = False
 
 URL_MAIN = 'http://flimmerstube.com'
 URL_MOVIE = URL_MAIN + '/video/vic/alle_filme'
-URL_SEARCH = URL_MOVIE + '/shv'
+URL_SEARCH = URL_MAIN + '/video/shv'
 
 
 def load():
@@ -51,7 +51,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     if sSearchText:
+        oRequest.addHeaderEntry('Referer', entryUrl)
+        oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
         oRequest.addParameters('query', sSearchText)
+        if '+' in sSearchText:
+            oRequest.addParameters('c', '70')
+        else:
+            oRequest.addParameters('c', '')
         oRequest.setRequestType(1)
     sHtmlContent = oRequest.request()
     pattern = '<div[^>]class="ve-screen"[^>]title="([^"(]+)[^>]([^")]+).*?url[^>]([^")]+).*?<a[^>]href="([^">]+)'
@@ -63,6 +69,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     total = len(aResult)
     for sName, sYear, sThumbnail, sUrl in aResult:
+        if sSearchText and not cParser().search(sSearchText, sName):
+            continue
         if sThumbnail.startswith('/'):
             sThumbnail = URL_MAIN + sThumbnail
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
