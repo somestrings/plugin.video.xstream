@@ -72,11 +72,12 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
-    sBaseUrl = params.getValue('sBaseUrl')
-    if not sBaseUrl:
-        params.setParam('sBaseUrl', entryUrl)
-        sBaseUrl = entryUrl
-    oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
+    iPage = int(params.getValue('page'))
+    if 'genre' in entryUrl:
+        oRequest = cRequestHandler(entryUrl + str(iPage) if iPage > 0 else entryUrl, ignoreErrors=(sGui is not False))
+    else:
+        oRequest = cRequestHandler(entryUrl + '?p=' + str(iPage) if iPage > 0 else entryUrl, ignoreErrors=(sGui is not False))
+    
     sHtmlContent = oRequest.request()
     pattern = 'class="linkto.*?href="([^"]+).*?src="([^"]+).*?>([^>]+)</div>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
@@ -102,15 +103,17 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('isTvshow', isTvshow)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
-        pattern = 'pagenumberselected.*?href=".*?href="([^"]+)'
-        isMatch, sNextUrl = cParser.parseSingleResult(sHtmlContent, pattern)
-        pattern = 'seiterr"[^>]href="([^"]+)'
+        sPageNr = int(params.getValue('page'))
+        if sPageNr == 0:
+            sPageNr = 2
+        else:
+            sPageNr += 1
+        pattern = 'seiterr"[^>]href=".*?([\d]+)'
+        isMatch, Lastpage = cParser.parseSingleResult(sHtmlContent, pattern)
         if isMatch:
-            isMatch, Lastpage = cParser.parseSingleResult(sHtmlContent, pattern)
-            if isMatch:
-                if sNextUrl <= Lastpage:
-                    params.setParam('sUrl', sBaseUrl + sNextUrl)
-                    oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
+            if int(sPageNr) <= int(Lastpage):
+                params.setParam('page', int(sPageNr))
+                oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
         oGui.setView('tvshows' if 'serie' in entryUrl else 'movies')
         oGui.setEndOfDirectory()
 
