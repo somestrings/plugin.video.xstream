@@ -20,6 +20,9 @@
    <platform>all</platform>
    <news>
 xStream 3.5.12~nightly
+- [hdfilme] fix fehlerhafte site
+- [parser] py23 kompatibel
+- add requestHandler2 beta for cloudflare
 - [moviedream] fix nextpage
 - [flimmerstube] fix search
 - [filmpalast] fix nextpage
