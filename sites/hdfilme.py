@@ -173,7 +173,7 @@ def showHosterserie():
     pattern = 'label":"([^"]+).*?file":"([^"]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     for sQualy, sUrl in aResult:
-        hoster = {'link': sUrl, 'name': sQualy + sUrl}
+        hoster = {'link': sUrl, 'name': sQualy}
         hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
