@@ -3,7 +3,7 @@ from resources.lib import logger
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler import cRequestHandler
+from resources.lib.handler.requestHandler2 import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'hdfilme'
@@ -136,7 +136,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 def showEpisodes():
     oGui = cGui()
     params = ParameterHandler()
-    sUrl = urlEncode(params.getValue('entryUrl'),':|/') + '/folge-1'
+    sUrl = cParser.urlEncode(params.getValue('entryUrl'),':|/') + '/folge-1'
     sThumbnail = params.getValue('sThumbnail')
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = 'data-episode-id="([\d]+).*?folge.*?([\d]+)'
@@ -162,28 +162,18 @@ def showEpisodes():
 
 
 def showHosterserie():
+    hosters = []
     eID = ParameterHandler().getValue('eID')
     sID = ParameterHandler().getValue('sID')
     rUrl = ParameterHandler().getValue('entryUrl')
-    hosters = []
-    oRequest = cRequestHandler(str(URL_MAIN + '/movie/load-stream/' + sID + '/' + eID + '?server=1'))
+    oRequest = cRequestHandler(str(URL_MAIN + '/movie/load-stream/' + sID + '/' + eID + '?server=2'))
     oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
     oRequest.addHeaderEntry('Referer', rUrl)
     sHtmlContent = oRequest.request()
-    pattern = 'urlVideo = "([^"]+)'
-    isMatch, hUrl = cParser().parse(sHtmlContent, pattern)
-    oRequest = cRequestHandler(hUrl[0])
-    oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
-    oRequest.addHeaderEntry('Referer', rUrl)
-    sHtmlContent = oRequest.request()
-    url = cParser().urlparse(hUrl[0])
-    pattern = 'RESOLUTION=\d+x([\d]+)([^#]+)'
+    pattern = 'label":"([^"]+).*?file":"([^"]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     for sQualy, sUrl in aResult:
-        if 'hydrax' in hUrl[0]:
-            hoster = {'link': hUrl[0].replace('playlist.m3u8', '') + sUrl, 'name': sQualy}
-        else:
-            hoster = {'link': 'http://' + url + sUrl, 'name': sQualy}
+        hoster = {'link': sUrl, 'name': sQualy + sUrl}
         hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
@@ -191,34 +181,22 @@ def showHosterserie():
 
 
 def showHosters():
-    sUrl = urlEncode(ParameterHandler().getValue('entryUrl'),':|/') + '/deutsch'
+    hosters = []
+    sUrl = cParser.urlEncode(ParameterHandler().getValue('entryUrl'),':|/') + '/deutsch'
     rUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = 'data-movie-id="(.*?)"[\s\S]*?data-episode-id="(.*?)"' #'data-episode-id="([^"]+).*?load[^>] "([^"]+)"'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
-    hosters = []
     if isMatch:
         for sMID, sEID in aResult:
-
-            oRequest = cRequestHandler(str(URL_MAIN + '/movie/load-stream/' + sMID +'/'+ sEID + '?server=1'))
+            oRequest = cRequestHandler(str(URL_MAIN + '/movie/load-stream/' + sMID +'/'+ sEID + '?server=2'))
             oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
             oRequest.addHeaderEntry('Referer', rUrl)
             sHtmlContent = oRequest.request()
-            pattern = 'urlVideo = "([^"]+)'
-            isMatch, hUrl = cParser().parse(sHtmlContent, pattern)
-            oRequest = cRequestHandler(hUrl[0])
-            oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
-            oRequest.addHeaderEntry('Referer', rUrl)
-            sHtmlContent = oRequest.request()
-            url = cParser().urlparse(hUrl[0])
-            pattern = 'RESOLUTION=\d+x([\d]+)([^#]+)'
+            pattern = 'label":"([^"]+).*?file":"([^"]+)'
             isMatch, aResult = cParser().parse(sHtmlContent, pattern)
             for sQualy, sUrl in aResult:
-                if 'hydrax' in hUrl[0]:
-                    hoster = {'link': hUrl[0].replace('playlist.m3u8', '') + sUrl, 'name': sQualy}
-                else:
-                    hoster = {'link': 'http://' + url + sUrl, 'name': sQualy}
+                hoster = {'link': sUrl, 'name': sQualy}
                 hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
@@ -226,7 +204,7 @@ def showHosters():
 
 
 def getHosterUrl(sUrl=False):
-    sUrl = sUrl + '|' + 'Origin=https%3A%2F%2Fhdfilme.net%2F&Accept-Language=de-de,de;q=0.8,en-us;q=0.5,en;q=0.3&Accept-Encoding=gzip&Referer=https%3A%2F%2Fhdfilme.cc%2F'
+    sUrl = sUrl + '|' + 'Origin=https%3A%2F%2Fhdfilme.cc%2F&Accept-Language=de-de,de;q=0.8,en-us;q=0.5,en;q=0.3&Accept-Encoding=gzip&Referer=https%3A%2F%2Fhdfilme.cc%2F'
     return [{'streamUrl': sUrl, 'resolved': True}]
 
 
@@ -240,8 +218,3 @@ def showSearch():
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
-
-
-def urlEncode(sUrl, safe=''):
-    import urllib
-    return urllib.quote(sUrl, safe)
