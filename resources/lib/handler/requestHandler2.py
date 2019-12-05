@@ -1,7 +1,5 @@
 #-*- coding: utf-8 -*-
-import re, os, sys, time, hashlib, socket
-import xbmcgui
-
+import re, os, sys, time, hashlib, socket, xbmcgui
 from resources.lib.config import cConfig
 from resources.lib import logger, common
 
@@ -17,7 +15,6 @@ except ImportError:
     from urllib.request import HTTPHandler, HTTPSHandler, HTTPCookieProcessor, build_opener, Request, urlopen
     from http.cookiejar import LWPCookieJar
     from http.client import HTTPSConnection
-
 
 class cRequestHandler:
     def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True):
@@ -130,12 +127,11 @@ class cRequestHandler:
         for key, value in list(self.__headerEntries.items()):
             oRequest.add_header(key, value)
         cookieJar.add_cookie_header(oRequest)
-
-
         sContent = ''
+
         try:
             oResponse = opener.open(oRequest, timeout=self.requestTimeout)
-            sContent = oResponse.read().encode('ascii')
+            sContent = oResponse.read()
             self.__sResponseHeader = oResponse.info()
 
             #compressed page ?
@@ -166,7 +162,7 @@ class cRequestHandler:
             else:
                 try:
                     if not self.ignoreErrors:
-                        print(('xStream', 'Fehler beim Abrufen der Url:', self.__sUrl))
+                        xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url:', self.__sUrl)
                     self.__sRealUrl = e.geturl()
                     self.__sResponseHeader = e.headers
                     sContent = e.read()           
@@ -175,7 +171,7 @@ class cRequestHandler:
 
             if not sContent:
                 if not self.ignoreErrors:
-                    print(('xStream', 'Fehler beim Abrufen der Url:', self.__sUrl))
+                    xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url:', self.__sUrl)
                 return ''
 
         except URLError as e:
@@ -250,7 +246,7 @@ class cRequestHandler:
         self.__cachePath = cache
 
     def readCache(self, url):
-        h = hashlib.md5(url.encode('utf-8')).hexdigest()
+        h = hashlib.md5(url).hexdigest()
         cacheFile = os.path.join(self.__cachePath, h)
         fileAge = self.getFileAge(cacheFile)
         if 0 < fileAge < self.cacheTime:
