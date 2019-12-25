@@ -1,4 +1,6 @@
 xStream 3.5.12~nightly
+- [kinox] fix
+- [movie4k] fix
 - [movietown] add site
 - [hdfilme] fix hoster
 - [parser] py23 kompatibel
