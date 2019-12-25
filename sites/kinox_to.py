@@ -6,7 +6,7 @@ from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler import cRequestHandler
+from resources.lib.handler.requestHandler2 import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'kinox_to'
@@ -40,7 +40,6 @@ def load():
     oGui = cGui()
     oRequest = cRequestHandler(URL_MAIN)
     sHtmlContent = oRequest.request()
-    parms.setParam('cf', cRequestHandler.createUrl(URL_MAIN, oRequest))
     parms.setParam('sUrl', URL_NEWS)
     parms.setParam('page', 1)
     parms.setParam('mediaType', 'news')
@@ -268,8 +267,8 @@ def parseNews():
             oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
             oGuiElement.setLanguage(sLang)
             oGuiElement.setSubLanguage(subLang)
-            oGuiElement.setThumbnail(URL_MAIN + str(aEntry[1]) + parms.getValue('cf'))
-            oGuiElement.setFanart(URL_MAIN + str(aEntry[1]) + parms.getValue('cf'))
+            oGuiElement.setThumbnail(URL_MAIN + str(aEntry[1]))
+            oGuiElement.setFanart(URL_MAIN + str(aEntry[1]))
             parms.setParam('sUrl', URL_MAIN + sUrl)
             parms.setParam('mediaType', mediaType)
             if mediaType == 'series':
@@ -344,8 +343,8 @@ def _cinema(oGui):
         oGuiElement.setTitle(sMovieTitle)
         oGuiElement.setDescription(aEntry[3])
         oGuiElement.setMediaType('movie')
-        oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]) + parms.getValue('cf'))
-        oGuiElement.setFanart(URL_MAIN + str(aEntry[2]) + parms.getValue('cf'))
+        oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]))
+        oGuiElement.setFanart(URL_MAIN + str(aEntry[2]))
         oGuiElement.addItemValue('rating', rating)
         parms.setParam('sUrl', URL_MAIN + str(aEntry[1]))
         oGui.addFolder(oGuiElement, parms, False, total)
@@ -373,7 +372,7 @@ def parseMovieEntrySite():
                 guiElement.setTVShowTitle(sMovieTitle)
                 parms.setParam('Season', seasonNum)
                 if thumbnail:
-                    guiElement.setThumbnail(thumbnail + parms.getValue('cf'))
+                    guiElement.setThumbnail(thumbnail)
                 oGui.addFolder(guiElement, parms, total)
             oGui.setView('seasons')
             oGui.setEndOfDirectory()
@@ -397,7 +396,7 @@ def showEpisodes():
     for item in aSeriesItems:
         oGuiElement = cGuiElement(item['title'], SITE_IDENTIFIER, 'showHosters')
         sShowTitle = sMovieTitle.split('(')[0].split('*')[0]
-        oGuiElement.setThumbnail(thumbnail + parms.getValue('cf'))
+        oGuiElement.setThumbnail(thumbnail)
         oGuiElement.setMediaType('episode')
         oGuiElement.setSeason(item['season'])
         oGuiElement.setEpisode(item['episode'])
@@ -521,7 +520,7 @@ def ajaxCall():
                 lang = __createLanguage(aEntry[4])
                 oGuiElement = cGuiElement(sMovieTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
                 oGuiElement.setDescription(aEntry[3])
-                oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]) + parms.getValue('cf'))
+                oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]))
                 oGuiElement.setLanguage(lang)
                 oGuiElement.setSubLanguage(subLang)
                 parms.setParam('sUrl', URL_MAIN + str(aEntry[1]))
