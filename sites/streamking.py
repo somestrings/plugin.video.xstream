@@ -3,16 +3,14 @@ from resources.lib import logger
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler import cRequestHandler
+from resources.lib.handler.requestHandler2 import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'streamking'
 SITE_NAME = 'Streamking'
 SITE_ICON = 'streamking.png'
-URL_MAIN = 'https://streamking.media/'
+URL_MAIN = 'https://streamking.eu/'
 URL_FILME = URL_MAIN + 'movies.html'
-URL_KINO = URL_MAIN + 'type/cinema.html'
-URL_IMDB = URL_MAIN + 'type/top-imdb'
 URL_SEARCH = URL_MAIN + 'search?q=%s'
 
 
@@ -22,11 +20,7 @@ def load():
     params = ParameterHandler()
     params.setParam('sUrl', URL_FILME)
     oGui.addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
-    params.setParam('sUrl', URL_KINO)
-    oGui.addFolder(cGuiElement('Im Kino', SITE_IDENTIFIER, 'showEntries'), params)
     oGui.addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
-    params.setParam('sUrl', URL_IMDB)
-    oGui.addFolder(cGuiElement('Top IMDB', SITE_IDENTIFIER, 'showEntries'), params)
     oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     oGui.setEndOfDirectory()
 
@@ -56,7 +50,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = 'data-src="([^"]+).*? alt="([^"]+).*?href="([^"]+)'
+    pattern = 'data-src="([^"]+).*?href="([^"]+)">([^<]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
 
     if not isMatch:
@@ -65,7 +59,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-    for sThumbnail, sName, sUrl in aResult:
+    for sThumbnail, sUrl, sName in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
@@ -86,12 +80,12 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 def showHosters():
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = 'data-video-url="([^"]+).*?">([^<]+)'
+    pattern = 'id="embed-item".*?src="([^"]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     hosters = []
     if isMatch:
-        for sUrl, sName in aResult:
-            hoster = {'link': sUrl, 'name': sName}
+        for sUrl in aResult:
+            hoster = {'link': sUrl, 'name': 'Hoster'}
             hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
@@ -99,6 +93,9 @@ def showHosters():
 
 
 def getHosterUrl(sUrl=False):
+    Request = cRequestHandler(sUrl, caching=False)
+    Request.request()
+    sUrl = Request.getRealUrl()
     return [{'streamUrl': sUrl, 'resolved': False}]
 
 
