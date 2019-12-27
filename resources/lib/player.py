@@ -1,20 +1,19 @@
+# -*- coding: utf-8 -*-
 import xbmc
-
 from resources.lib import logger
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.handler.ParameterHandler import ParameterHandler
 
-
 class XstreamPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
-        xbmc.Player.__init__(self, *args, **kwargs)        
+        xbmc.Player.__init__(self, *args, **kwargs)
         self.streamFinished = False
         self.streamSuccess = True
         self.playedTime = 0
         self.totalTime = 999999
         logger.info('player instance created')
-    
+
     def onPlayBackStarted(self):
         logger.info('starting Playback')
         self.totalTime = self.getTotalTime()
@@ -24,17 +23,14 @@ class XstreamPlayer(xbmc.Player):
         if self.playedTime == 0 and self.totalTime == 999999:
             self.streamSuccess = False
             logger.error('Kodi failed to open stream')
-
         self.streamFinished = True
-
         if cConfig().getSetting('metahandler') == 'true':
             from xstream import get_metahandler
             meta = get_metahandler()
-
             if meta:
                 try:
-                    percent = self.playedTime/self.totalTime
-                    logger.info('Watched percent '+str(int(percent*100)))
+                    percent = self.playedTime / self.totalTime
+                    logger.info('Watched percent ' + str(int(percent * 100)))
                     if percent >= 0.80:
                         logger.info('Attemt to change watched status')
                         params = ParameterHandler()
@@ -59,19 +55,17 @@ class XstreamPlayer(xbmc.Player):
                                 metaInfo = meta.get_episode_meta(TVShowTitle, imdbID, str(season), str(episode))
                             if metaInfo and int(metaInfo['overlay']) == 6:
                                 meta.change_watched(mediaType, name, imdbID, season=season, episode=episode)
-                                xbmc.executebuiltin("XBMC.Container.Refresh")
+                                xbmc.executebuiltin('XBMC.Container.Refresh')
                         else:
                             logger.info('Could not change watched status; imdbID or mediaType missing')
                 except Exception as e:
                     logger.info(e)
-                
+
     def onPlayBackEnded(self):
         logger.info('Playback completed')
         self.onPlayBackStopped()
-        
+
 class cPlayer:
-      
-    
     def clearPlayList(self):
         oPlaylist = self.__getPlayList()
         oPlaylist.clear()
@@ -81,21 +75,18 @@ class cPlayer:
 
     def addItemToPlaylist(self, oGuiElement):
         oGui = cGui()
-        oListItem =  oGui.createListItem(oGuiElement)
+        oListItem = oGui.createListItem(oGuiElement)
         self.__addItemToPlaylist(oGuiElement, oListItem)
-	
-    def __addItemToPlaylist(self, oGuiElement, oListItem):    
-        oPlaylist = self.__getPlayList()	
-        oPlaylist.add(oGuiElement.getMediaUrl(), oListItem )
+
+    def __addItemToPlaylist(self, oGuiElement, oListItem):
+        oPlaylist = self.__getPlayList()
+        oPlaylist.add(oGuiElement.getMediaUrl(), oListItem)
 
     def startPlayer(self):
         logger.info('start player')
         xbmcPlayer = XstreamPlayer()
-
         while (not xbmc.abortRequested) & (not xbmcPlayer.streamFinished):
             if xbmcPlayer.isPlayingVideo():
                 xbmcPlayer.playedTime = xbmcPlayer.getTime()
             xbmc.sleep(1000)
         return xbmcPlayer.streamSuccess
-            
-        
