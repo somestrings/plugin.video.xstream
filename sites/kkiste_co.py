@@ -102,11 +102,7 @@ def showHosters():
 
 
 def getHosterUrl(sUrl=False):
-    if 'supervideo' in sUrl:
-        sUrl = supervideo(sUrl)
-        return [{'streamUrl': sUrl, 'resolved': True}]
-    else:
-        return [{'streamUrl': sUrl, 'resolved': False}]
+    return [{'streamUrl': sUrl, 'resolved': False}]
 
 
 def showSearch():
@@ -122,14 +118,3 @@ def _search(oGui, sSearchText):
     showEntries(URL_MAIN, oGui, sSearchText)
 
 
-def supervideo(sUrl):
-    sHtmlContent = cRequestHandler(sUrl).request()
-    import jsunpacker
-    isMatch, aResult = cParser().parse(sHtmlContent, '(eval\(function.*?)</script>')
-    if isMatch:
-        for packed in aResult:
-            sHtmlContent += jsunpacker.unpack(packed)
-        isMatch, sUrl = cParser().parse(sHtmlContent, 'sources.*?"([^"]+)')
-    else:
-        isMatch, sUrl = cParser().parse(sHtmlContent, 'player.updateSrc\({src: \"([^\"]+?)\"')
-    return sUrl[0]
