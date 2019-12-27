@@ -3,6 +3,7 @@
 
 from __future__ import division
 import re, os, time, json, random, ssl, requests
+import xbmcvfs
 from requests.adapters import HTTPAdapter
 from collections import OrderedDict
 from requests.sessions import Session
@@ -22,20 +23,20 @@ class GestionCookie():
 
     def DeleteCookie(self,Domain):
         Name = "/".join([self.PathCache, "cookie_%s.txt"]) % (Domain)
-        os.remove(os.path.join(self.PathCache,Name))
+        xbmcvfs.delete(Name)
 
     def SaveCookie(self,Domain,data):
-        Name = os.path.join(self.PathCache,'Cookie_'+ str(Domain) +'.txt')
-        file = open(Name,'w')
-        file.write(data)
-        file.close()
+        Name = "/".join([self.PathCache, "cookie_%s.txt"]) % (Domain)
+        f = xbmcvfs.File(Name, 'w')
+        f.write(data)
+        f.close()
 
     def Readcookie(self,Domain):
-        Name = os.path.join(self.PathCache,'Cookie_'+ str(Domain) +'.txt')
+        Name = "/".join([self.PathCache, "cookie_%s.txt"]) % (Domain)
         try:
-            file = open(Name,'r')
-            data = file.read()
-            file.close()
+            f = xbmcvfs.File(Name)
+            data = f.read()
+            f.close()
         except:
             return ''
         return data
@@ -330,7 +331,7 @@ class CloudflareBypass(object):
         #fh = open('c:\\test.txt', "w")
         #fh.write(sContent)
         #fh.close()
-            
+
         #Memorisation des cookies
         c = ''
         cookie = s.MemCookie
@@ -360,8 +361,7 @@ class CloudflareScraper(Session):
                 'Connection': 'close',
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache',
-                'DNT': '1'
-            }
+                'DNT': '1'}
 
         self.cipherHeader = {
                 'cipherSuite': [
@@ -371,6 +371,7 @@ class CloudflareScraper(Session):
                     "ECDHE-ECDSA-AES128-GCM-SHA256",
                     "ECDHE-RSA-AES128-GCM-SHA256",
                     "ECDHE-ECDSA-CHACHA20-POLY1305",
+                    "ECDHE-RSA-CHACHA20-POLY1305",
                     "ECDHE-ECDSA-AES256-GCM-SHA384",
                     "ECDHE-RSA-AES256-GCM-SHA384",
                     "ECDHE-ECDSA-AES256-SHA",
@@ -379,9 +380,7 @@ class CloudflareScraper(Session):
                     "ECDHE-RSA-AES256-SHA",
                     "DHE-RSA-AES128-SHA",
                     "AES128-SHA",
-                    "AES256-SHA"
-                ],
-            }
+                    "AES256-SHA"],}
 
         self.MemCookie = {}
         self.cipherSuite = None
@@ -400,8 +399,7 @@ class CloudflareScraper(Session):
             ciphers = [
                 'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-ECDSA-CHACHA20-POLY1305-SHA256', 'ECDHE-RSA-CHACHA20-POLY1305-SHA256',
                 'ECDHE-RSA-AES128-CBC-SHA', 'ECDHE-RSA-AES256-CBC-SHA', 'RSA-AES128-GCM-SHA256',
-                'RSA-AES256-GCM-SHA384', 'RSA-AES256-SHA', '3DES-EDE-CBC'
-            ]
+                'RSA-AES256-GCM-SHA384', 'RSA-AES256-SHA', '3DES-EDE-CBC']
 
             if hasattr(ssl, 'PROTOCOL_TLSv1_3'):
                 ciphers.insert(0, ['GREASE_3A', 'GREASE_6A', 'AES128-GCM-SHA256', 'AES256-GCM-SHA256', 'AES256-GCM-SHA384', 'CHACHA20-POLY1305-SHA256'])
@@ -426,35 +424,33 @@ class CloudflareScraper(Session):
         
         if 'cookies' in kwargs:
             self.MemCookie.update( kwargs['cookies'] )
-            
+
         if Mode_Debug:
             print ("Headers send : " + str(kwargs['headers']) )
             print ("Cookies send : " + str(kwargs['cookies']) )
             print ("url : " + url )
             print ("data send : " + str(kwargs.get('params','')) )
             print ("param send : " + str(kwargs.get('data','')) )
-               
+
         resp = super(CloudflareScraper, self).request(method, url, *args, **kwargs)
 
         if Mode_Debug:
-            print ( 'cookie recu ' + str(resp.cookies.get_dict())  )
+            print ('cookie recu ' + str(resp.cookies.get_dict()))
 
         #save cookie
         self.MemCookie.update( resp.cookies.get_dict() )
-        
+
         #bug
         kwargs['cookies'].update( resp.cookies.get_dict() )
 
         # Check if Cloudflare anti-bot is on
         if self.ifCloudflare(resp):
-            
             print ('Page geschützt' )
-            
             resp2 = self.solve_cf_challenge(resp, **kwargs)
-            
+
             #self.MemCookie.update( resp.cookies.get_dict() )
             #print  ('cookie recu ' + str(self.MemCookie) )
-        
+
             return resp2
             
         # Otherwise, no Cloudflare anti-bot detected
@@ -506,14 +502,14 @@ class CloudflareScraper(Session):
         #fh = open('html.txt', "r")
         #body = fh.read()
         #fh.close()
-        
+
         if Mode_Debug:
             print ('Trying decoding, pass ' + str(self.cf_tries) )
-            
+
             #fh = open('c:\\test.txt', "w")
             #fh.write(body)
             #fh.close()
-        
+
         try:
             cf_delay = float(re.search('submit.*?(\d+)', body, re.DOTALL).group(1)) / 1000.0
 
@@ -525,7 +521,7 @@ class CloudflareScraper(Session):
             #s_match = re.search('name="s" value="(.+?)"', sub_body)
             #if s_match:
             #    params["s"] = s_match.group(1) # On older variants this parameter is absent.
-                
+
             data["r"] = str(re.search(r'name="r" value="(.+?)"', sub_body).group(1))
             data["jschl_vc"] = str(re.search(r'name="jschl_vc" value="(\w+)"', sub_body).group(1))
             data["pass"] = str(re.search(r'name="pass" value="(.+?)"', sub_body).group(1)) 
@@ -534,9 +530,7 @@ class CloudflareScraper(Session):
                 extra_div_expression = re.search('id="cf-dn-.*?>(.+?)<', sub_body).group(1)
 
             # Initial value.
-            js_answer = self.cf_parse_expression(
-                re.search('setTimeout\(function\(.*?:(.*?)}', body, re.DOTALL).group(1)
-            )
+            js_answer = self.cf_parse_expression(re.search('setTimeout\(function\(.*?:(.*?)}', body, re.DOTALL).group(1))
             # Extract the arithmetic operations.
             builder = re.search("challenge-form'\);\s*;(.*);a.value", body, re.DOTALL).group(1)
             # Remove a function semicolon before splitting on semicolons, else it messes the order.
@@ -573,25 +567,22 @@ class CloudflareScraper(Session):
         # performing other types of requests even as the first request.
         method = resp.request.method
         cloudflare_kwargs["allow_redirects"] = False
-        
+
         #print ('Trying :' + str(params))
         #print ('With :' + str(cloudflare_kwargs['cookies']))
         #print ('With :' + str(cloudflare_kwargs['headers']))
-
         #submit_url = 'http://httpbin.org/headers'
-        
+
         cloudflare_kwargs['data'].update( data )
         method = 'POST'
-        
+
         redirect = self.request(method, submit_url, **cloudflare_kwargs) 
-        
+
         if not redirect:
             return False
 
         #self.MemCookie.update( redirect.cookies.get_dict() )
-        
         print ( '>>>' + str( redirect.headers)   )
-        
         if 'Location' in redirect.headers:
             redirect_location = urlparse(redirect.headers["Location"])
             
