@@ -1,4 +1,8 @@
-xStream 3.5.12~nightly
+xStream 3.5.13~nightly
+
+
+xStream 3.5.12
+  03.01.2020
 - [streamking] fix filthy site
 - [kkiste.co] fix hoster supervideo
 - [kinox] fix
