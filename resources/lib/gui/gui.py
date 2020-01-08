@@ -93,8 +93,7 @@ class cGui:
             for contextitem in oGuiElement.getContextItems():
                 params = contextitem.getOutputParameterHandler()
                 sParams = params.getParameterAsUri()
-                sTest = "%s?site=%s&function=%s&%s" % (
-                self.pluginPath, contextitem.getFile(), contextitem.getFunction(), sParams)
+                sTest = "%s?site=%s&function=%s&%s" % (self.pluginPath, contextitem.getFile(), contextitem.getFunction(), sParams)
                 contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s)" % (sTest,),)]
         itemValues = oGuiElement.getItemValues()
         contextitem = cContextElement()
@@ -174,12 +173,10 @@ class cGui:
         xbmcplugin.endOfDirectory(self.pluginHandle, success)
 
     def setView(self, content='movies'):
-        '''
-        set the listing to a certain content, makes special views available
-        sets view to the viewID which is selected in xStream settings
-        see http://mirrors.xbmc.org/docs/python-docs/stable/xbmcplugin.html#-setContent
-        (seasons is also supported but not listed)
-        '''
+        # set the listing to a certain content, makes special views available
+        # sets view to the viewID which is selected in xStream settings
+        # see http://mirrors.xbmc.org/docs/python-docs/stable/xbmcplugin.html#-setContent
+        # (seasons is also supported but not listed)
         content = content.lower()
         supportedViews = ['files', 'songs', 'artists', 'albums', 'movies', 'tvshows', 'seasons', 'episodes', 'musicvideos']
         if content in supportedViews:
@@ -222,8 +219,7 @@ class cGui:
                 params.setParam('mediaType', 'episode')
         sParams = params.getParameterAsUri()
         if len(oGuiElement.getFunction()) == 0:
-            sUrl = "%s?site=%s&title=%s&%s" % (
-            self.pluginPath, oGuiElement.getSiteName(), urllib.quote_plus(oGuiElement.getTitle()), sParams)
+            sUrl = "%s?site=%s&title=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), urllib.quote_plus(oGuiElement.getTitle()), sParams)
         else:
             sUrl = "%s?site=%s&function=%s&title=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), oGuiElement.getFunction(), urllib.quote_plus(oGuiElement.getTitle()), sParams)
             if not bIsFolder:
@@ -259,7 +255,8 @@ class cGui:
             iSeconds = 1000
         else:
             iSeconds = iSeconds * 1000
-        xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % (cConfig().getLocalizedString(30308), (cConfig().getLocalizedString(30309) % str(sTitle)), iSeconds, common.addon.getAddonInfo('icon')))
+        xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % (
+        cConfig().getLocalizedString(30308), (cConfig().getLocalizedString(30309) % str(sTitle)), iSeconds, common.addon.getAddonInfo('icon')))
 
     @staticmethod
     def showError(sTitle, sDescription, iSeconds=0):
@@ -270,9 +267,10 @@ class cGui:
         xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % (str(sTitle), (str(sDescription)), iSeconds, common.addon.getAddonInfo('icon')))
 
     @staticmethod
-    def showInfo(sTitle, sDescription, iSeconds=0):
+    def showInfo(sTitle='xStream', sDescription='Es wurde kein Eintrag gefunden', iSeconds=0):
         if iSeconds == 0:
             iSeconds = 1000
         else:
             iSeconds = iSeconds * 1000
         xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % (str(sTitle), (str(sDescription)), iSeconds, common.addon.getAddonInfo('icon')))
+
