@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import re
-
 try:
     from urlparse import urlparse
     from urllib import quote, unquote, quote_plus, unquote_plus
@@ -18,16 +17,16 @@ class cParser:
 
     @staticmethod
     def __replaceSpecialCharacters(s):
-        s = s.replace('\\/','/').replace('&amp;', '&').replace('\\u00c4', 'Ä').replace('\\u00e4', 'ä')
+        s = s.replace('\\/', '/').replace('&amp;', '&').replace('\\u00c4', 'Ä').replace('\\u00e4', 'ä')
         s = s.replace('\\u00d6', 'Ö').replace('\\u00f6', 'ö').replace('\\u00dc', 'Ü').replace('\\u00fc', 'ü')
-        s = s.replace('\\u00df', 'ß').replace('\\u2013', '-').replace('\\u00b2','²').replace('\\u00b3', '³')
+        s = s.replace('\\u00df', 'ß').replace('\\u2013', '-').replace('\\u00b2', '²').replace('\\u00b3', '³')
         s = s.replace('\\u00e9', 'é').replace('\\u2018', '‘').replace('\\u201e', '„').replace('\\u201c', '“')
         s = s.replace('\\u00c9', 'É').replace('\\u2026', '...').replace('\\u202fh', 'h').replace('\\u2019', '’')
         s = s.replace('\\u0308', '̈').replace('\\u00e8', 'è')
         return s
 
     @staticmethod
-    def parse(sHtmlContent, pattern, iMinFoundValue = 1, ignoreCase = False):
+    def parse(sHtmlContent, pattern, iMinFoundValue=1, ignoreCase=False):
         sHtmlContent = cParser.__replaceSpecialCharacters(sHtmlContent)
         if ignoreCase:
             aMatches = re.compile(pattern, re.DOTALL | re.I).findall(sHtmlContent)
@@ -66,7 +65,7 @@ class cParser:
         return unquote(sUrl)
 
     @staticmethod
-    def urlEncode(sUrl, safe = ''):
+    def urlEncode(sUrl, safe=''):
         return quote(sUrl, safe)
 
     @staticmethod
