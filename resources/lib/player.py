@@ -42,7 +42,7 @@ class XstreamPlayer(xbmc.Player):
                         TVShowTitle = params.getValue('TVShowTitle')
                         if params.exist('season'):
                             season = params.getValue('season')
-                            if int(season) > 0:mediaType = 'season'
+                            if int(season) > 0: mediaType = 'season'
                         if params.exist('episode'):
                             episode = params.getValue('episode')
                             if int(episode) > 0: mediaType = 'episode'
@@ -65,6 +65,7 @@ class XstreamPlayer(xbmc.Player):
         logger.info('Playback completed')
         self.onPlayBackStopped()
 
+
 class cPlayer:
     def clearPlayList(self):
         oPlaylist = self.__getPlayList()
@@ -74,8 +75,7 @@ class cPlayer:
         return xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
 
     def addItemToPlaylist(self, oGuiElement):
-        oGui = cGui()
-        oListItem = oGui.createListItem(oGuiElement)
+        oListItem = cGui().createListItem(oGuiElement)
         self.__addItemToPlaylist(oGuiElement, oListItem)
 
     def __addItemToPlaylist(self, oGuiElement, oListItem):
