@@ -1,7 +1,5 @@
-#-*- coding: utf-8 -*-
-import sys
-import xbmc
-import xbmcplugin
+# -*- coding: utf-8 -*-
+import sys, xbmc, xbmcplugin
 from resources.lib import common
 
 class cConfig:
@@ -31,7 +29,7 @@ class cConfig:
             except:
                 pass
 
-    def getSetting(self, sName, default = ''):
+    def getSetting(self, sName, default=''):
         if self.__bIsDharma:
             result = self.__oSettings.getSetting(sName)
             if result:
@@ -48,7 +46,7 @@ class cConfig:
         if self.__bIsDharma:
             return self.__aLanguage(sCode)
         else:
-            try:		
-                 return xbmc.getLocalizedString(sCode)
+            try:
+                return xbmc.getLocalizedString(sCode)
             except:
                 return ''
