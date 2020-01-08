@@ -81,13 +81,11 @@ class cRequestHandler:
             sContent = self.readCache(self.getRequestUri())
             if sContent:
                 return sContent
-
         cookieJar = cookielib.LWPCookieJar(filename=self._cookiePath)
         try:
             cookieJar.load(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
         except Exception as e:
             logger.info(e)
-
         sParameters = urllib.urlencode(self.__aParameters, True)
         handlers = [urllib2.HTTPHandler(), urllib2.HTTPSHandler(), urllib2.HTTPCookieProcessor(cookiejar=cookieJar)]
 
@@ -106,31 +104,31 @@ class cRequestHandler:
 
         try:
             oResponse = opener.open(oRequest, timeout=self.requestTimeout)
-        except urllib2.HTTPError, e:
-            if e.code == 503 and e.headers.get("Server") == 'cloudflare':
+        except urllib2.HTTPError as e:
+            if e.code == 503 and e.headers.get('Server') == 'cloudflare':
                 html = e.read()
                 oResponse = self.__check_protection(html, user_agent, cookieJar)
                 if not oResponse:
-                    logger.error("Failed to get CF-Cookie for Url: " + self.__sUrl)
+                    logger.error('Failed to get CF-Cookie for Url: ' + self.__sUrl)
                     return ''
             elif not self.ignoreErrors:
                 xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url:', self.__sUrl, str(e))
-                logger.error("HTTPError " + str(e) + " Url: " + self.__sUrl)
+                logger.error('HTTPError ' + str(e) + ' Url: ' + self.__sUrl)
                 return ''
             else:
                 oResponse = e
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             if not self.ignoreErrors:
                 if hasattr(e.reason, 'args') and e.reason.args[0] == 1 and sys.version_info < (2, 7, 9):
                     xbmcgui.Dialog().ok('xStream', str(e.reason), '', 'For this request is Python v2.7.9 or higher required.')
                 else:
                     xbmcgui.Dialog().ok('xStream', str(e.reason))
-            logger.error("URLError " + str(e.reason) + " Url: " + self.__sUrl)
+            logger.error('URLError ' + str(e.reason) + ' Url: ' + self.__sUrl)
             return ''
-        except httplib.HTTPException, e:
+        except httplib.HTTPException as e:
             if not self.ignoreErrors:
                 xbmcgui.Dialog().ok('xStream', str(e))
-            logger.error("HTTPException " + str(e) + " Url: " + self.__sUrl)
+            logger.error('HTTPException ' + str(e) + ' Url: ' + self.__sUrl)
             return ''
 
         self.__sResponseHeader = oResponse.info()
@@ -150,11 +148,11 @@ class cRequestHandler:
         cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
 
         if (self.__bRemoveNewLines == True):
-            sContent = sContent.replace("\n", "")
-            sContent = sContent.replace("\r\t", "")
+            sContent = sContent.replace('\n', '')
+            sContent = sContent.replace('\r\t', '')
 
         if (self.__bRemoveBreakLines == True):
-            sContent = sContent.replace("&nbsp;", "")
+            sContent = sContent.replace('&nbsp;', '')
         self.__sRealUrl = oResponse.geturl()
 
         oResponse.close()
@@ -189,7 +187,6 @@ class cRequestHandler:
             cookieJar.load(self._cookiePath, self.__bIgnoreDiscard, self.__bIgnoreExpired)
         except Exception as e:
             logger.info(e)
-
         for entry in cookieJar:
             if entry.name == sCookieName:
                 if sDomain == '':
@@ -271,11 +268,12 @@ class cRequestHandler:
         sUrl = ''
         if cfId and cfClear and 'Cookie=Cookie:' not in sUrl:
             delimiter = '&' if '|' in sUrl else '|'
-            sUrl = delimiter + "Cookie=Cookie: __cfduid=" + cfId.value + "; cf_clearance=" + cfClear.value
+            sUrl = delimiter + 'Cookie=Cookie: __cfduid=' + cfId.value + '; cf_clearance=' + cfClear.value
         if 'User-Agent=' not in sUrl:
             delimiter = '&' if '|' in sUrl else '|'
-            sUrl += delimiter + "User-Agent=" + oRequest.getHeaderEntry('User-Agent')
+            sUrl += delimiter + 'User-Agent=' + oRequest.getHeaderEntry('User-Agent')
         return sUrl
+
 
 # python 2.7.9 and 2.7.10 certificate workaround
 class newHTTPSHandler(urllib2.HTTPSHandler):
