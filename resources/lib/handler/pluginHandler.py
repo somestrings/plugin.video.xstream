@@ -1,21 +1,19 @@
-import json
-import os
-
+# -*- coding: utf-8 -*-
+import json, os
 from resources.lib import common, logger
 from resources.lib.config import cConfig
 
 
 class cPluginHandler:
-
     def __init__(self):
         self.addon = common.addon
         self.rootFolder = common.addonPath
         self.settingsFile = os.path.join(self.rootFolder, 'resources', 'settings.xml')
         self.profilePath = common.profilePath
-        self.pluginDBFile = os.path.join(self.profilePath,'pluginDB')
+        self.pluginDBFile = os.path.join(self.profilePath, 'pluginDB')
         logger.info('profile folder: %s' % self.profilePath)
         logger.info('root folder: %s' % self.rootFolder)
-        self.defaultFolder =  os.path.join(self.rootFolder, 'sites')
+        self.defaultFolder = os.path.join(self.rootFolder, 'sites')
         logger.info('default sites folder: %s' % self.defaultFolder)
 
     def getAvailablePlugins(self):
@@ -24,11 +22,11 @@ class cPluginHandler:
         update = False
         fileNames = self.__getFileNamesFromFolder(self.defaultFolder)
         for fileName in fileNames:
-            plugin = {'name':'', 'icon':'', 'settings':'', 'modified':0}
+            plugin = {'name': '', 'icon': '', 'settings': '', 'modified': 0}
             if fileName in pluginDB:
                 plugin.update(pluginDB[fileName])
             try:
-                modTime = os.path.getmtime(os.path.join(self.defaultFolder,fileName+'.py'))
+                modTime = os.path.getmtime(os.path.join(self.defaultFolder, fileName + '.py'))
             except OSError:
                 modTime = 0
             if fileName not in pluginDB or modTime > plugin['modified']:
@@ -53,8 +51,7 @@ class cPluginHandler:
 
     def getAvailablePluginsFromDB(self):
         plugins = []
-        oConfig = cConfig()
-        iconFolder = os.path.join(self.rootFolder, 'resources','art','sites')
+        iconFolder = os.path.join(self.rootFolder, 'resources', 'art', 'sites')
         pluginDB = self.__getPluginDB()
         for pluginID in pluginDB:
             plugin = pluginDB[pluginID]
@@ -65,15 +62,15 @@ class cPluginHandler:
             else:
                 plugin['icon'] = ''
             # existieren zu diesem plugin die an/aus settings
-            if oConfig.getSetting(pluginSettingsName) == 'true':
-                    plugins.append(plugin)
+            if cConfig().getSetting(pluginSettingsName) == 'true':
+                plugins.append(plugin)
         return plugins
 
     def __updatePluginDB(self, data):
         if not os.path.exists(self.profilePath):
             os.makedirs(self.profilePath)
         file = open(self.pluginDBFile, 'w')
-        json.dump(data,file)
+        json.dump(data, file)
         file.close()
 
     def __getPluginDB(self):
@@ -83,22 +80,20 @@ class cPluginHandler:
         try:
             data = json.load(file)
         except ValueError:
-            logger.error("pluginDB seems corrupt, creating new one")
+            logger.error('pluginDB seems corrupt, creating new one')
             data = dict()
         file.close()
         return data
 
     def __updateSettings(self, pluginData):
-        '''
-        data (dict): containing plugininformations
-        '''
+        # data (dict): containing plugininformations
         xmlString = '<plugin_settings>%s</plugin_settings>'
         import xml.etree.ElementTree as ET
         tree = ET.parse(self.settingsFile)
-        #find Element for plugin Settings
+        # find Element for plugin Settings
         pluginElem = False
         for elem in tree.findall('category'):
-            if elem.attrib['label']=='30021':
+            if elem.attrib['label'] == '30021':
                 pluginElem = elem
                 break
         if pluginElem is None:
@@ -107,17 +102,16 @@ class cPluginHandler:
         pluginElements = pluginElem.findall('setting')
         for elem in pluginElements:
             pluginElem.remove(elem)
-        # add plugins to settings
+            # add plugins to settings
         for pluginID in sorted(pluginData):
             plugin = pluginData[pluginID]
-            subEl = ET.SubElement(pluginElem,'setting', {'type': 'lsep', 'label':plugin['name']})
+            subEl = ET.SubElement(pluginElem, 'setting', {'type': 'lsep', 'label': plugin['name']})
             subEl.tail = '\n    '
             attrib = {'default': 'true', 'type': 'bool'}
             attrib['id'] = 'plugin_%s' % pluginID
             attrib['label'] = '30050'
             subEl = ET.SubElement(pluginElem, 'setting', attrib)
             subEl.tail = '\n    '
-
             attrib = {'default': str(plugin['globalsearch']).lower(), 'type': 'bool'}
             attrib['id'] = 'global_search_%s' % pluginID
             attrib['label'] = '30052'
@@ -158,7 +152,7 @@ class cPluginHandler:
         try:
             plugin = __import__(fileName, globals(), locals())
             pluginData['name'] = plugin.SITE_NAME
-        except Exception, e:
+        except Exception as e:
             logger.error("Can't import plugin: %s :%s" % (fileName, e))
             return False
         try:
