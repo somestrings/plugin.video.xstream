@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import re, os, sys, time, hashlib, socket, xbmcgui
 from resources.lib.config import cConfig
 from resources.lib import logger, common
@@ -15,6 +15,7 @@ except ImportError:
     from urllib.request import HTTPHandler, HTTPSHandler, HTTPCookieProcessor, build_opener, Request, urlopen
     from http.cookiejar import LWPCookieJar
     from http.client import HTTPSConnection
+
 
 class cRequestHandler:
     def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True):
@@ -92,11 +93,11 @@ class cRequestHandler:
             return ''
         if 'Set-Cookie' in self.__sResponseHeader:
             c = self.__sResponseHeader.get('set-cookie')
-            c2 = re.findall('(?:^|,) *([^;,]+?)=([^;,\/]+?);',c)
+            c2 = re.findall('(?:^|,) *([^;,]+?)=([^;,\/]+?);', c)
             if c2:
                 cookies = ''
                 for cook in c2:
-                    cookies = cookies + cook[0] + '=' + cook[1]+ ';'
+                    cookies = cookies + cook[0] + '=' + cook[1] + ';'
                 cookies = cookies[:-1]
                 return cookies
         return ''
@@ -134,12 +135,12 @@ class cRequestHandler:
             sContent = oResponse.read()
             self.__sResponseHeader = oResponse.info()
 
-            #compressed page ?
+            # compressed page ?
             if self.__sResponseHeader.get('Content-Encoding') == 'gzip':
                 import zlib
-                sContent = zlib.decompress(sContent, zlib.MAX_WBITS|16)
+                sContent = zlib.decompress(sContent, zlib.MAX_WBITS | 16)
 
-            #https://bugs.python.org/issue4773
+            # https://bugs.python.org/issue4773
             self.__sRealUrl = oResponse.geturl()
             self.__sResponseHeader = oResponse.info()
             oResponse.close()
@@ -153,7 +154,7 @@ class cRequestHandler:
                     self.__sResponseHeader = e.hdrs
                     cookies = self.GetCookies()
                     CF = cloudflare.CloudflareBypass()
-                    sContent = CF.GetHtml(self.__sUrl,e.read(),cookies,sParameters,oRequest.headers)
+                    sContent = CF.GetHtml(self.__sUrl, e.read(), cookies, sParameters, oRequest.headers)
                     self.__sRealUrl, self.__sResponseHeader = CF.GetReponseInfo()
                 else:
                     sContent = e.read()
@@ -165,7 +166,7 @@ class cRequestHandler:
                         xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url:', self.__sUrl)
                     self.__sRealUrl = e.geturl()
                     self.__sResponseHeader = e.headers
-                    sContent = e.read()           
+                    sContent = e.read()
                 except:
                     sContent = ''
 
@@ -180,15 +181,15 @@ class cRequestHandler:
                     xbmcgui.Dialog().ok('xStream', str(e.reason), '', 'For this request is Python v2.7.9 or higher required.')
                 else:
                     xbmcgui.Dialog().ok('xStream', str(e.reason))
-            logger.error("URLError " + str(e.reason) + " Url: " + self.__sUrl)
+            logger.error('URLError ' + str(e.reason) + ' Url: ' + self.__sUrl)
 
         cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
         if (self.__bRemoveNewLines == True):
-            sContent = sContent.replace("\n","")
-            sContent = sContent.replace("\r\t","")
+            sContent = sContent.replace('\n', '')
+            sContent = sContent.replace('\r\t', '')
 
         if (self.__bRemoveBreakLines == True):
-            sContent = sContent.replace("&nbsp;","")
+            sContent = sContent.replace('&nbsp;', '')
 
         if self.caching and self.cacheTime > 0:
             self.writeCache(self.getRequestUri(), sContent)
@@ -236,7 +237,7 @@ class cRequestHandler:
     def ignoreExpired(self, bIgnoreExpired):
         self.__bIgnoreExpired = bIgnoreExpired
 
-    #   Caching
+    # Caching
     def setCachePath(self, cache=''):
         if not cache:
             profilePath = common.profilePath
@@ -285,11 +286,11 @@ class cRequestHandler:
             if fileAge > self.cacheTime:
                 os.remove(cacheFile)
 
-    def Readcookie(self,Domain):
+    def Readcookie(self, Domain):
         PathCache = common.profilePath
-        Name = os.path.join(PathCache,'Cookie_'+ str(Domain) +'.txt')
+        Name = os.path.join(PathCache, 'Cookie_' + str(Domain) + '.txt')
         try:
-            file = open(Name,'r')
+            file = open(Name, 'r')
             data = file.read()
             file.close()
         except:
@@ -307,10 +308,10 @@ class cRequestHandler:
         sUrl = ''
         if cfId and cfClear and 'Cookie=Cookie:' not in sUrl:
             delimiter = '&' if '|' in sUrl else '|'
-            sUrl = delimiter + "Cookie=Cookie: __cfduid=" + cfId[0] + "; cf_clearance=" + cfClear[0]
+            sUrl = delimiter + 'Cookie=Cookie: __cfduid=' + cfId[0] + '; cf_clearance=' + cfClear[0]
         if 'User-Agent=' not in sUrl:
             delimiter = '&' if '|' in sUrl else '|'
-            sUrl += delimiter + "User-Agent=" + 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'
+            sUrl += delimiter + 'User-Agent=' + 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'
         return sUrl
 
 
