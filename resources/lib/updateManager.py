@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-import urllib
-import os
-import json
-import logger
-import xbmc
+import urllib, os, json, logger, xbmc
 from resources.lib.common import addonPath, profilePath
 from resources.lib.download import cDownload
 
@@ -13,27 +9,24 @@ if xbmc.getCondVisibility('system.platform.android') and int(xbmc.getInfoLabel('
 else:
     import zipfile
 
-
-## Installation path.
+# Installation path.
 ROOT_DIR = addonPath
 ADDON_DIR = os.path.abspath(os.path.join(ROOT_DIR, '..'))
 XSTREAM_DIRNAME = os.path.basename(ROOT_DIR)
 
-
-## URLRESOLVER
+# URLRESOLVER
 REMOTE_URLRESOLVER_COMMITS = "https://api.github.com/repos/streamxstream/script.module.urlresolver/commits/master"
 REMOTE_URLRESOLVER_DOWNLOADS = "https://api.github.com/repos/streamxstream/script.module.urlresolver/archive/master.zip"
 
-## XSTREAM
+# XSTREAM
 REMOTE_XSTREAM_COMMITS = "https://api.github.com/repos/streamxstream/plugin.video.xstream/commits/nightly"
 REMOTE_XSTREAM_NIGHTLY = "https://github.com/streamxstream/plugin.video.xstream/archive/nightly.zip"
 
-## Filename of the update File.
+# Filename of the update File.
 LOCAL_NIGHTLY_VERSION = os.path.join(profilePath, "nightly_commit_sha")
 LOCAL_RESOLVER_VERSION = os.path.join(profilePath, "resolver_commit_sha")
 LOCAL_FILE_NAME_XSTREAM = 'update_xstream.zip'
 LOCAL_FILE_NAME_RESOLVER = 'update_urlresolver.zip'
-
 
 def xStreamUpdate():
     logger.info("xStream xStreamUpdate")
@@ -44,16 +37,15 @@ def xStreamUpdate():
         from resources.lib.gui.gui import cGui
         cGui().showError('xStream', 'Fehler beim xStream-Update.', 5)
 
+
 def urlResolverUpdate():
     logger.info("xStream urlResolverUpdate")
-
     urlResolverPaths = []
     for child in os.listdir(ADDON_DIR):
         if not child.lower().startswith('script.module.urlresolver'): continue
         resolver_path = os.path.join(ADDON_DIR, child)
         if os.path.isdir(resolver_path):
             urlResolverPaths.append(resolver_path)
-
     if len(urlResolverPaths) > 1:
         from resources.lib.gui.gui import cGui
         cGui().showError('xStream', 'Es ist mehr als ein URLResolver installiert. Bitte löschen!', 5)
@@ -67,10 +59,11 @@ def urlResolverUpdate():
 
     commitXML = _getXmlString(REMOTE_URLRESOLVER_COMMITS)
     if commitXML:
-        commitUpdate(commitXML, LOCAL_RESOLVER_VERSION, REMOTE_URLRESOLVER_DOWNLOADS, urlResolverPaths[0], "Updating URLResolver", LOCAL_FILE_NAME_RESOLVER)
+        commitUpdate(commitXML, LOCAL_RESOLVER_VERSION, REMOTE_URLRESOLVER_DOWNLOADS, urlResolverPaths[0], 'Updating URLResolver', LOCAL_FILE_NAME_RESOLVER)
     else:
         from resources.lib.gui.gui import cGui
         cGui().showError('xStream', 'Fehler beim URLResolver-Update.', 5)
+
 
 def commitUpdate(onlineFile, offlineFile, downloadLink, LocalDir, Title, localFileName):
     try:
@@ -79,16 +72,14 @@ def commitUpdate(onlineFile, offlineFile, downloadLink, LocalDir, Title, localFi
             update(LocalDir, downloadLink, Title, localFileName)
             open(offlineFile, 'w').write(jsData['sha'])
     except Exception as e:
-        logger.info("Ratelimit reached")
+        logger.info('Ratelimit reached')
         logger.info(e)
+
 
 def update(LocalDir, REMOTE_PATH, Title, localFileName):
     logger.info(Title + " from: " + REMOTE_PATH)
-
     cDownload().download(REMOTE_PATH, localFileName, False, Title)
-
     updateFile = zipfile.ZipFile(os.path.join(profilePath, localFileName))
-
     removeFilesNotInRepo(updateFile, LocalDir)
 
     for index, n in enumerate(updateFile.namelist()):
@@ -107,12 +98,13 @@ def update(LocalDir, REMOTE_PATH, Title, localFileName):
     xbmc.executebuiltin("XBMC.UpdateLocalAddons()")
     logger.info("Update Successful")
 
+
 def removeFilesNotInRepo(updateFile, LocalDir):
     ignored_files = ['settings.xml']
     updateFileNameList = [i.split("/")[-1] for i in updateFile.namelist()]
 
     for root, dirs, files in os.walk(LocalDir):
-        if ".git" in root or "pydev" in root or ".idea" in root:
+        if '.git' in root or 'pydev' in root or '.idea' in root:
             continue
         else:
             for file in files:
@@ -121,12 +113,13 @@ def removeFilesNotInRepo(updateFile, LocalDir):
                 if file not in updateFileNameList:
                     os.remove(os.path.join(root, file))
 
+
 def _getXmlString(xml_url):
     try:
         xmlString = urllib.urlopen(xml_url).read()
         if "sha" in json.loads(xmlString):
             return xmlString
         else:
-            logger.info("Update-URL incorrect")
+            logger.info('Update-URL incorrect')
     except Exception as e:
         logger.info(e)
