@@ -3,7 +3,7 @@ from resources.lib import logger
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler import cRequestHandler
+from resources.lib.handler.requestHandler2 import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'alleserien_com'
@@ -55,7 +55,7 @@ def showGenre():
         isMatch, aResult = cParser.parse(sContainer, pattern)
 
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        oGui.showInfo()
         return
 
     for sName in aResult:
@@ -73,7 +73,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     page = params.getValue('page')
     type = params.getValue('type')
     sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
-    isMatch, url = cParser.parseSingleResult(sHtmlContent, "url : '([^']+)")
+    isMatch, url = cParser.parseSingleResult(sHtmlContent, ",url.*?'([^']+)")
     isMatch, token = cParser.parseSingleResult(sHtmlContent, "token':'([^']+)")
     oRequest = cRequestHandler(url, ignoreErrors=(sGui is not False))
     if sSearchText:
@@ -95,7 +95,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
-        if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        if not sGui: oGui.showInfo()
         return
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
@@ -135,7 +135,7 @@ def showSeasons():
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '<p>([^<]+)')
 
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        oGui.showInfo()
         return
 
     total = len(aResult)
@@ -168,7 +168,7 @@ def showEpisodes():
         isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '<p>([^<]+)')
 
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        oGui.showInfo()
         return
 
     total = len(aResult)
