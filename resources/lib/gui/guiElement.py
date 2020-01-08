@@ -18,10 +18,10 @@ class cGuiElement:
     '''
 
     DEFAULT_FOLDER_ICON = 'DefaultFolder.png'
-    DEFAULT_FANART = path.join(addon.getAddonInfo('path'),'fanart.jpg')
-    MEDIA_TYPES = ['movie','tvshow','season','episode']
+    DEFAULT_FANART = path.join(addon.getAddonInfo('path'), 'fanart.jpg')
+    MEDIA_TYPES = ['movie', 'tvshow', 'season', 'episode']
 
-    def __init__(self, sTitle = '', sSite = None, sFunction = None):
+    def __init__(self, sTitle='', sSite=None, sFunction=None):
         self.__sType = 'video'
         self.__sMediaUrl = ''
         self.__sTitle = cUtil.cleanse_text(sTitle)
@@ -145,7 +145,7 @@ class cGuiElement:
 
     def getIcon(self):
         return self.__sIcon
-    
+
     def setFanart(self, sFanart):
         self.__sFanart = sFanart
 
@@ -154,7 +154,7 @@ class cGuiElement:
 
     def addItemValue(self, sItemKey, sItemValue):
         self.__aItemValues[sItemKey] = sItemValue
-        
+
     def setItemValues(self, aValueList):
         self.__aItemValues = aValueList
 
@@ -165,13 +165,13 @@ class cGuiElement:
         for sPropertyKey in self.__aProperties.keys():
             self.__aItemValues[sPropertyKey] = self.__aProperties[sPropertyKey]
         return self.__aItemValues
-    
+
     def addItemProperties(self, sPropertyKey, sPropertyValue):
         self.__aProperties[sPropertyKey] = sPropertyValue
-  
+
     def getItemProperties(self):
         for sItemValueKey in self.__aItemValues.keys():
-            if not self.__aItemValues[sItemValueKey]=='':
+            if not self.__aItemValues[sItemValueKey] == '':
                 try:
                     self.__aProperties[sItemValueKey] = str(self.__aItemValues[sItemValueKey])
                 except:
@@ -190,7 +190,7 @@ class cGuiElement:
     def setSubLanguage(self, sLang):
         self._sSubLanguage = str(sLang)
 
-    def getMeta(self, mediaType, imdbID='', TVShowTitle = '', season='', episode ='', mode = 'add'):
+    def getMeta(self, mediaType, imdbID='', TVShowTitle='', season='', episode='', mode='add'):
         '''
         Fetch metainformations for GuiElement.
         Args:
@@ -201,18 +201,16 @@ class cGuiElement:
             TVShowTitle (str)   :
             mode (str)          : 'add'/'replace' defines if fetched metainformtions should be added to existing informations, or if they should replace them.
         '''
-
-        if cConfig().getSetting('metahandler')=='false':
-           return False
+        if cConfig().getSetting('metahandler') == 'false':
+            return False
         if not self._mediaType:
             self.setMediaType(mediaType)
-        if not mode in ['add','replace']:
+        if not mode in ['add', 'replace']:
             logger.info('Wrong meta set mode')
         if not season and self._season:
             season = self._season
         if not episode and self._episode:
             episode = self._episode
-
         if not self._mediaType:
             logger.info('Could not get MetaInformations for %s, mediaType not defined' % self.getTitle())
             return False
@@ -221,10 +219,10 @@ class cGuiElement:
         if not oMetaget:
             return False
         if self._mediaType == 'movie' or self._mediaType == 'tvshow':
-            if self._mediaType == 'tvshow' and self.__aItemValues.get('TVShowTitle',False):
+            if self._mediaType == 'tvshow' and self.__aItemValues.get('TVShowTitle', False):
                 meta = oMetaget.get_meta(self._mediaType, self.__aItemValues['TVShowTitle'])
             else:
-                meta = oMetaget.get_meta(self._mediaType, self.__sTitle)         
+                meta = oMetaget.get_meta(self._mediaType, self.__sTitle)
         elif self._mediaType == 'season':
             meta = oMetaget.get_seasons(TVShowTitle, imdbID, [str(season)])
         elif self._mediaType == 'episode':
@@ -252,9 +250,7 @@ class cGuiElement:
             if meta['backdrop_url'] != '' and self.__sFanart == self.DEFAULT_FANART:
                 self.setFanart(meta['backdrop_url'])
             self.setItemValues(meta)
-
         if meta['imdb_id']:
             self._imdbID = meta['imdb_id']
-
         self._isMetaSet = True
         return meta
