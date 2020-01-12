@@ -3,7 +3,7 @@ from resources.lib import logger
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler import cRequestHandler
+from resources.lib.handler.requestHandler2 import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'topstreamfilm'
@@ -155,32 +155,53 @@ def showEpisodes():
 
 
 def showHosters():
-    sUrl = ParameterHandler().getValue('entryUrl')
-    sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = 'trembed=([\d]+).*?trid=([\d]+).*?trtype=([\d]+)'
-    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     hosters = []
+    url = ParameterHandler().getValue('entryUrl')
+
+    oRequest = cRequestHandler(url, ignoreErrors=False)
+    sHtmlContent = oRequest.request()
+    pattern = '" src="([^"]+)" f'
+    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+
+    oRequest = cRequestHandler(aResult[0], ignoreErrors=False)
+    sHtmlContent = oRequest.request()
+
+    pattern = '" src="([^"]+)" f'
+    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+
+    oRequest = cRequestHandler(aResult[0], caching=False)
+    oRequest.addHeaderEntry('Referer', 'https://topstreamfilm.com/')
+    oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
+    oRequest.request()
+    sUrl = oRequest.getRealUrl()
+
+    oRequest = cRequestHandler(sUrl.replace('v', 'api/source'), ignoreErrors=False)
+    oRequest.addHeaderEntry('Referer', sUrl)
+    oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
+    oRequest.addHeaderEntry('Host', 'feurl.com')
+    oRequest.addHeaderEntry('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0')
+    oRequest.addHeaderEntry('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
+    oRequest.addHeaderEntry('Origin', 'https://feurl.com')
+    oRequest.addHeaderEntry('Accept', '*/*')
+    oRequest.addParameters('r', 'https://topstreamfilm.com/')
+    oRequest.addParameters('d', 'feurl.com')
+    oRequest.setRequestType(1)
+    sHtmlContent = oRequest.request()
+
+    pattern = 'file":"([^"]+)","label":"([^"]+)'
+    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+
     if isMatch:
-        for trembed, id, rtype in aResult:
-            hUrl = 'https://topstreamfilm.com/?trembed=' + trembed + '&trid=' + id + '&trtype=' + rtype
-            oRequest = cRequestHandler(hUrl)
-            sHtmlContent = oRequest.request()
-            pattern = 'tid=([^&]+)'
-            isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-            for sId in aResult:
-                hUrl = 'https://topstreamfilm.com/?trhide=1&trhex=' + sId[::-1]
-                oRequest = cRequestHandler(hUrl, caching=False)
-                oRequest.request()
-                sUrl = oRequest.getRealUrl()
-                hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
-                hosters.append(hoster)
+        for sUrl, sQ in aResult:
+            hoster = {'link': sUrl, 'name': sQ}
+            hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
 
 
 def getHosterUrl(sUrl=False):
-    return [{'streamUrl': sUrl, 'resolved': False}]
+    return [{'streamUrl': sUrl, 'resolved': True}]
 
 
 def showSearch():
