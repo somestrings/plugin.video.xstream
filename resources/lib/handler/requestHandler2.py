@@ -125,7 +125,7 @@ class cRequestHandler:
         else:
             oRequest = Request(self.__sUrl)
 
-        for key, value in list(self.__headerEntries.items()):
+        for key, value in (self.__headerEntries.items()):
             oRequest.add_header(key, value)
         cookieJar.add_cookie_header(oRequest)
         sContent = ''
