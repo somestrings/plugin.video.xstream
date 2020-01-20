@@ -1,4 +1,6 @@
 xStream 3.5.13~nightly
+- [settings.xml] Indexseiten Menü Anpassung (A-K, L-Z) als Klartext in der settings.xml
+   Löst das Menü Scrollproblem auf manchen Systemen
 - [hdfilme] fix hoster und Code cleanup
 
 xStream 3.5.12
