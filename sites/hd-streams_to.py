@@ -3,11 +3,11 @@ from resources.lib import logger
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler import cRequestHandler
+from resources.lib.handler.requestHandler2 import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'hd-streams_to'
-SITE_NAME = 'hd-streams.to'
+SITE_NAME = 'HD-Streams.to'
 SITE_ICON = 'hd-streams_to.png'
 URL_MAIN = 'https://hd-streams.to/de/'
 URL_FILME = URL_MAIN + 'movies/'
@@ -23,7 +23,7 @@ def load():
     oGui.addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_SERIE)
     oGui.addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
-    params.setParam('sCont', 'Kategorien')
+    params.setParam('sCont', 'Genres')
     oGui.addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
     params.setParam('sCont', 'Jahr')
     oGui.addFolder(cGuiElement('Jahr', SITE_IDENTIFIER, 'showValue'), params)
@@ -41,7 +41,7 @@ def showValue():
         pattern = '<a[^>]*href="([^"]+)".*?>([^"]+)</a>'
         isMatch, aResult = cParser.parse(sContainer[0], pattern)
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        oGui.showInfo()
         return
 
     for sUrl, sName in aResult:
@@ -56,19 +56,19 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '<div class="poster">.*?<img src="([^"]+).*?alt="([^"]+).*?href="([^"]+).*?<span>([\d]+).*?texto">([^"]+)<'
+    pattern = '<article id="post-\d.*?src="([^"]+).*?href="([^"]+)">([^<]+).*?span>([\d]+).*?texto">([^<]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
-        pattern = '<article>.*?<img src="([^"]+).*?alt="([^"]+).*?href="([^"]+).*?year">([\d]+).*?contenido">([^"]+)<'
+        pattern = '<article>.*?<img src="([^"]+).*?href="([^"]+)">([^<]+).*?year">([\d]+).*?contenido">([^"]+)</div>'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
-        if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        if not sGui: oGui.showInfo()
         return
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
-    for sThumbnail, sName, sUrl, sYear, sDesc in aResult:
+    for sThumbnail, sUrl, sName, sYear, sDesc in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         sThumbnail = sThumbnail + cf
@@ -83,7 +83,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
-        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, '<span[^>]class=[^>]current.*?</span><a[^>]href="([^"]+)')
+        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, "<span[^>]class=[^>]current.*?</span><a[^>]href='([^']+)")
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
@@ -98,11 +98,11 @@ def showSeasons():
     sThumbnail = params.getValue('sThumbnail')
     sTVShowTitle = params.getValue('sName')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = '<span[^>]class="title">.*?([\d]+)'
+    pattern = "<span[^>]class='title'>.*?([\d]+)"
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        oGui.showInfo()
         return
 
     isDesc, sDesc = cParser.parse(sHtmlContent, 'class="wp-content">([^"]+)<div')
@@ -128,15 +128,15 @@ def showEpisodes():
     entryUrl = params.getValue('entryUrl')
     sSeasonNr = params.getValue('sSeasonNr')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = '<span[^>]*class="se-t[^"]*">%s</span>.*?<ul[^>]*class="episodios"[^>]*>(.*?)</ul>' % sSeasonNr
-    isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
+    pattern = "title'>Season[^>]%s[^<]<i>.*?<span class='date'" % sSeasonNr
+    isMatch, sContainer = cParser.parse(sHtmlContent, pattern)
 
     if isMatch:
-        pattern = 'numerando">[^-]*-\s*(\d+)<.*?<a[^>]*href="([^"]+)">([^<]+)'
-        isMatch, aResult = cParser.parse(sContainer, pattern)
+        pattern = "numerando'>[^-]*-\s*(\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
+        isMatch, aResult = cParser.parse(sContainer[0], pattern)
 
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        oGui.showInfo()
         return
 
     isDesc, sDesc = cParser.parse(sHtmlContent, 'class="wp-content">([^"]+)<div')
@@ -159,20 +159,24 @@ def showEpisodes():
 def showHosters():
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = 'data-post="([\d]+)" data-nume="([\d]+)">'
+    pattern = "</span><a data-id='([\d]+)' "
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     hosters = []
     if isMatch:
-        for post, nume in aResult:
+        for post in aResult:
             oRequest = cRequestHandler(URL_MAIN + 'wp-admin/admin-ajax.php')
             oRequest.addParameters('action', 'doo_player_ajax')
             oRequest.addParameters('post', post)
-            oRequest.addParameters('nume', nume)
+            oRequest.addParameters('nume', '1')
+            if 'tvshows' in sUrl:
+                oRequest.addParameters('type', 'tv')
+            else:
+                oRequest.addParameters('type', 'movie')
             oRequest.setRequestType(1)
             sHtmlContent = oRequest.request()
             isMatch, aResult = cParser().parse(sHtmlContent, "src=[^>]([^']+)")
             for sUrl in aResult:
-                hoster = {'link': sUrl, 'name': 'Openload'}
+                hoster = {'link': sUrl, 'name': '3434.uls.to'}
                 hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
