@@ -1,6 +1,6 @@
 xStream 3.5.13~nightly
-- [settings.xml] Indexseiten Menü Anpassung (A-K, L-Z) als Klartext in der settings.xml
-   Löst das Menü Scrollproblem auf manchen Systemen
+- [kinoger] add ddos guard support und fix site
+- [hd-streams.to] fix site
 - [hdfilme] fix hoster und Code cleanup
 
 xStream 3.5.12
