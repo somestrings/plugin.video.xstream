@@ -20,6 +20,8 @@
    <platform>all</platform>
    <news>
 xStream 3.5.13~nightly
+- [kinoger] add ddos guard support und fix site
+- [hd-streams.to] fix site
 - [hdfilme] fix hoster und Code cleanup
 
 xStream 3.5.12
