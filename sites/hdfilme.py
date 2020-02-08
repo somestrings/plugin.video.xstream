@@ -179,9 +179,8 @@ def showHosterserie():
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
         if isMatch:
             for sQualy, sUrl in aResult:
-                hoster = {'link': hUrl[0].replace('playlist.m3u8', '') + sUrl, 'name': sQualy}
+                hoster = {'link': 'https://' + url + sUrl, 'name': sQualy}
                 hosters.append(hoster)
-
     oRequest = cRequestHandler(str(URL_MAIN + 'movie/load-stream/' + sID +'/'+ eID + '?server=2'))
     oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
     oRequest.addHeaderEntry('Referer', rUrl)
@@ -221,13 +220,13 @@ def showHosters():
                 oRequest.addHeaderEntry('Referer', URL_MAIN)
                 oRequest.addHeaderEntry('Origin', URL_MAIN)
                 sHtmlContent = oRequest.request()
+                url = cParser().urlparse(hUrl[0])
                 pattern = 'RESOLUTION=\d+x([\d]+)([^#]+)'
                 isMatch, aResult = cParser().parse(sHtmlContent, pattern)
                 if isMatch:
                     for sQualy, sUrl in aResult:
-                        hoster = {'link': hUrl[0].replace('playlist.m3u8', '') + sUrl, 'name': sQualy}
+                        hoster = {'link': 'https://' + url + sUrl, 'name': sQualy}
                         hosters.append(hoster)
-
     if isMatch:
         for sMID, sEID in aResult1:
             oRequest = cRequestHandler(str(URL_MAIN + 'movie/load-stream/' + sMID +'/'+ sEID + '?server=2'))
