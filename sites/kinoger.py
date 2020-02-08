@@ -191,24 +191,12 @@ def showHosters():
     hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern1 = 'namba.show[^>]\d.*?([\d]+)'
-    isNamba, Namba = cParser().parse(sHtmlContent, pattern1)
-    if isNamba:
-        for id in Namba:
-            oRequest = cRequestHandler('http://v1.kinoger.pw/vod/' + id)
-            oRequest.addHeaderEntry('Referer', sUrl)
-            NambaContent = oRequest.request()
-            pattern = 'source src="([^"]+)'
-            isNamba, Namba[0] = cParser().parse(NambaContent, pattern)
-            for sUrl in Namba:
-                hoster = {'link': sUrl[0], 'name': 'Namba'}
-                hosters.append(hoster)
     pattern = "show[^>]\d,[^>][^>]'([^']+)"
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
 
     if isMatch:
         for sUrl in aResult:
-            if 'newcloud' in sUrl or 'sst' in sUrl:
+            if 'sst' in sUrl:
                 oRequest = cRequestHandler(sUrl)
                 oRequest.addHeaderEntry('Referer', sUrl)
                 sHtmlContent = oRequest.request()
@@ -219,6 +207,34 @@ def showHosters():
                 for sUrl in aResult:
                     hoster = {'link': sUrl, 'name': Qualy2(sUrl)}
                     hosters.append(hoster)
+            if 'kinoger.re' in sUrl:
+                oRequest = cRequestHandler(sUrl.replace('/v/', '/api/source/'))
+                oRequest.addHeaderEntry('Referer', sUrl)
+                oRequest.addParameters('r', 'https://kinoger.com/')
+                oRequest.addParameters('d', 'kinoger.re')
+                sHtmlContent = oRequest.request()
+                pattern = 'file":"([^"]+)","label":"([^"]+)'
+                isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+                for sUrl, sQualy in aResult:
+                    hoster = {'link': sUrl, 'name': sQualy}
+                    hosters.append(hoster)
+            if 'cloudvideo.tv' in sUrl:
+                oRequest = cRequestHandler(sUrl.replace('emb.html?','embed-') + '.html')
+                oRequest.addHeaderEntry('Referer', sUrl)
+                sHtmlContent = oRequest.request()
+                pattern = 'source src="([^"]+)'
+                isMatch, aResult = cParser.parseSingleResult(sHtmlContent, pattern)
+                oRequest = cRequestHandler(aResult)
+                oRequest.addHeaderEntry('Referer', sUrl)
+                sHtmlContent = oRequest.request()
+
+                pattern = 'RESOLUTION=\d+x([\d]+).*?CODECS=".*?(http[^#]+)'
+                isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+                for sQualy, sUrl in aResult:
+                    if not 'iframe' in sUrl:
+                        hoster = {'link': sUrl, 'name': sQualy}
+                        hosters.append(hoster)
+
     elif 'hdgo' in sUrl or 'sst' in sUrl:
         oRequest = cRequestHandler(sUrl)
         oRequest.addHeaderEntry('Referer', sUrl)
