@@ -178,14 +178,16 @@ def parseUrl():
     # Test if we should run a function on a special site
     if not params.exist('site'):
         xbmc.executebuiltin('XBMC.RunPlugin(%s?function=clearCache)' % sys.argv[0])
-        xStreamUpdate = True if cConfig().getSetting('githubUpdateXstream') == 'true' else False
-        urlResolverUpdate = True if cConfig().getSetting('githubUpdateUrlResolver') == 'true' else False
-        if xStreamUpdate and urlResolverUpdate:
-            xbmc.executebuiltin('XBMC.RunPlugin(%s?function=updateAll)' % sys.argv[0])
-        elif xStreamUpdate:
-            xbmc.executebuiltin('XBMC.RunPlugin(%s?function=updateXstream)' % sys.argv[0])
-        elif urlResolverUpdate:
-            xbmc.executebuiltin('XBMC.RunPlugin(%s?function=updateUrlResolver)' % sys.argv[0])
+
+        # xStreamUpdate = True if cConfig().getSetting('githubUpdateXstream') == 'true' else False
+        # urlResolverUpdate = True if cConfig().getSetting('githubUpdateUrlResolver') == 'true' else False
+        # if xStreamUpdate and urlResolverUpdate:
+        #     xbmc.executebuiltin('XBMC.RunPlugin(%s?function=updateAll)' % sys.argv[0])
+        # elif xStreamUpdate:
+        #     xbmc.executebuiltin('XBMC.RunPlugin(%s?function=updateXstream)' % sys.argv[0])
+        # elif urlResolverUpdate:
+        #     xbmc.executebuiltin('XBMC.RunPlugin(%s?function=updateUrlResolver)' % sys.argv[0])
+
         # As a default if no site was specified, we run the default starting gui with all plugins
         showMainMenu(sFunction)
         return
