@@ -205,14 +205,14 @@ def devAutoUpdates(silent=False):
         if addon().getSetting('githubUpdateUrlResolver') == 'true':
             if urlResolverUpdate(silent) == True:
                 status = True
-            else: status = False
+            else: status = status
 
         return status
     except Exception as e:
         xbmc.log(e)
 
 
-def devUpdates(): # für manuelles Update
+def devUpdates(): # für manuelles Updates vorgesehen
     try:
         resolverupdate = False
         pluginupdate = False

@@ -24,6 +24,7 @@ def infoDialog(message, heading=AddonName, icon='', time=5000, sound=False):
 #if os.path.isfile(NIGHTLY_VERSION_CONTROL)== False or xbmcaddon.Addon().getSetting('DevUpdateAuto') == 'true':
 from resources.lib import updateManager
 status = updateManager.devAutoUpdates(True)
-if status == True: infoDialog("Auto Update abgeschlossen", sound=False, icon='INFO')
-#if status == False: infoDialog("Auto Update mit Fehler beendet", sound=True, icon='ERROR')
-
+if status == True: infoDialog("Auto Update abgeschlossen", sound=False, icon='INFO', time=3000)
+if status == False: infoDialog("Auto Update mit Fehler beendet", sound=True, icon='ERROR')
+if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon='INFO', time=3000)
+exit(0)

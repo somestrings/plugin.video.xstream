@@ -1,9 +1,8 @@
 <settings> 
   <category label="30020">
     <setting label="30030" type="lsep" />
-    <setting id="DevUpdateAuto" type="bool" label="Nightly Updates (automatisch)" default="true" />
-    <setting default="true" id="githubUpdateXstream" label="30010" type="bool" visible="eq(-1,false)"/>
-    <setting default="true" id="githubUpdateUrlResolver" label="30015" type="bool" visible="eq(-2,false)" />
+    <setting default="true" id="githubUpdateXstream" label="30010" type="bool" />
+    <setting default="true" id="githubUpdateUrlResolver" label="30015" type="bool"  />
     <setting type="sep" />
     <setting label="30031" type="lsep" />
     <setting default="true" id="GlobalSearchPosition" label="30011" type="bool" />
