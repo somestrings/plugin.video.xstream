@@ -1,4 +1,6 @@
 xStream 3.5.13~nightly
+- Fix Indexseiten Übersicht im Einstellungs Menü
+- Fix updateManager (Statusanzeige) 
 - Update settings.xml und UpdateManager
   URLResolver Update über xStream möglich
   xStream bzw.URLResolver Update wird bei Kodistart ausgeführt, wenn im
