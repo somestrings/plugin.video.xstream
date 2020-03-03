@@ -1,4 +1,8 @@
 xStream 3.5.13~nightly
+- Update settings.xml und UpdateManager
+  URLResolver Update über xStream möglich
+  xStream bzw.URLResolver Update wird bei Kodistart ausgeführt, wenn im
+  Einstellungsmenü aktiviert
 - [kinoger] add hoster cloudvideo.tv und kinoger.re
 - [hdfilme] fix hoster
 - [kinoger] add ddos guard support und fix site
