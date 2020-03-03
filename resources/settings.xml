@@ -133,11 +133,11 @@
     <category label="30022">
     <setting default="false" id="auto-view" label="30060" type="bool" />
     <setting type="sep" />
-    <setting default="55" enable="!eq(-1,false)" id="files-view" label="30061" type="number" />
-    <setting default="503" enable="!eq(-2,false)" id="movies-view" label="30062" type="number" />
-    <setting default="503" enable="!eq(-3,false)" id="tvshows-view" label="30063" type="number" />
-    <setting default="504" enable="!eq(-4,false)" id="seasons-view" label="30064" type="number" />
-    <setting default="504" enable="!eq(-5,false)" id="episodes-view" label="30065" type="number" />
+    <setting default="55" enable="!eq(-2,false)" id="files-view" label="30061" type="number" />
+    <setting default="503" enable="!eq(-3,false)" id="movies-view" label="30062" type="number" />
+    <setting default="503" enable="!eq(-4,false)" id="tvshows-view" label="30063" type="number" />
+    <setting default="504" enable="!eq(-5,false)" id="seasons-view" label="30064" type="number" />
+    <setting default="504" enable="!eq(-6,false)" id="episodes-view" label="30065" type="number" />
   </category>
   <category label="30023">
     <setting label="30080" />
