@@ -2,7 +2,7 @@
   <category label="30020">
     <setting label="30030" type="lsep" />
     <setting default="true" id="githubUpdateXstream" label="30010" type="bool" />
-    <setting default="true" id="githubUpdateUrlResolver" label="30015" type="bool" />
+    <setting default="true" id="githubUpdateUrlResolver" label="30015" type="bool"  />
     <setting type="sep" />
     <setting label="30031" type="lsep" />
     <setting default="true" id="GlobalSearchPosition" label="30011" type="bool" />
@@ -26,7 +26,7 @@
     <setting default="600" id="cacheTime" label="30006" option="int" range="0,60,1800" type="slider" />
     <setting default="30" id="requestTimeout" label="30014" option="int" range="10,5,60" type="slider" />
   </category> 
-  <category label="Indexseiten A-M">
+  <category label="30021">
 	<setting label="Alleserien" type="lsep" />
     <setting default="true" id="plugin_alleserien_com" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_alleserien_com" label="30052" type="bool" />
@@ -106,8 +106,7 @@
     <setting label="Movietown" type="lsep" />
     <setting default="true" id="plugin_movietown_org" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_movietown_org" label="30052" type="bool" />
-  </category> 
-  <category label="Indexseiten ab N">
+    <setting type="sep" />
     <setting label="NetzKino" type="lsep" />
     <setting default="true" id="plugin_netzkino_de" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_netzkino_de" label="30052" type="bool" />
@@ -134,11 +133,11 @@
     <category label="30022">
     <setting default="false" id="auto-view" label="30060" type="bool" />
     <setting type="sep" />
-    <setting default="55" enable="!eq(-2,false)" id="files-view" label="30061" type="number" />
-    <setting default="503" enable="!eq(-3,false)" id="movies-view" label="30062" type="number" />
-    <setting default="503" enable="!eq(-4,false)" id="tvshows-view" label="30063" type="number" />
-    <setting default="504" enable="!eq(-5,false)" id="seasons-view" label="30064" type="number" />
-    <setting default="504" enable="!eq(-6,false)" id="episodes-view" label="30065" type="number" />
+    <setting default="55" enable="!eq(-1,false)" id="files-view" label="30061" type="number" />
+    <setting default="503" enable="!eq(-2,false)" id="movies-view" label="30062" type="number" />
+    <setting default="503" enable="!eq(-3,false)" id="tvshows-view" label="30063" type="number" />
+    <setting default="504" enable="!eq(-4,false)" id="seasons-view" label="30064" type="number" />
+    <setting default="504" enable="!eq(-5,false)" id="episodes-view" label="30065" type="number" />
   </category>
   <category label="30023">
     <setting label="30080" />

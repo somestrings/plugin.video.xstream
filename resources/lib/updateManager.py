@@ -197,18 +197,15 @@ def zipfolder(foldername, target_dir):
 
 def devAutoUpdates(silent=False):
     try:
-        status1 = status2 = None
+        status = None
         if addon().getSetting('githubUpdateXstream') == 'true':
-            status1 = xStreamUpdate(silent)
+            status = False
+            if xStreamUpdate(silent) == True:
+                status = True
         if addon().getSetting('githubUpdateUrlResolver') == 'true':
-            status2 = urlResolverUpdate(silent)
-
-        if status1 == status2:
-            status = status1
-        else:
-            if status1 == False or status2 == False:
-                status = False
-            else: status = True
+            if urlResolverUpdate(silent) == True:
+                status = True
+            else: status = status
 
         return status
     except Exception as e:
