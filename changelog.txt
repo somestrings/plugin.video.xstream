@@ -1,3 +1,6 @@
+xStream 3.5.13~nightly3
+- Update settings.xml und service.py
+
 xStream 3.5.13~nightly2
 - fix updateManager
 - fix "Indexseiten" in Settings
