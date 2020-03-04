@@ -1,3 +1,7 @@
+xStream 3.5.13~nightly2
+- fix updateManager
+- fix "Indexseiten" in Settings
+
 xStream 3.5.13~nightly
 - Update settings.xml und UpdateManager
   URLResolver Update über xStream möglich
