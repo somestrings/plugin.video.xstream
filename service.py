@@ -30,5 +30,5 @@ if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon=
 
 # "setting.xml" wenn notwendig aktualisieren
 from resources.lib.handler.pluginHandler import cPluginHandler
-cPluginHandler().getAvailablePlugins()
+# cPluginHandler().getAvailablePlugins() #tem. disable
 exit(0)
