@@ -86,57 +86,71 @@ class cPluginHandler:
         return data
 
     def __updateSettings(self, pluginData):
+        index1 = []
+        index2 = []
+        x = 0
+        while x < len(pluginData):
+            if x < len(pluginData)/2: index1.append(sorted(pluginData)[x])
+            elif x >= len(pluginData)/2: index2.append(sorted(pluginData)[x])
+            x = x + 1
+
         # data (dict): containing plugininformations
         xmlString = '<plugin_settings>%s</plugin_settings>'
         import xml.etree.ElementTree as ET
         tree = ET.parse(self.settingsFile)
         # find Element for plugin Settings
-        pluginElem = False
-        for elem in tree.findall('category'):
-            if elem.attrib['label'] == '30021':
-                pluginElem = elem
-                break
-        if pluginElem is None:
-            logger.info('could not update settings, pluginElement not found')
-            return False
-        pluginElements = pluginElem.findall('setting')
-        for elem in pluginElements:
-            pluginElem.remove(elem)
-            # add plugins to settings
-        for pluginID in sorted(pluginData):
-            plugin = pluginData[pluginID]
-            subEl = ET.SubElement(pluginElem, 'setting', {'type': 'lsep', 'label': plugin['name']})
-            subEl.tail = '\n    '
-            attrib = {'default': 'true', 'type': 'bool'}
-            attrib['id'] = 'plugin_%s' % pluginID
-            attrib['label'] = '30050'
-            subEl = ET.SubElement(pluginElem, 'setting', attrib)
-            subEl.tail = '\n    '
-            attrib = {'default': str(plugin['globalsearch']).lower(), 'type': 'bool'}
-            attrib['id'] = 'global_search_%s' % pluginID
-            attrib['label'] = '30052'
-            attrib['enable'] = "!eq(-1,false)"
-            subEl = ET.SubElement(pluginElem, 'setting', attrib)
-            subEl.tail = '\n    '
+        for i in ('Indexseite 1', 'Indexseite 2'):
+            index = index1
+            if i == 'Indexseite 2': index = index2
 
-            if 'settings' in plugin:
-                customSettings = []
-                try:
-                    customSettings = ET.XML(xmlString % plugin['settings']).findall('setting')
-                except:
-                    logger.info('Parsing of custom settings for % failed.' % plugin['name'])
-                for setting in customSettings:
-                    setting.tail = '\n    '
-                    pluginElem.append(setting)
-            subEl = ET.SubElement(pluginElem, 'setting', {'type': 'sep'})
-            subEl.tail = '\n    '
-        pluginElements = pluginElem.findall('setting')[-1].tail = '\n'
-        try:
-            ET.dump(pluginElem)
-        except:
-            logger.info('Settings update failed')
-            return
-        tree.write(self.settingsFile)
+            pluginElem = False
+            for elem in tree.findall('category'):
+                if elem.attrib['label'] == i:
+                    pluginElem = elem
+                    break
+            if pluginElem is None:
+                logger.info('could not update settings, pluginElement not found')
+                return False
+            pluginElements = pluginElem.findall('setting')
+            for elem in pluginElements:
+                pluginElem.remove(elem)
+                # add plugins to settings
+
+            #for pluginID in sorted(pluginData):
+            for pluginID in index:
+                plugin = pluginData[pluginID]
+                subEl = ET.SubElement(pluginElem, 'setting', {'type': 'lsep', 'label': plugin['name']})
+                subEl.tail = '\n    '
+                attrib = {'default': 'true', 'type': 'bool'}
+                attrib['id'] = 'plugin_%s' % pluginID
+                attrib['label'] = '30050'
+                subEl = ET.SubElement(pluginElem, 'setting', attrib)
+                subEl.tail = '\n    '
+                attrib = {'default': str(plugin['globalsearch']).lower(), 'type': 'bool'}
+                attrib['id'] = 'global_search_%s' % pluginID
+                attrib['label'] = '30052'
+                attrib['enable'] = "!eq(-1,false)"
+                subEl = ET.SubElement(pluginElem, 'setting', attrib)
+                subEl.tail = '\n    '
+
+                if 'settings' in plugin:
+                    customSettings = []
+                    try:
+                        customSettings = ET.XML(xmlString % plugin['settings']).findall('setting')
+                    except:
+                        logger.info('Parsing of custom settings for % failed.' % plugin['name'])
+                    for setting in customSettings:
+                        setting.tail = '\n    '
+                        pluginElem.append(setting)
+                subEl = ET.SubElement(pluginElem, 'setting', {'type': 'sep'})
+                subEl.tail = '\n    '
+            pluginElements = pluginElem.findall('setting')[-1].tail = '\n'
+            try:
+                ET.dump(pluginElem)
+            except:
+                logger.info('Settings update failed')
+                return
+            tree.write(self.settingsFile)
 
     def __getFileNamesFromFolder(self, sFolder):
         aNameList = []

@@ -27,4 +27,8 @@ status = updateManager.devAutoUpdates(True)
 if status == True: infoDialog("Auto Update abgeschlossen", sound=False, icon='INFO', time=3000)
 if status == False: infoDialog("Auto Update mit Fehler beendet", sound=True, icon='ERROR')
 if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon='INFO', time=3000)
+
+# "setting.xml" wenn notwendig aktualisieren
+from resources.lib.handler.pluginHandler import cPluginHandler
+cPluginHandler().getAvailablePlugins()
 exit(0)
