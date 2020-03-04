@@ -16,11 +16,6 @@ def infoDialog(message, heading=AddonName, icon='', time=5000, sound=False):
     elif icon == 'ERROR': icon = xbmcgui.NOTIFICATION_ERROR
     xbmcgui.Dialog().notification(heading, message, icon, time, sound=sound)
 
-##ka - remove parent directory (..) in lists
-if not 'false' in xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue", "params":{"setting":"filelists.showparentdiritems"}}'):
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"filelists.showparentdiritems","value":false}}')
-    xbmc.executebuiltin("ReloadSkin()")
-
 #if os.path.isfile(NIGHTLY_VERSION_CONTROL)== False or xbmcaddon.Addon().getSetting('DevUpdateAuto') == 'true':
 from resources.lib import updateManager
 status = updateManager.devAutoUpdates(True)
@@ -35,4 +30,10 @@ try:
         cPluginHandler().getAvailablePlugins()
 except:
     pass
+
+##ka - remove parent directory (..) in lists
+if not 'false' in xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue", "params":{"setting":"filelists.showparentdiritems"}}'):
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"filelists.showparentdiritems","value":false}}')
+    xbmc.executebuiltin("ReloadSkin()")
+
 exit(0)
