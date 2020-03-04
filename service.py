@@ -30,7 +30,7 @@ if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon=
 
 # "setting.xml" wenn notwendig Indexseiten aktualisieren
 try:
-    If xbmcaddon.Addon().getSetting('newSetting') == 'true':
+    if xbmcaddon.Addon().getSetting('newSetting') == 'true':
         from resources.lib.handler.pluginHandler import cPluginHandler
         cPluginHandler().getAvailablePlugins()
 except:
