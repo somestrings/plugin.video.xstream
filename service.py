@@ -28,7 +28,11 @@ if status == True: infoDialog("Auto Update abgeschlossen", sound=False, icon='IN
 if status == False: infoDialog("Auto Update mit Fehler beendet", sound=True, icon='ERROR')
 if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon='INFO', time=3000)
 
-# "setting.xml" wenn notwendig aktualisieren
-from resources.lib.handler.pluginHandler import cPluginHandler
-# cPluginHandler().getAvailablePlugins() #tem. disable
+# "setting.xml" wenn notwendig Indexseiten aktualisieren
+try:
+    If xbmcaddon.Addon().getSetting('newSetting') == 'true':
+        from resources.lib.handler.pluginHandler import cPluginHandler
+        cPluginHandler().getAvailablePlugins()
+except:
+    pass
 exit(0)

@@ -3,6 +3,7 @@
     <setting label="30030" type="lsep" />
     <setting default="true" id="githubUpdateXstream" label="30010" type="bool" />
     <setting default="true" id="githubUpdateUrlResolver" label="30015" type="bool" />
+    <setting default="true" id="newSetting" label="newSetting" type="bool" visible="false" />
     <setting type="sep" />
     <setting label="30031" type="lsep" />
     <setting default="true" id="GlobalSearchPosition" label="30011" type="bool" />
@@ -27,7 +28,7 @@
     <setting default="30" id="requestTimeout" label="30014" option="int" range="10,5,60" type="slider" />
   </category> 
   <category label="Indexseiten 1">
-	<setting label="Alleserien" type="lsep" />
+    <setting label="Alleserien" type="lsep" />
     <setting default="true" id="plugin_alleserien_com" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_alleserien_com" label="30052" type="bool" />
     <setting type="sep" />
@@ -116,8 +117,6 @@
     <setting label="SerienStream" type="lsep" />
     <setting default="true" id="plugin_serienstream_to" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_serienstream_to" label="30052" type="bool" />
-    <setting default="" id="serienstream.user" label="30083" type="text" />
-    <setting default="" id="serienstream.pass" label="30084" option="hidden" type="text" />
     <setting type="sep" />
     <setting label="StreamIt" type="lsep" />
     <setting default="true" id="plugin_streamit_ws" label="30050" type="bool" />
