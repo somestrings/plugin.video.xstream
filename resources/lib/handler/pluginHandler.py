@@ -99,9 +99,9 @@ class cPluginHandler:
         import xml.etree.ElementTree as ET
         tree = ET.parse(self.settingsFile)
         # find Element for plugin Settings
-        for i in ('Indexseite 1', 'Indexseite 2'):
+        for i in ('Indexseiten 1', 'Indexseiten 2'):
             index = index1
-            if i == 'Indexseite 2': index = index2
+            if i == 'Indexseiten 2': index = index2
 
             pluginElem = False
             for elem in tree.findall('category'):

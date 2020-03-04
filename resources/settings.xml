@@ -2,7 +2,7 @@
   <category label="30020">
     <setting label="30030" type="lsep" />
     <setting default="true" id="githubUpdateXstream" label="30010" type="bool" />
-    <setting default="true" id="githubUpdateUrlResolver" label="30015" type="bool"  />
+    <setting default="true" id="githubUpdateUrlResolver" label="30015" type="bool" />
     <setting type="sep" />
     <setting label="30031" type="lsep" />
     <setting default="true" id="GlobalSearchPosition" label="30011" type="bool" />
@@ -26,7 +26,7 @@
     <setting default="600" id="cacheTime" label="30006" option="int" range="0,60,1800" type="slider" />
     <setting default="30" id="requestTimeout" label="30014" option="int" range="10,5,60" type="slider" />
   </category> 
-  <category label="30021">
+  <category label="Indexseiten 1">
 	<setting label="Alleserien" type="lsep" />
     <setting default="true" id="plugin_alleserien_com" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_alleserien_com" label="30052" type="bool" />
@@ -76,6 +76,8 @@
     <setting default="true" id="plugin_kino_cx" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_kino_cx" label="30052" type="bool" />
     <setting type="sep" />
+</category> 
+  <category label="Indexseiten 2">
     <setting label="Kinoger" type="lsep" />
     <setting default="true" id="plugin_kinoger" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_kinoger" label="30052" type="bool" />
