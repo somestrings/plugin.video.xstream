@@ -1,15 +1,11 @@
-xStream 3.5.13~nightly3
+xStream 3.5.13
+  05.03.2020
 - Update settings.xml und service.py
-
-xStream 3.5.13~nightly2
-- fix updateManager
-- fix "Indexseiten" in Settings
-
-xStream 3.5.13~nightly
+- Fix UpdateManager
+- Fix "Indexseiten" Übersicht im Einstellungs Menü
 - Update settings.xml und UpdateManager
   URLResolver Update über xStream möglich
-  xStream bzw.URLResolver Update wird bei Kodistart ausgeführt, wenn im
-  Einstellungsmenü aktiviert
+  xStream bzw.URLResolver Update wird bei Kodistart ausgeführt, wenn im Einstellungsmenü aktiviert
 - [kinoger] add hoster cloudvideo.tv und kinoger.re
 - [hdfilme] fix hoster
 - [kinoger] add ddos guard support und fix site
