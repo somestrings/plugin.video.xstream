@@ -188,10 +188,10 @@ def showHosterserie():
     pattern = 'var sources = (\[.*?\]);'
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        pattern = 'label":"(.+?)"[\s\S]+?file":"(.+?)"'
+        pattern = r'"file":"(.+?)","label":"(.+?)","type":"(.+?)"'
         isMatch, aResult = cParser().parse(sContainer, pattern)
         if isMatch:
-            for sQualy, sUrl in aResult:
+            for  sUrl,sQualy,stype in aResult:
                 hoster = {'link': sUrl, 'name': sQualy}
                 hosters.append(hoster)
     if hosters:
@@ -236,10 +236,10 @@ def showHosters():
             pattern = 'var sources = (\[.*?\]);'
             isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
             if isMatch:
-                pattern = 'label":"(.+?)"[\s\S]+?file":"(.+?)"'
+                pattern = r'"file":"(.+?)","label":"(.+?)","type":"(.+?)"'
                 isMatch, aResult = cParser().parse(sContainer, pattern)
                 if isMatch:
-                    for sQualy, sUrl in aResult:
+                    for  sUrl,sQualy,stype in aResult:
                         hoster = {'link': sUrl, 'name': sQualy}
                         hosters.append(hoster)
     if hosters:
@@ -248,7 +248,7 @@ def showHosters():
 
 
 def getHosterUrl(sUrl=False):
-    sUrl = sUrl + '|' + 'Origin=https%3A%2F%2Fhdfilme.cc%2F&Accept-Language=de-de,de;q=0.8,en-us;q=0.5,en;q=0.3&Accept-Encoding=gzip&Referer=https%3A%2F%2Fhdfilme.cc%2F'
+    sUrl = sUrl + '|verifypeer=false&Origin=https%3A%2F%2Fhdfilme.cc%2F&Referer=https%3A%2F%2Fhdfilme.cc%2F'
     return [{'streamUrl': sUrl, 'resolved': True}]
 
 
