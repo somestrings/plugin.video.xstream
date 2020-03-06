@@ -1,3 +1,6 @@
+3.5.14~nightly1
+- Fix HdFilme
+
 xStream 3.5.13
   05.03.2020
 - Update settings.xml und service.py
