@@ -32,8 +32,8 @@ except:
     pass
 
 ##ka - remove parent directory (..) in lists
-if not 'false' in xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue", "params":{"setting":"filelists.showparentdiritems"}}'):
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"filelists.showparentdiritems","value":false}}')
-    xbmc.executebuiltin("ReloadSkin()")
+#if not 'false' in xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue", "params":{"setting":"filelists.showparentdiritems"}}'):
+#    xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"filelists.showparentdiritems","value":false}}')
+#    xbmc.executebuiltin("ReloadSkin()")
 
 exit(0)
