@@ -204,13 +204,12 @@ def devAutoUpdates(silent=False):
             status2 = urlResolverUpdate(silent)
 
         if status1 == status2:
-            status = status1
-        else:
-            if status1 == False or status2 == False:
-                status = False
-            else: status = True
+            return status1
+        elif status1 == False or status2 == False:
+                return False
+        elif (status1 == True or status2 == True) and (status1 == None or status2 == None):
+            return True
 
-        return status
     except Exception as e:
         xbmc.log(e)
 
