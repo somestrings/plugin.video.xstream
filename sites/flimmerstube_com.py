@@ -9,26 +9,20 @@ from resources.lib.parser import cParser
 SITE_IDENTIFIER = 'flimmerstube_com'
 SITE_NAME = 'Flimmerstube'
 SITE_ICON = 'flimmerstube.png'
-SITE_GLOBAL_SEARCH = False
-
 URL_MAIN = 'http://flimmerstube.com'
 URL_MOVIE = URL_MAIN + '/video/vic/alle_filme'
 URL_SEARCH = URL_MAIN + '/video/shv'
 
-
 def load():
     logger.info("Load %s" % SITE_NAME)
-    oGui = cGui()
     params = ParameterHandler()
     params.setParam('sUrl', URL_MOVIE)
-    oGui.addFolder(cGuiElement('Deutsche Horrorfilme', SITE_IDENTIFIER, 'showEntries'), params)
-    oGui.addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
-    oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
-    oGui.setEndOfDirectory()
-
+    cGui().addFolder(cGuiElement('Deutsche Horrorfilme', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
+    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
+    cGui().setEndOfDirectory()
 
 def showGenre():
-    oGui = cGui()
     params = ParameterHandler()
     entryUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(entryUrl).request()
@@ -36,14 +30,13 @@ def showGenre():
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        cGui().showInfo()
         return
 
     for sUrl, sName in aResult:
         params.setParam('sUrl', URL_MAIN + sUrl)
-        oGui.addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
-    oGui.setEndOfDirectory()
-
+        cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().setEndOfDirectory()
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -64,7 +57,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
-        if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        if not sGui: oGui.showInfo()
         return
 
     total = len(aResult)
@@ -90,8 +83,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('movies')
         oGui.setEndOfDirectory()
 
-
 def showHosters():
+    hosters = []
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
@@ -100,7 +93,6 @@ def showHosters():
     if not isMatch:
         pattern = 'src=[^>]"(http[^"]+)'
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-    hosters = []
     if isMatch:
         for sUrl in aResult:
             hoster = {'link': sUrl, 'name': sUrl}
@@ -109,7 +101,6 @@ def showHosters():
         hosters.append('getHosterUrl')
     return hosters
 
-
 def getHosterUrl(sUrl=False):
     if 'youtube' in sUrl:
         import xbmc, xbmcgui
@@ -117,15 +108,12 @@ def getHosterUrl(sUrl=False):
             xbmc.executebuiltin("InstallAddon(%s)" % "plugin.video.youtube")
     return [{'streamUrl': sUrl, 'resolved': False}]
 
-
 def showSearch():
-    oGui = cGui()
-    sSearchText = oGui.showKeyBoard()
+    sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
-    oGui.setEndOfDirectory()
+    cGui().setEndOfDirectory()
 
 
 def _search(oGui, sSearchText):
-    if not sSearchText: return
     showEntries(URL_SEARCH, oGui, sSearchText)
