@@ -179,9 +179,9 @@ def showHosterserie():
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
         if isMatch:
             for sQualy, sUrl in aResult:
-                hoster = {'link': 'https://' + url + sUrl, 'name': sQualy}
+                hoster = {'link': 'https://' + url + sUrl, 'name':'S0 - ' + sQualy}
                 hosters.append(hoster)
-    oRequest = cRequestHandler(str(URL_MAIN + 'movie/load-stream/' + sID +'/'+ eID + '?server=2'))
+    oRequest = cRequestHandler(str(URL_MAIN + 'movie/load-stream/' + sID +'/'+ eID + '?server=1'))
     oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
     oRequest.addHeaderEntry('Referer', rUrl)
     sHtmlContent = oRequest.request()
@@ -192,7 +192,7 @@ def showHosterserie():
         isMatch, aResult = cParser().parse(sContainer, pattern)
         if isMatch:
             for  sUrl,sQualy,stype in aResult:
-                hoster = {'link': sUrl, 'name': sQualy}
+                hoster = {'link': sUrl, 'name':'S1 - ' + sQualy}
                 hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
@@ -225,11 +225,11 @@ def showHosters():
                 isMatch, aResult = cParser().parse(sHtmlContent, pattern)
                 if isMatch:
                     for sQualy, sUrl in aResult:
-                        hoster = {'link': 'https://' + url + sUrl, 'name': sQualy}
+                        hoster = {'link': 'https://' + url + sUrl, 'name':'S0 - ' + sQualy}
                         hosters.append(hoster)
     if isMatch:
         for sMID, sEID in aResult1:
-            oRequest = cRequestHandler(str(URL_MAIN + 'movie/load-stream/' + sMID +'/'+ sEID + '?server=2'))
+            oRequest = cRequestHandler(str(URL_MAIN + 'movie/load-stream/' + sMID +'/'+ sEID + '?server=1'))
             oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
             oRequest.addHeaderEntry('Referer', rUrl)
             sHtmlContent = oRequest.request()
@@ -240,7 +240,7 @@ def showHosters():
                 isMatch, aResult = cParser().parse(sContainer, pattern)
                 if isMatch:
                     for  sUrl,sQualy,stype in aResult:
-                        hoster = {'link': sUrl, 'name': sQualy}
+                        hoster = {'link': sUrl, 'name':'S1 - ' + sQualy}
                         hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
