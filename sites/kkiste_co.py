@@ -9,20 +9,16 @@ from resources.lib.parser import cParser
 SITE_IDENTIFIER = 'kkiste_co'
 SITE_NAME = 'KKiste.co'
 SITE_ICON = 'kkiste_co.png'
-
 URL_MAIN = 'https://kkiste.co/'
-
 
 def load():
     logger.info('Load %s' % SITE_NAME)
-    oGui = cGui()
     params = ParameterHandler()
     params.setParam('sUrl', URL_MAIN)
-    oGui.addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
-    oGui.addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
-    oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
-    oGui.setEndOfDirectory()
-
+    cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
+    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
+    cGui().setEndOfDirectory()
 
 def showGenre():
     params = ParameterHandler()
@@ -33,14 +29,13 @@ def showGenre():
     if isMatch:
         isMatch, aResult = cParser.parse(sHtmlContainer, 'href="([^"]+).*?>([^<]+)')
     if not isMatch:
-        cGui().showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        cGui().showInfo()
         return
 
     for sUrl, sName in aResult:
         params.setParam('sUrl', sUrl)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
-
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -57,7 +52,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
 
     if not isMatch:
-        if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        if not sGui: oGui.showInfo()
         return
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
@@ -82,12 +77,11 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('movie')
         oGui.setEndOfDirectory()
 
-
 def showHosters():
+    hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
     isMatch, aResult = cParser().parse(sHtmlContent, 'link="([^"]+)')
-    hosters = []
     if isMatch:
         for sUrl in aResult:
             if not 'vod' in sUrl and not 'youtube' in sUrl and not 'verystream' in sUrl:
@@ -100,21 +94,15 @@ def showHosters():
         hosters.append('getHosterUrl')
     return hosters
 
-
 def getHosterUrl(sUrl=False):
     return [{'streamUrl': sUrl, 'resolved': False}]
 
-
 def showSearch():
-    oGui = cGui()
-    sSearchText = oGui.showKeyBoard()
+    sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
-    oGui.setEndOfDirectory()
-
+    cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
     if not sSearchText: return
     showEntries(URL_MAIN, oGui, sSearchText)
-
-
