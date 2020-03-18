@@ -20,19 +20,18 @@ def load():
     oGui = cGui()
     params = ParameterHandler()
     params.setParam('sUrl', URL_FILME)
-    oGui.addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_SERIE)
-    oGui.addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sCont', 'Genres')
-    oGui.addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
+    cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
     params.setParam('sCont', 'Jahr')
-    oGui.addFolder(cGuiElement('Jahr', SITE_IDENTIFIER, 'showValue'), params)
-    oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
-    oGui.setEndOfDirectory()
+    cGui().addFolder(cGuiElement('Jahr', SITE_IDENTIFIER, 'showValue'), params)
+    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
+    cGui().setEndOfDirectory()
 
 
 def showValue():
-    oGui = cGui()
     params = ParameterHandler()
     sHtmlContent = cRequestHandler(URL_MAIN).request()
     isMatch, sContainer = cParser.parse(sHtmlContent, '">%s<.*?</ul>' % params.getValue('sCont'))
@@ -41,13 +40,13 @@ def showValue():
         pattern = '<a[^>]*href="([^"]+)".*?>([^"]+)</a>'
         isMatch, aResult = cParser.parse(sContainer[0], pattern)
     if not isMatch:
-        oGui.showInfo()
+        cGui().showInfo()
         return
 
     for sUrl, sName in aResult:
         params.setParam('sUrl', sUrl)
-        oGui.addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
-    oGui.setEndOfDirectory()
+        cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().setEndOfDirectory()
 
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
@@ -90,9 +89,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('tvshows' if 'tvshow' in sUrl else 'movies')
         oGui.setEndOfDirectory()
 
-
 def showSeasons():
-    oGui = cGui()
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue('sThumbnail')
@@ -102,7 +99,7 @@ def showSeasons():
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
-        oGui.showInfo()
+        cGui().showInfo()
         return
 
     isDesc, sDesc = cParser.parse(sHtmlContent, 'class="wp-content">([^"]+)<div')
@@ -116,13 +113,11 @@ def showSeasons():
         if isDesc:
             oGuiElement.setDescription(sDesc[0])
         params.setParam('sSeasonNr', int(sSeasonNr))
-        oGui.addFolder(oGuiElement, params, True, total)
-    oGui.setView('seasons')
-    oGui.setEndOfDirectory()
-
+        cGui().addFolder(oGuiElement, params, True, total)
+    cGui().setView('seasons')
+    cGui().setEndOfDirectory()
 
 def showEpisodes():
-    oGui = cGui()
     params = ParameterHandler()
     sThumbnail = params.getValue('sThumbnail')
     entryUrl = params.getValue('entryUrl')
@@ -134,9 +129,8 @@ def showEpisodes():
     if isMatch:
         pattern = "numerando'>[^-]*-\s*(\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
         isMatch, aResult = cParser.parse(sContainer[0], pattern)
-
     if not isMatch:
-        oGui.showInfo()
+        cGui().showInfo()
         return
 
     isDesc, sDesc = cParser.parse(sHtmlContent, 'class="wp-content">([^"]+)<div')
@@ -151,10 +145,9 @@ def showEpisodes():
             oGuiElement.setDescription(sDesc[0])
         oGuiElement.setMediaType('episode')
         params.setParam('entryUrl', sUrl)
-        oGui.addFolder(oGuiElement, params, False, total)
-    oGui.setView('episodes')
-    oGui.setEndOfDirectory()
-
+        cGui().addFolder(oGuiElement, params, False, total)
+    cGui().setView('episodes')
+    cGui().setEndOfDirectory()
 
 def showHosters():
     sUrl = ParameterHandler().getValue('entryUrl')
@@ -182,21 +175,17 @@ def showHosters():
         hosters.append('getHosterUrl')
     return hosters
 
-
 def getHosterUrl(sUrl=False):
     Request = cRequestHandler(sUrl, caching=False)
     Request.addHeaderEntry('Referer', sUrl)
     Request.request()
     return [{'streamUrl': Request.getRealUrl(), 'resolved': False}]
 
-
 def showSearch():
-    oGui = cGui()
-    sSearchText = oGui.showKeyBoard()
+    sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
-    oGui.setEndOfDirectory()
-
+    cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
