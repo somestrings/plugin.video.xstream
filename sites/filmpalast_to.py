@@ -9,7 +9,6 @@ from resources.lib.parser import cParser
 SITE_IDENTIFIER = 'filmpalast_to'
 SITE_NAME = 'FilmPalast'
 SITE_ICON = 'filmpalast.png'
-
 URL_MAIN = 'https://filmpalast.to'
 URL_MOVIES = URL_MAIN + '/movies/new'
 URL_SHOWS = URL_MAIN + '/serien/view'
@@ -17,49 +16,41 @@ URL_TOP = URL_MAIN + '/movies/top'
 URL_ENGLISH = URL_MAIN + '/search/genre/Englisch'
 URL_SEARCH = URL_MAIN + '/search/title/%s'
 
-
 def load():
     logger.info("Load %s" % SITE_NAME)
     params = ParameterHandler()
-    oGui = cGui()
     params.setParam('sUrl', URL_MAIN)
-    oGui.addFolder(cGuiElement('Neues', SITE_IDENTIFIER, 'showEntries'), params)
-    oGui.addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showMovieMenu'))
-    oGui.addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showSeriesMenu'))
-    oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
-    oGui.setEndOfDirectory()
-
+    cGui().addFolder(cGuiElement('Neues', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showMovieMenu'))
+    cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showSeriesMenu'))
+    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
+    cGui().setEndOfDirectory()
 
 def showMovieMenu():
-    oGui = cGui()
     params = ParameterHandler()
     params.setParam('sUrl', URL_MOVIES)
-    oGui.addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_TOP)
-    oGui.addFolder(cGuiElement('Top Filme', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Top Filme', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_ENGLISH)
-    oGui.addFolder(cGuiElement('Englisch', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Englisch', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MOVIES)
     params.setParam('value', 'genre')
-    oGui.addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
+    cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
     params.setParam('sUrl', URL_MOVIES)
     params.setParam('value', 'movietitle')
-    oGui.addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showValue'), params)
-    oGui.setEndOfDirectory()
-
+    cGui().addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showValue'), params)
+    cGui().setEndOfDirectory()
 
 def showSeriesMenu():
-    oGui = cGui()
     params = ParameterHandler()
     params.setParam('sUrl', URL_SHOWS)
-    oGui.addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('value', 'movietitle')
-    oGui.addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showValue'), params)
-    oGui.setEndOfDirectory()
-
+    cGui().addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showValue'), params)
+    cGui().setEndOfDirectory()
 
 def showValue():
-    oGui = cGui()
     params = ParameterHandler()
     value = params.getValue("value")
     sHtmlContent = cRequestHandler(params.getValue('sUrl')).request()
@@ -69,16 +60,14 @@ def showValue():
     if isMatch:
         pattern = 'href="([^"]+)">([^<]+)'
         isMatch, aResult = cParser.parse(sContainer, pattern)
-
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        cGui().showInfo()
         return
 
     for sUrl, sName in aResult:
         params.setParam('sUrl', sUrl)
-        oGui.addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
-    oGui.setEndOfDirectory()
-
+        cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().setEndOfDirectory()
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -93,7 +82,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
-        if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        if not sGui: oGui.showInfo()
         return
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
@@ -105,7 +94,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         sThumbnail = sThumbnail + cf
         if sThumbnail.startswith('/'):
             sThumbnail = URL_MAIN + sThumbnail
-
         isYear, sYear = cParser.parseSingleResult(sDummy, 'Jahr:[^>]([\d]+)')
         isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\d]+)')
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
@@ -134,9 +122,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('tvshow' if isTvshow else 'movie')
         oGui.setEndOfDirectory()
 
-
 def showSeasons():
-    oGui = cGui()
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue("sThumbnail")
@@ -146,7 +132,7 @@ def showSeasons():
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        cGui().showInfo()
         return
 
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '"description">([^<]+)')
@@ -160,13 +146,11 @@ def showSeasons():
         oGuiElement.setFanart(sThumbnail)
         if isDesc:
             oGuiElement.setDescription(sDesc)
-        oGui.addFolder(oGuiElement, params, True, total)
-    oGui.setView('seasons')
-    oGui.setEndOfDirectory()
-
+        cGui().addFolder(oGuiElement, params, True, total)
+    cGui().setView('seasons')
+    cGui().setEndOfDirectory()
 
 def showEpisodes():
-    oGui = cGui()
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue("sThumbnail")
@@ -177,13 +161,12 @@ def showEpisodes():
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
 
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        cGui().showInfo()
         return
 
     pattern = '<a[^>]*href="([^"]*)"[^>]*class="getStaffelStream"[^>]*>.*?<small>([^>]*?)</small>'
     isMatch, aResult = cParser.parse(sContainer, pattern)
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '"description">([^<]+)')
-
     total = len(aResult)
     for sEpisodeUrl, sName in aResult:
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, "showHosters")
@@ -198,10 +181,9 @@ def showEpisodes():
             params.setParam('entryUrl', sEpisodeUrl)
         if isDesc:
             oGuiElement.setDescription(sDesc)
-        oGui.addFolder(oGuiElement, params, False, total)
-    oGui.setView('episodes')
-    oGui.setEndOfDirectory()
-
+        cGui().addFolder(oGuiElement, params, False, total)
+    cGui().setView('episodes')
+    cGui().setEndOfDirectory()
 
 def showHosters():
     sUrl = ParameterHandler().getValue('entryUrl')
@@ -217,7 +199,6 @@ def showHosters():
         hosters.append('getHosterUrl')
     return hosters
 
-
 def getHosterUrl(sUrl=False):
     if 'vivo.php' in sUrl:
         oRequest = cRequestHandler(sUrl, caching=False)
@@ -227,14 +208,11 @@ def getHosterUrl(sUrl=False):
     else:
         return [{'streamUrl': sUrl, 'resolved': False}]
 
-
 def showSearch():
-    oGui = cGui()
-    sSearchText = oGui.showKeyBoard()
+    sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
-    oGui.setEndOfDirectory()
-
+    cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
