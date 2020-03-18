@@ -1,4 +1,22 @@
 3.5.14~nightly2
+- [dokus4] add site
+- [dokustream] remove offline
+- [alleserien] code cleanup
+- [filmpalast] code cleanup
+- [flimmerstube] code cleanup
+- [hd-streams.to] code cleanup
+- [hd-streams.org] cloudflare problem remove
+- [kino.cx] keine hoster remove
+- [kindertube] code cleanup
+- [kinoger] code cleanup
+- [kkiste] code cleanup
+- [moviedream] code cleanup
+- [movietown] code cleanup
+- [netzkino] code cleanup
+- [serienstream] code cleanup
+- [streamit.ws] keine hoster remove
+- [topstreamfilm] hoster problem remove 
+- [streamking] code cleanup add serien und jahr
 - Update service.py
 
 3.5.14~nightly1
