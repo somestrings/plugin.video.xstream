@@ -1,4 +1,5 @@
 3.5.14~nightly2
+- [hdfilme] fix hoster tnx loki
 - [dokus4] add site
 - [dokustream] remove offline
 - [alleserien] code cleanup
