@@ -9,7 +9,6 @@ from resources.lib.handler.ParameterHandler import ParameterHandler
 SITE_IDENTIFIER = 'kindertube'
 SITE_NAME = 'Kindertube'
 SITE_ICON = 'kindertube.png'
-
 URL_MAIN = 'http://www.kindertube.de/'
 URL_ALL = URL_MAIN + 'alle-filme-und-serien.html'
 URL_02 = URL_MAIN + 'kleinkind-filme-0-2-jahre.html'
@@ -20,22 +19,20 @@ URL_SERIEN = URL_MAIN + 'alte-kinderserien.html'
 
 def load():
     logger.info("Load %s" % SITE_NAME)
-    oGui = cGui()
     params = ParameterHandler()
     params.setParam('sUrl', URL_ALL)
-    oGui.addFolder(cGuiElement('Alle Filme', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Alle Filme', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_02)
-    oGui.addFolder(cGuiElement('0-2 jährigen', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('0-2 jährigen', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_KLEINKINDER)
-    oGui.addFolder(cGuiElement('Kleinkinder', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Kleinkinder', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_LEHRFILME)
-    oGui.addFolder(cGuiElement('Lehrfilme', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Lehrfilme', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MUSIK)
-    oGui.addFolder(cGuiElement('Musik', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Musik', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_SERIEN)
-    oGui.addFolder(cGuiElement('Serien von früher', SITE_IDENTIFIER, 'showEntries'), params)
-    oGui.setEndOfDirectory()
-
+    cGui().addFolder(cGuiElement('Serien von früher', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().setEndOfDirectory()
 
 def showEntries(entryUrl=False, sGui=False):
     oGui = sGui if sGui else cGui()
@@ -48,9 +45,8 @@ def showEntries(entryUrl=False, sGui=False):
     if isMatch:
         pattern = '<a[^>]*href="([^"]+).*?<img[^>]*src="([^"]+).*?"title">([^<]+)'
         isMatch, aResult = cParser().parse(sContainer, pattern)
-
     if not isMatch:
-        if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        if not sGui: oGui.showInfo()
         return
 
     total = len(aResult)
@@ -62,9 +58,7 @@ def showEntries(entryUrl=False, sGui=False):
         oGui.addFolder(oGuiElement, params, True, total)
     oGui.setEndOfDirectory()
 
-
 def showEpisodes():
-    oGui = cGui()
     params = ParameterHandler()
     sEpisodes = params.getValue('sEpisodes')
     sHtmlContent = cRequestHandler(sEpisodes).request()
@@ -72,7 +66,7 @@ def showEpisodes():
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
 
     if not isMatch:
-        if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        if not sGui: cGui().showInfo()
         return
 
     total = len(aResult)
@@ -82,9 +76,8 @@ def showEpisodes():
         oGuiElement.setThumbnail(URL_MAIN + Episodes + sThumbnail)
         oGuiElement.setFanart(URL_MAIN + Episodes + sThumbnail)
         params.setParam('url', 'https://www.youtube.com/watch?v=' + sUrl)
-        oGui.addFolder(oGuiElement, params, False, total)
-    oGui.setEndOfDirectory()
-
+        cGui().addFolder(oGuiElement, params, False, total)
+    cGui().setEndOfDirectory()
 
 def getHosterUrl(sUrl=False):
     if 'youtube' in sUrl:
