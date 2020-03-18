@@ -8,14 +8,11 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 
-
 SITE_IDENTIFIER = 'netzkino_de'
 SITE_NAME = 'NetzKino'
 SITE_ICON = 'netzkino.png'
-
 URL_MAIN = 'http://api.netzkino.de.simplecache.net/capi-2.0a/categories/%s.json?d=www&l=de-DE&v=unknown'
 URL_SEARCH = 'http://api.netzkino.de.simplecache.net/capi-2.0a/search?q=%s&d=www&l=de-DE&v=unknown'
-
 
 def load():
     logger.info("Load %s" % SITE_NAME)
@@ -55,7 +52,6 @@ def load():
     oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     oGui.setEndOfDirectory()
 
-
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
@@ -66,11 +62,9 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not sJson:
         if not sGui: oGui.showError('xStream', 'Fehler beim Laden der Daten.')
         return
-
     aJson = json.loads(sJson)
-
     if not 'posts' in aJson or len(aJson['posts']) == 0:
-        if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        if not sGui: oGui.showInfo()
         return
 
     total = len(aJson['posts'])
@@ -81,7 +75,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
                 continue
             if sSearchText and not cParser().search(sSearchText, item['title'].encode('utf-8', 'ignore')):
                 continue
-
             oGuiElement = cGuiElement(item['title'].encode('utf-8', 'ignore'), SITE_IDENTIFIER, 'getHosterUrl')
             oGuiElement.setThumbnail(item['thumbnail'].encode('utf-8', 'ignore'))
             sFanart = ','.join(item['custom_fields']['featured_img_all'])
@@ -89,9 +82,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             sYahr = ','.join(item['custom_fields']['Jahr'])
             oGuiElement.setYear(sYahr)
             oGuiElement.setDescription(item['content'])
-            Youtube = ','.join(item['custom_fields']['Youtube_Delivery_Id'])
             Streaming = ','.join(item['custom_fields']['Streaming'])
-            params.setParam('Youtube', Youtube)
             params.setParam('Streaming', Streaming)
             oGui.addFolder(oGuiElement, params, False, total)
         except:
@@ -99,30 +90,21 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not sGui:
         oGui.setEndOfDirectory()
 
-
 def getHosterUrl(Streaming=False):
     if not Streaming: Streaming = ParameterHandler().getValue('Streaming')
     sUrl = 'http://netzkino_and-vh.akamaihd.net/i/%s.mp4/master.m3u8' % Streaming
-    results = []
-    result = {'streamUrl': sUrl, 'resolved': True}
-    results.append(result)
-    return results
-
+    return [{'streamUrl': sUrl, 'resolved': True}]
 
 def showSearch():
-    oGui = cGui()
-    sSearchText = oGui.showKeyBoard()
+    sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
-    oGui.setEndOfDirectory()
-
+    cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    if not sSearchText: return
     showEntries(URL_SEARCH % sSearchText.strip(), oGui, sSearchText)
 
 def showAdult():
-    oConfig = cConfig()
-    if oConfig.getSetting('showAdult') == 'true':
+    if cConfig().getSetting('showAdult') == 'true':
         return True
     return False
