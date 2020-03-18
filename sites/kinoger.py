@@ -11,41 +11,36 @@ SITE_IDENTIFIER = 'kinoger'
 SITE_NAME = 'Kinoger'
 SITE_ICON = 'kinoger.png'
 SITE_SETTINGS = '<setting default="kinoger.com" enable="!eq(-2,false)" id="kinoger-domain" label="30051" type="labelenum" values="kinoger.com|kinoger.to" />'
-
 DOMAIN = cConfig().getSetting('kinoger-domain')
 URL_MAIN = 'https://' + DOMAIN
 URL_SERIE = URL_MAIN + 'stream/serie/'
 
-
 def load():
     logger.info("Load %s" % SITE_NAME)
-    oGui = cGui()
     params = ParameterHandler()
     geturl(URL_MAIN)
     params.setParam('sUrl', URL_MAIN)
-    oGui.addFolder(cGuiElement('Filme & Serien', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Filme & Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_SERIE)
-    oGui.addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'))
-    oGui.addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
-    oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
-    oGui.setEndOfDirectory()
-
+    cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'))
+    cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
+    cGui().setEndOfDirectory()
 
 def showGenre():
-    oGui = cGui()
     params = ParameterHandler()
     sHtmlContent = cRequestHandler(URL_MAIN).request()
     pattern = '<li[^>]class="links"><a href="([^"]+).*?/>([^<]+)</a>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
-        oGui.showInfo()
+        cGui().showInfo()
         return
 
     for sUrl, sName in aResult:
         params.setParam('sUrl', URL_MAIN + sUrl)
-        oGui.addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
-    oGui.setEndOfDirectory()
+        cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().setEndOfDirectory()
 
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
@@ -112,10 +107,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('tvshows' if 'staffel' in sName.lower() else 'movies')
         oGui.setEndOfDirectory()
 
-
 def showSeasons():
     geturl(URL_MAIN)
-    oGui = cGui()
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue('sThumbnail')
@@ -128,7 +121,7 @@ def showSeasons():
         pattern = "'([^\]]+)"
         isMatch, aResult = cParser.parse(sContainer, pattern)
     if not isMatch:
-        oGui.showInfo()
+        cGui().showInfo()
         return
 
     i = 0
@@ -146,13 +139,12 @@ def showSeasons():
             oGuiElement.setDescription(sDesc)
         params.setParam('sNr', i)
         params.setParam('sSeasonNr', sSeasonNr)
-        oGui.addFolder(oGuiElement, params, True, total)
-    oGui.setView('seasons')
-    oGui.setEndOfDirectory()
+        cGui().addFolder(oGuiElement, params, True, total)
+    cGui().setView('seasons')
+    cGui().setEndOfDirectory()
 
 
 def showEpisodes():
-    oGui = cGui()
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(entryUrl).request()
@@ -164,7 +156,7 @@ def showEpisodes():
     isMatch, aResult = cParser.parse(sEpisodeNr, pattern)
 
     if not isMatch:
-        oGui.showInfo()
+        cGui().showInfo()
         return
 
     i = 0
@@ -182,9 +174,9 @@ def showEpisodes():
             oGuiElement.setThumbnail(sThumbnail)
             oGuiElement.setFanart(sThumbnail)
         params.setParam('entryUrl', sEpisodeNr)
-        oGui.addFolder(oGuiElement, params, False, total)
-    oGui.setView('episodes')
-    oGui.setEndOfDirectory()
+        cGui().addFolder(oGuiElement, params, False, total)
+    cGui().setView('episodes')
+    cGui().setEndOfDirectory()
 
 
 def showHosters():
@@ -193,7 +185,6 @@ def showHosters():
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = "show[^>]\d,[^>][^>]'([^']+)"
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if isMatch:
         for sUrl in aResult:
             if 'sst' in sUrl:
@@ -234,7 +225,6 @@ def showHosters():
                     if not 'iframe' in sUrl:
                         hoster = {'link': sUrl, 'name': sQualy}
                         hosters.append(hoster)
-
     elif 'hdgo' in sUrl or 'sst' in sUrl:
         oRequest = cRequestHandler(sUrl)
         oRequest.addHeaderEntry('Referer', sUrl)
@@ -250,7 +240,6 @@ def showHosters():
         hosters.append('getHosterUrl')
     return hosters
 
-
 def getHosterUrl(sUrl=False):
     if sUrl.startswith('//'):
         sUrl = 'https:' + sUrl
@@ -259,7 +248,6 @@ def getHosterUrl(sUrl=False):
     else:
         return [{'streamUrl': sUrl + '|Referer=' + sUrl + '&Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0', 'resolved': True}]
 
-
 def showSearch():
     oGui = cGui()
     sSearchText = oGui.showKeyBoard()
@@ -267,24 +255,9 @@ def showSearch():
     _search(False, sSearchText)
     oGui.setEndOfDirectory()
 
-
 def _search(oGui, sSearchText):
     geturl(URL_MAIN)
     showEntries(URL_MAIN, oGui, sSearchText)
-
-
-def Qualy(sUrl):
-    if '/1/' in sUrl:
-        return '360p'
-    elif '/2/' in sUrl:
-        return '480p'
-    elif '/3/' in sUrl:
-        return '720p'
-    elif '/4/' in sUrl:
-        return '1080p'
-    else:
-        return 'SD'
-
 
 def Qualy2(sUrl):
     if '360p' in sUrl:
@@ -295,8 +268,6 @@ def Qualy2(sUrl):
         return '720p'
     else:
         return '1080p'
-
-
 
 def geturl(sUrl):
     from urlparse import urlparse
