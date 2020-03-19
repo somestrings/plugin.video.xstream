@@ -1,4 +1,5 @@
 3.5.14~nightly2
+- [xcine] code optimierung tnx loki
 - [xcine] add site tnx loki
 - [hdfilme] fix hoster tnx loki
 - [dokus4] add site
