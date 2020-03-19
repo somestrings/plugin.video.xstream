@@ -1,4 +1,6 @@
 3.5.14~nightly2
+- [hdfilme] hoster optimierung tnx loki and code cleanup
+- [xcine] code cleanup
 - [xcine] code optimierung tnx loki
 - [xcine] add site tnx loki
 - [hdfilme] fix hoster tnx loki
