@@ -7,7 +7,7 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'pureanime'
-SITE_NAME = 'Pureaneme'
+SITE_NAME = 'Pureanime'
 SITE_ICON = 'pureanime.png'
 SITE_GLOBAL_SEARCH = False
 URL_MAIN = 'https://pure-anime.net/'
@@ -164,7 +164,7 @@ def Language(sLang):
     elif 'espsub' in sLang:
         return ' (Spanische Untertitel)'
     elif 'trsub' in sLang:
-        return ' (Türkische Untertitel)'
+        return ' (TÃ¼rkische Untertitel)'
     elif 'de.png' in sLang:
         return ' (Deutsch)'
     elif 'en.png' in sLang:
