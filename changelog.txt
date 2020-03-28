@@ -1,4 +1,7 @@
 3.5.14~nightly2
+- [moviestream] code cleanup
+- [cinenator] code cleanup
+- [pureanime] cloudplayer add Qualy
 - [pureanime] add site
 - [hdfilme] hoster optimierung tnx loki and code cleanup
 - [xcine] code cleanup
