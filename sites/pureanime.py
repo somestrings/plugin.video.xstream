@@ -150,59 +150,49 @@ def showHosters():
             oRequest.setRequestType(1)
             sHtmlContent = oRequest.request()
             isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, "src='([^']+)")
-            hoster = {'link': sUrl, 'name': sName + Language(sLang)}
-            hosters.append(hoster)
+            if 'cloudplayer' in sUrl:
+                from resources.lib import jsunpacker
+                import base64
+                sHtmlContent = cRequestHandler(sUrl, ignoreErrors=True).request()
+                isMatch, sUrl = cParser.parse(sHtmlContent, 'src":"([^"]+)')
+                if isMatch:
+                    sHtmlContent = cRequestHandler(sUrl[0], ignoreErrors=True).request()
+                    isMatch, sUrl = cParser.parse(sHtmlContent, 'JuicyCodes.Run[^>]"(.*?)"[^>];')
+                if isMatch:
+                    sHtmlContent = base64.b64decode(sUrl[0].replace('"+"', ''))
+                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\(function\(p,a,c,k,e,d\).+)\s+?')
+                if isMatch:
+                    sHtmlContent = jsunpacker.unpack(sUrl[0])
+                    isMatch, aResult = cParser.parse(sHtmlContent, 'file":"([^"]+).*?label":"([^"]+)')
+                    for sUrl, sQualy in aResult:
+                        hoster = {'link': sUrl, 'name': sName + Language(sLang) + sQualy}
+                        hosters.append(hoster)
+            else:
+                hoster = {'link': sUrl, 'name': sName + Language(sLang)}
+                hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
 
 def Language(sLang):
     if 'gersub' in sLang:
-        return ' (Deutsche Untertitel)'
+        return ' (Deutsche Untertitel) '
     elif 'engsub' in sLang:
-        return ' (Englische Untertitel)'
+        return ' (Englische Untertitel) '
     elif 'espsub' in sLang:
-        return ' (Spanische Untertitel)'
+        return ' (Spanische Untertitel) '
     elif 'trsub' in sLang:
-        return ' (Türkische Untertitel)'
+        return ' (Türkische Untertitel) '
     elif 'de.png' in sLang:
-        return ' (Deutsch)'
+        return ' (Deutsch) '
     elif 'en.png' in sLang:
-        return ' (Englische)'
+        return ' (Englische) '
     else:
-        return ''
-
-def cloudplayer(sUrl):
-    from resources.lib import jsunpacker
-    import base64
-    sHtmlContent = cRequestHandler(sUrl, ignoreErrors=True).request()
-    isMatch, sUrl = cParser.parse(sHtmlContent, 'src":"([^"]+)')
-    if isMatch:
-        sHtmlContent = cRequestHandler(sUrl[0], ignoreErrors=True).request()
-        isMatch, sUrl = cParser.parse(sHtmlContent, 'JuicyCodes.Run[^>]"(.*?)"[^>];')
-        if isMatch:
-            sHtmlContent = base64.b64decode(sUrl[0].replace('"+"', ''))
-            isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\(function\(p,a,c,k,e,d\).+)\s+?')
-            if isMatch:
-                sHtmlContent = jsunpacker.unpack(sUrl[0])
-                if isMatch:
-                    isMatch, sUrl = cParser.parse(sHtmlContent, 'file":"([^"]+)')
-                    return sUrl[0]
+        return ' '
 
 def getHosterUrl(sUrl=False):
     if 'cloudplayer' in sUrl:
-        sUrl = cloudplayer(sUrl)
         return [{'streamUrl': sUrl, 'resolved': True}]
-    if 'ani-stream' in sUrl:
-        sHtmlContent = cRequestHandler(sUrl, ignoreErrors=True).request()
-        isMatch, sUrl = cParser.parse(sHtmlContent, 'file:[^<]"([^"]+)')
-        if isMatch:
-            return [{'streamUrl': sUrl[0], 'resolved': True}]
-    if '7-up.net' in sUrl:
-        sHtmlContent = cRequestHandler(sUrl, ignoreErrors=True).request()
-        isMatch, sUrl = cParser.parse(sHtmlContent, 'file":"([^"]+)')
-        if isMatch:
-            return [{'streamUrl': sUrl[0], 'resolved': True}]
     else:
         return [{'streamUrl': sUrl, 'resolved': False}]
 
