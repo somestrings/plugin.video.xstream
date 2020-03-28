@@ -1,4 +1,5 @@
 3.5.14~nightly2
+- [cinenator] hoster add lang and qualy
 - [moviestream] code cleanup
 - [cinenator] code cleanup
 - [pureanime] cloudplayer add Qualy
