@@ -148,26 +148,22 @@ def showEpisodes():
 
 def showHosters():
     hosters = []
-    params = ParameterHandler()
-    sUrl = params.getValue('entryUrl')
+    sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '<strong>Stream</strong>.*?</div>'
-    isMatch, sHtmlContainer = cParser.parseSingleResult(sHtmlContent, pattern)
+    pattern = "domain=([^']+).*?href='([^']+).*?quality'>([^<]+).*?<td>([^<]+)"
+    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
-        pattern = 'domain=([^"]+).*?href="([^"]+)'
-        isMatch, aResult = cParser().parse(sHtmlContainer, pattern)
-    if isMatch:
-        for sName, sUrl in aResult:
+        for sName, sUrl, sQualy, sLang in aResult:
             if not 'filecrypt' in sName:
-                hoster = {'link': sUrl, 'name': sName}
+                hoster = {'link': sUrl, 'name': sName + ' ' + sLang + ' ' + sQualy}
                 hosters.append(hoster)
-        if hosters:
-            hosters.append('getHosterUrl')
-        return hosters
+    if hosters:
+        hosters.append('getHosterUrl')
+    return hosters
 
 def getHosterUrl(sUrl=False):
     sHtmlContent = cRequestHandler(sUrl).request()
-    isMatch, hLink = cParser.parseSingleResult(sHtmlContent, '><a[^>]*href="([^"]+)">')
+    isMatch, hLink = cParser.parseSingleResult(sHtmlContent, 'id="link.*?href="([^"]+)"')
     return [{'streamUrl': hLink, 'resolved': False}]
 
 def showSearch():
@@ -177,4 +173,4 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % sSearchText.strip(), oGui, sSearchText)
+    showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
