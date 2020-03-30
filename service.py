@@ -16,12 +16,12 @@ def infoDialog(message, heading=AddonName, icon='', time=5000, sound=False):
     elif icon == 'ERROR': icon = xbmcgui.NOTIFICATION_ERROR
     xbmcgui.Dialog().notification(heading, message, icon, time, sound=sound)
 
-#if os.path.isfile(NIGHTLY_VERSION_CONTROL)== False or xbmcaddon.Addon().getSetting('DevUpdateAuto') == 'true':
-from resources.lib import updateManager
-status = updateManager.devAutoUpdates(True)
-if status == True: infoDialog("Auto Update abgeschlossen", sound=False, icon='INFO', time=3000)
-if status == False: infoDialog("Auto Update mit Fehler beendet", sound=True, icon='ERROR')
-#if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon='INFO', time=3000)
+if os.path.isfile(NIGHTLY_VERSION_CONTROL)== False or xbmcaddon.Addon().getSetting('DevUpdateAuto') == 'true':
+    from resources.lib import updateManager
+    status = updateManager.devAutoUpdates(True)
+    if status == True: infoDialog("Auto Update abgeschlossen", sound=False, icon='INFO', time=3000)
+    if status == False: infoDialog("Auto Update mit Fehler beendet", sound=True, icon='ERROR')
+    #if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon='INFO', time=3000)
 
 # "setting.xml" wenn notwendig Indexseiten aktualisieren
 try:

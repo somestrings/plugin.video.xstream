@@ -147,19 +147,21 @@ def parseUrl():
         elif sFunction == 'searchAlter':
             searchAlter(params)
             return
-        elif sFunction == 'updateXstream':
+        ##ka  edit
+        elif sFunction == 'devUpdates':
             from resources.lib import updateManager
-            updateManager.xStreamUpdate()
+            updateManager.devUpdates()
             return
-        elif sFunction == 'updateUrlResolver':
-            from resources.lib import updateManager
-            updateManager.urlResolverUpdate()
-            return
-        elif sFunction == 'updateAll':
-            from resources.lib import updateManager
-            updateManager.xStreamUpdate()
-            updateManager.urlResolverUpdate()
-            return
+        ##ka  remove
+        # elif sFunction == 'updateUrlResolver':
+        #     from resources.lib import updateManager
+        #     updateManager.urlResolverUpdate()
+        #     return
+        # elif sFunction == 'updateAll':
+        #     from resources.lib import updateManager
+        #     updateManager.xStreamUpdate()
+        #     updateManager.urlResolverUpdate()
+        #     return
     elif params.exist('remoteplayurl'):
         try:
             import urlresolver
@@ -214,8 +216,11 @@ def parseUrl():
         if params.exist('searchterm'):
             searchterm = params.getValue('searchterm')
         searchGlobal(searchterm)
-    elif sSiteName == 'favGui':
-        showFavGui(sFunction)
+
+    ##ka - remove - not exist
+    # elif sSiteName == 'favGui':
+    #     showFavGui(sFunction)
+
     # If addon settings are called
     elif sSiteName == 'xStream':
         oGui = cGui()
@@ -229,6 +234,10 @@ def parseUrl():
     elif sSiteName == 'metahandler':
         import metahandler
         metahandler.display_settings()
+    # # If UpdateManager are called (manual update)
+    elif sSiteName == 'devUpdates':
+        from resources.lib import updateManager
+        updateManager.devUpdates()
     elif sSiteName == 'settings':
         oGui = cGui()
         for folder in settingsGuiElements():
@@ -275,6 +284,14 @@ def showMainMenu(sFunction):
     else:
         for folder in settingsGuiElements():
             oGui.addFolder(folder)
+    ##ka add - Create a gui element for updateManager
+    if cConfig().getSetting('DevUpdateAuto') == 'false':
+        oGuiElement = cGuiElement()
+        oGuiElement.setTitle('Nightly Update')
+        oGuiElement.setSiteName('devUpdates')
+        oGuiElement.setFunction(sFunction)
+        oGuiElement.setThumbnail('DefaultAddonProgram.png')
+        oGui.addFolder(oGuiElement)
     oGui.setEndOfDirectory()
 
 

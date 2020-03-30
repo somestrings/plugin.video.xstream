@@ -1,3 +1,6 @@
+3.5.14~nightly3
+- Nightly Updates select auto/manual
+
 3.5.14~nightly2
 - [cinenator] hoster add lang and qualy
 - [moviestream] code cleanup
