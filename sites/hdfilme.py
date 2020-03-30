@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import urllib
 from resources.lib import logger
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
@@ -12,7 +13,7 @@ SITE_ICON = 'hdfilme.png'
 URL_MAIN = 'https://hdfilme.cc/'
 URL_MOVIES = URL_MAIN + 'filme1?'
 URL_SHOWS = URL_MAIN + 'serien1?'
-URL_SEARCH = URL_MAIN + 'movie-search?key=%s'
+URL_SEARCH = URL_MAIN + 'search?key=%s'
 
 def load():
     logger.info("Load %s" % SITE_NAME)
@@ -211,4 +212,4 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
+    showEntries(URL_SEARCH % urllib.quote_plus(sSearchText), oGui, sSearchText)
