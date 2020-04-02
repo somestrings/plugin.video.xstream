@@ -1,7 +1,6 @@
-3.5.14~nightly3
+3.5.14
+  02.04.2020
 - Nightly Updates select auto/manual
-
-3.5.14~nightly2
 - [cinenator] hoster add lang and qualy
 - [moviestream] code cleanup
 - [cinenator] code cleanup
@@ -31,9 +30,6 @@
 - [topstreamfilm] hoster problem remove 
 - [streamking] code cleanup add serien und jahr
 - Update service.py
-
-3.5.14~nightly1
-- Fix HdFilme
 
 xStream 3.5.13
   05.03.2020
