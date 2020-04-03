@@ -65,6 +65,10 @@ def Update(username, plugin_id, branch, token, silent):
         LOCAL_PLUGIN_VERSION = os.path.join(ADDON_DIR, "update_sha")
         LOCAL_FILE_NAME_PLUGIN = os.path.join(ADDON_DIR, 'update-' + plugin_id + '.zip')
         if not os.path.exists(ADDON_DIR): os.mkdir(ADDON_DIR)
+#ka - Update erzwingen
+        if addon().getSetting('enforceUpdate') == 'true':
+            if silent == False and os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
+
         path = addon(plugin_id).getAddonInfo('Path')
         commitXML = _getXmlString(REMOTE_PLUGIN_COMMITS, auth)
         if commitXML:
@@ -240,6 +244,8 @@ def devUpdates(): # für manuelles Updates vorgesehen
                 urlResolverUpdate(False)
             except:
                 pass
+        #ka - reset enforce Update
+        if addon().getSetting('enforceUpdate') == 'true': addon().setSetting('enforceUpdate', 'false')
         return
     except Exception as e:
         xbmc.log(e)

@@ -1,3 +1,7 @@
+3.5.15~nightly1
+  03.04.2020
+- UpdateManager add 'enforce Update'
+
 3.5.14
   02.04.2020
 - Nightly Updates select auto/manual
