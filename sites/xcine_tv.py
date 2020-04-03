@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-import urllib
 from resources.lib import logger
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
@@ -216,4 +214,4 @@ def showSearch():
 	cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-	showEntries(URL_SEARCH % urllib.quote_plus(sSearchText), oGui, sSearchText)
+	showEntries(URL_SEARCH % quotePlus(sSearchText), oGui, sSearchText)
