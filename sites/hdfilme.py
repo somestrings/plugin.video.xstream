@@ -9,7 +9,7 @@ from resources.lib.parser import cParser
 SITE_IDENTIFIER = 'hdfilme'
 SITE_NAME = 'HDfilme'
 SITE_ICON = 'hdfilme.png'
-URL_MAIN = 'https://hdfilme.cc/'
+URL_MAIN = 'https://hdfilme.cx/'
 URL_MOVIES = URL_MAIN + 'filme1?'
 URL_SHOWS = URL_MAIN + 'serien1?'
 URL_SEARCH = URL_MAIN + 'search?key=%s'
