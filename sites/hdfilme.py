@@ -163,7 +163,9 @@ def showAllHosters():
 			sID = aResult[0][0]
 			eID = aResult[0][1]
 
-	for server in ['0','1','2']:
+	for server in ['0']:
+
+	#for server in ['0','1','2']:
 		try:
 			oRequest = cRequestHandler(URL_MAIN + 'movie/load-stream/' + sID + '/' + eID + '?server=' + server)
 			oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
@@ -201,7 +203,7 @@ def showAllHosters():
 	return hosters
 
 def getHosterUrl(sUrl=False):
-    sUrl = sUrl + '|verifypeer=false&Origin=https%3A%2F%2Fhdfilme.cc%2F&Referer=https%3A%2F%2Fhdfilme.cc%2F'
+    sUrl = sUrl + '|verifypeer=false&Origin=https%3A%2F%2Fhdfilme.cx%2F&Referer=https%3A%2F%2Fhdfilme.cx%2F'
     return [{'streamUrl': sUrl, 'resolved': True}]
 
 def showSearch():
