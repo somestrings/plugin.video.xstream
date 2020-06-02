@@ -1,7 +1,7 @@
 3.5.15~nightly3
   02.06.2020
   Update:
-- Update Manager (Change master auf nightly)
+- Update Manager (Change URLResolver master auf nightly branche)
 
 3.5.15~nightly2
   30.04.2020
