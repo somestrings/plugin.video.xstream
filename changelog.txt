@@ -2,6 +2,7 @@
   02.06.2020
   Update:
 - Update Manager (Change URLResolver master auf nightly branche)
+- [pureanime] fix hoster
 
 3.5.15~nightly2
   30.04.2020
