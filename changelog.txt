@@ -1,5 +1,10 @@
 3.5.16~nightly1
 
+3.5.15.1
+  28.06.2020
+  Update:
+- script.module.six Anhängigkeit hinzugefügt
+
 3.5.15
   02.06.2020
   Update:
