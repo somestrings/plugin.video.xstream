@@ -66,8 +66,8 @@ def Update(username, plugin_id, branch, token, silent):
         LOCAL_FILE_NAME_PLUGIN = os.path.join(ADDON_DIR, 'update-' + plugin_id + '.zip')
         if not os.path.exists(ADDON_DIR): os.mkdir(ADDON_DIR)
 #ka - Update erzwingen
-        if addon().getSetting('enforceUpdate') == 'true':
-            if silent == False and os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
+        if addon().getSetting('enforceUpdate') == 'true': os.remove(LOCAL_PLUGIN_VERSION)
+        # if silent == False and os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
 
         path = addon(plugin_id).getAddonInfo('Path')
         commitXML = _getXmlString(REMOTE_PLUGIN_COMMITS, auth)
@@ -202,9 +202,9 @@ def zipfolder(foldername, target_dir):
 def devAutoUpdates(silent=False):
     try:
         status1 = status2 = None
-        if addon().getSetting('githubUpdateXstream') == 'true':
+        if addon().getSetting('githubUpdateXstream') == 'true' or if addon().getSetting('enforceUpdate') == 'true':
             status1 = xStreamUpdate(silent)
-        if addon().getSetting('githubUpdateUrlResolver') == 'true':
+        if addon().getSetting('githubUpdateUrlResolver') == 'true' or if addon().getSetting('enforceUpdate') == 'true':
             status2 = urlResolverUpdate(silent)
 
         if status1 == status2:
