@@ -202,9 +202,9 @@ def zipfolder(foldername, target_dir):
 def devAutoUpdates(silent=False):
     try:
         status1 = status2 = None
-        if addon().getSetting('githubUpdateXstream') == 'true' or if addon().getSetting('enforceUpdate') == 'true':
+        if addon().getSetting('githubUpdateXstream') == 'true' or addon().getSetting('enforceUpdate') == 'true':
             status1 = xStreamUpdate(silent)
-        if addon().getSetting('githubUpdateUrlResolver') == 'true' or if addon().getSetting('enforceUpdate') == 'true':
+        if addon().getSetting('githubUpdateUrlResolver') == 'true' or addon().getSetting('enforceUpdate') == 'true':
             status2 = urlResolverUpdate(silent)
 
         if status1 == status2:
