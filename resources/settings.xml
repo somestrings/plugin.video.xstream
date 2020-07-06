@@ -4,7 +4,7 @@
     <setting default="true" id="DevUpdateAuto" label="Nightly Update (automatisch)" type="bool" />
     <setting default="true" id="githubUpdateXstream" label="30010" type="bool" visible="eq(-1,true)" />
     <setting default="true" id="githubUpdateUrlResolver" label="30015" type="bool" visible="eq(-2,true)" />
-    <setting default="false" id="enforceUpdate" label="[B][COLOR red]Aktualisierung einmalig erzwingen[/COLOR][/B] (Nightly Update)" type="bool" visible="eq(-3,false)"/>
+    <setting default="false" id="enforceUpdate" label="[B][COLOR red]Aktualisierung einmalig erzwingen[/COLOR][/B] (Nightly Update)" type="bool" />
     <setting default="true" id="newSetting" label="newSetting" type="bool" visible="false" />
     <setting type="sep" />
     <setting label="30031" type="lsep" />
