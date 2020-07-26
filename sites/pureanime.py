@@ -9,6 +9,7 @@ from resources.lib.parser import cParser
 SITE_IDENTIFIER = 'pureanime'
 SITE_NAME = 'Pureanime'
 SITE_ICON = 'pureanime.png'
+SITE_SETTINGS = '<setting id="pureanime.user" type="text" label="30083" default="" /><setting id="pureanime.pass" type="text" option="hidden" label="30084" default="" />'
 SITE_GLOBAL_SEARCH = False
 URL_MAIN = 'https://pure-anime.net/'
 URL_MOVIES = URL_MAIN + 'anime-movies/'
@@ -16,52 +17,52 @@ URL_SERIES = URL_MAIN + 'anime-serien/'
 URL_TRENDING = URL_MAIN + 'trending/'
 URL_SEARCH = URL_MAIN + '?s=%s'
 
+def login():
+    from resources.lib.config import cConfig
+    username = cConfig().getSetting('pureanime.user')
+    password = cConfig().getSetting('pureanime.pass')
+    if not username == '' and not password == '':
+        oRequest = cRequestHandler('https://pure-anime.net/wp-admin/admin-ajax.php', caching=False)
+        oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
+        oRequest.addHeaderEntry('Referer', URL_MAIN)
+        oRequest.addParameters('log', username)
+        oRequest.addParameters('pwd', password)
+        oRequest.addParameters('rmb', 'forever')
+        oRequest.addParameters('red', URL_MAIN)
+        oRequest.addParameters('action', 'dooplay_login')
+        oRequest.request()
+
+
 def load():
     logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
+    login()
     params.setParam('sUrl', URL_SERIES)
     cGui().addFolder(cGuiElement('Anime Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MOVIES)
     cGui().addFolder(cGuiElement('Anime Movies/OVAs', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_TRENDING)
     cGui().addFolder(cGuiElement('Anime Trends', SITE_IDENTIFIER, 'showEntries'), params)
-    cGui().addFolder(cGuiElement('Jahr', SITE_IDENTIFIER, 'showJahr'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
 
-def showJahr():
-    params = ParameterHandler()
-    sHtmlContent = cRequestHandler(URL_MAIN).request()
-    pattern = 'class="releases.*?</nav>'
-    isMatch, sHtmlContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-
-    if isMatch:
-        isMatch, aResult = cParser.parse(sHtmlContainer, 'href="([^"]+).*?>([^<]+)')
-    if not isMatch:
-        cGui().showInfo()
-        return
-
-    for sUrl, sName in aResult:
-        params.setParam('sUrl', sUrl)
-        cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
-    cGui().setEndOfDirectory()
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
+    if sSearchText:
+        oRequest.addHeaderEntry('Referer', URL_MAIN)
     sHtmlContent = oRequest.request()
     pattern = 'a[^>]title="([^"]+).*?href="([^"]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if not isMatch:
         pattern = 'alt="([^"]+).*? href="([^"]+)"><div class="see">'
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if not isMatch:
         pattern = 'result-item.*?alt="([^"]+).*?href="([^"]+)">'
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
@@ -196,13 +197,13 @@ def Language(sLang):
     elif 'espsub' in sLang:
         return ' (Spanische Untertitel) '
     elif 'trsub' in sLang:
-        return ' (Türkische Untertitel) '
+        return ' (Turkische Untertitel) '
     elif 'de.png' in sLang:
         return ' (Deutsch) '
     elif 'en.png' in sLang:
         return ' (Englische) '
     else:
-        return ' '
+        return ''
 
 def getHosterUrl(sUrl=False):
     if 'cloudplayer' in sUrl or 'uniquestream' in sUrl:
