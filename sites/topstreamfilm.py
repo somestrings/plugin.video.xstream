@@ -3,8 +3,10 @@ from resources.lib import logger
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler2 import cRequestHandler
+from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
+from urlparse import urlparse
+import time
 
 SITE_IDENTIFIER = 'topstreamfilm'
 SITE_NAME = 'Topstreamfilm'
@@ -144,93 +146,57 @@ def showEpisodes():
 
 def showHosters():
     hosters = []
-    sHtmlContent = cRequestHandler(ParameterHandler().getValue('entryUrl'), ignoreErrors=True).request()
-    pattern = 'class="TPlayer">.*?class="btnsplyr'
-    isMatch, sHtmlContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-    sHtmlContainer = sHtmlContainer.replace('&quot;', '"')
-    isMatch, aResult = cParser().parse(sHtmlContainer, '(http[^"]+)')
-    for sUrl2 in aResult:
-        sHtmlContent = cRequestHandler(sUrl2, ignoreErrors=True).request()
-        pattern = '" src="([^"]+)"'
-        isMatch, sUrl3 = cParser().parseSingleResult(sHtmlContent, pattern)
-        if 'topstreamfilm' in sUrl3:
-            sUrl3 = sUrl3[:-1]
-            oRequest = cRequestHandler(sUrl3, ignoreErrors=True)
-            oRequest.addHeaderEntry('Referer', sUrl3)
-            oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-            sHtmlContent = oRequest.request()
-            pattern = "var id = trde[^>]'([^']+)"
-            isMatch, sId = cParser().parseSingleResult(sHtmlContent, pattern)
-            if isMatch:
-                pattern = "iframe.src = '([^']+)"
-                isMatch, sUrl4 = cParser().parseSingleResult(sHtmlContent, pattern)
-            if isMatch:
-                oRequest = cRequestHandler(sUrl4 + sId[::-1], caching=False, ignoreErrors=True)
-                oRequest.addHeaderEntry('Referer', sUrl4)
-                oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-                sHtmlContent = oRequest.request()
-                sUrl6 = oRequest.getRealUrl()
-                if 'public' in sUrl6:
-                    sUrl6 = sUrl6.replace('public/dist/index.html?id=', 'getLinkStreamMd5/')
-                    oRequest = cRequestHandler(sUrl6, ignoreErrors=True)
-                    oRequest.addHeaderEntry('Referer', sUrl4)
-                    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-                    sHtmlContent = oRequest.request()
-                    isMatch, aResult = cParser().parse(sHtmlContent, 'file":"([^"]+).*?label":"([^"]+)')
-                    if isMatch:
-                        for sUrl, sQ in aResult:
-                            hoster = {'link': sUrl, 'name': sQ}
-                            hosters.append(hoster)
-        if 'club' in sUrl3:
-            oRequest = cRequestHandler(sUrl3, ignoreErrors=True)
-            oRequest.addHeaderEntry('Referer', URL_MAIN)
-            oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-            sHtmlContent = oRequest.request()
-            isMatch, sUrl7 = cParser().parseSingleResult(sHtmlContent, 'iframe[^>]src="([^"]+)')
-            if isMatch:
-                oRequest = cRequestHandler(sUrl7, caching=False, ignoreErrors=True)
-                oRequest.addHeaderEntry('Referer', 'https://topstreamfilm.com/')
-                oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
-                oRequest.request()
-                sUrl8 = oRequest.getRealUrl()
-                oRequest = cRequestHandler(sUrl8.replace('v', 'api/source'), ignoreErrors=True)
-                oRequest.addHeaderEntry('Referer', sUrl8)
-                oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
-                oRequest.addHeaderEntry('Origin', 'https://feurl.com')
-                oRequest.addParameters('r', 'https://fd.topsf.club/')
-                oRequest.addParameters('d', 'feurl.com')
-                oRequest.setRequestType(1)
-                sHtmlContent = oRequest.request()
-            pattern = 'file":"([^"]+)","label":"([^"]+)'
-            isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-            if isMatch:
-                for sUrl, sQ in aResult:
-                    hoster = {'link': sUrl, 'name': sQ}
-                    hosters.append(hoster)
+    oRequest = cRequestHandler(ParameterHandler().getValue('entryUrl'), caching=True, ignoreErrors=True)
+    sHtmlContent = oRequest.request()
+    pattern = '" src="([^"]+)" f'
+    isMatch, sUrl2 = cParser().parseSingleResult(sHtmlContent, pattern)
+
+    oRequest = cRequestHandler(sUrl2, caching=True, ignoreErrors=True)
+    oRequest.addHeaderEntry('Referer', ParameterHandler().getValue('entryUrl'))
+    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
+    sHtmlContent = oRequest.request()
+    pattern = '" src="([^"]+)" f'
+    isMatch, sUrl3 = cParser().parseSingleResult(sHtmlContent, pattern)
+
+    oRequest = cRequestHandler(sUrl3, caching=False, ignoreErrors=True)
+    oRequest.addHeaderEntry('Referer', sUrl2)
+    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
+    sHtmlContent = oRequest.request()
+    sUrl4 = oRequest.getRealUrl()
+
+    oRequest = cRequestHandler(sUrl4, caching=True, ignoreErrors=True)
+    oRequest.addHeaderEntry('Referer', sUrl2)
+    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
+    sHtmlContent = oRequest.request()
+    pattern = "var id = trde[^>]'([^']+)"
+    isMatch, sId = cParser().parseSingleResult(sHtmlContent, pattern)
+    pattern = "iframe.src = '([^']+)"
+    isMatch, sUrl5 = cParser().parseSingleResult(sHtmlContent, pattern)
+
+    oRequest = cRequestHandler(sUrl5 + sId[::-1], caching=False, ignoreErrors=True)
+    oRequest.addHeaderEntry('Referer', sUrl4)
+    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
+    sHtmlContent = oRequest.request()
+    sUrl6 = oRequest.getRealUrl()
+    isMatch, id = cParser.parseSingleResult(sUrl6, 'id=([^"]+)')
+    netloc = urlparse(sUrl6).netloc
+    m3u8 = 'https://{0}/playlist/{1}/{2}'.format(netloc, id, int(time.time() * 1000))
+
+    oRequest = cRequestHandler(m3u8, caching=True, ignoreErrors=True)
+    oRequest.addHeaderEntry('Referer', sUrl4)
+    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
+    sHtmlContent = oRequest.request()
+    isMatch, aResult = cParser().parse(sHtmlContent, 'RESOLUTION=\d+x([\d]+)([^#]+)')
+
+    for sQ, sUrl in aResult:
+        hoster = {'link': 'https://{0}{1}'.format(netloc,sUrl), 'name': sQ}
+        hosters.append(hoster)
+
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
 
-def _redirectHoster(url):
-    import urllib2
-    opener = urllib2.build_opener()
-    opener.addheaders = [('Referer', url)]
-    opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0')]
-    try:
-        resp = opener.open(url)
-        if url != resp.geturl():
-            return resp.geturl()
-        else:
-            return url
-    except urllib2.HTTPError, e:
-        if e.code == 403:
-            if url != e.geturl():
-                return e.geturl()
-        raise
-
 def getHosterUrl(sUrl=False):
-    if 'fvs.io' in sUrl:
-        sUrl = _redirectHoster(sUrl)
     return [{'streamUrl': sUrl, 'resolved': True}]
 
 def showSearch():
