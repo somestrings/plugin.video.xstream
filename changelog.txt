@@ -1,4 +1,5 @@
 3.5.16~nightly1
+- [kkiste] Add Serie und Release Jahre
 - [Pureanime] add konto und fix suche
 
 3.5.15.1
