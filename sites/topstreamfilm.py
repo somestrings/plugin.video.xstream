@@ -5,7 +5,6 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
-from urlparse import urlparse
 import time
 
 SITE_IDENTIFIER = 'topstreamfilm'
@@ -179,7 +178,7 @@ def showHosters():
     sHtmlContent = oRequest.request()
     sUrl6 = oRequest.getRealUrl()
     isMatch, id = cParser.parseSingleResult(sUrl6, 'id=([^"]+)')
-    netloc = urlparse(sUrl6).netloc
+    netloc = cParser.urlparse(sUrl6)
     m3u8 = 'https://{0}/playlist/{1}/{2}'.format(netloc, id, int(time.time() * 1000))
 
     oRequest = cRequestHandler(m3u8, caching=True, ignoreErrors=True)
