@@ -27,6 +27,7 @@
 3.5.15.2
   06.07.2020
   Update:
+- [moviedream] add top10 fix for py23
 - [topstreamfilm] fix hoster
 - [kkiste] Add Serie und Release Jahre
 - [Pureanime] add konto und fix suche
