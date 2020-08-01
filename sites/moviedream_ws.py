@@ -36,8 +36,37 @@ def showMenu():
         params.setParam('sUrl', URL_MAIN + sID)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN)
+    if value == 'film':
+        cGui().addFolder(cGuiElement('Top10', SITE_IDENTIFIER, 'top10'), params)
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
     cGui().setEndOfDirectory()
+
+
+def top10(entryUrl=False, sGui=False, sSearchText=False):
+    oGui = sGui if sGui else cGui()
+    params = ParameterHandler()
+    sHtmlContent = cRequestHandler(URL_MAIN).request()
+    pattern = 'class="carouselbox">.*?src="([^"]+).*?">([^<]+).*?</b>([\d]+).*?">([^<]+).*?href="([^"]+)'
+    isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+
+    if not isMatch:
+        cGui().showInfo()
+        return
+
+    total = len(aResult)
+    for sThumbnail, sName, sDauer, sDesc, sUrl in aResult:
+        sThumbnail = URL_MAIN + sThumbnail
+        oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
+        oGuiElement.setThumbnail(sThumbnail)
+        oGuiElement.setFanart(sThumbnail)
+        oGuiElement.setDescription(sDesc)
+        oGuiElement.addItemValue('duration', int(sDauer) * 60)
+        params.setParam('entryUrl', URL_MAIN + sUrl.replace('../..',''))
+        oGuiElement.setMediaType("movie")
+        params.setParam('sThumbnail', sThumbnail)
+        oGui.addFolder(oGuiElement, params, False, total)
+    cGui().setEndOfDirectory()
+
 
 def showGenre():
     params = ParameterHandler()
@@ -55,6 +84,7 @@ def showGenre():
         params.setParam('sUrl', entryUrl + sUrl)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
+
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -158,8 +188,8 @@ def showEpisodes():
 def showHosters():
     hosters = []
     from resources.lib import pyaes
-    from resources.lib import m as I11I1IIII1II11111II1I1I1II11I1I
-    import base64
+    from resources.lib.m import I11I1IIII1II11111II1I1I1II11I1I
+    import base64, binascii
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
@@ -168,10 +198,11 @@ def showHosters():
 
     for password, ciphertext, iv, salt in aResult:
         hoster = {}
-        key = I11I1IIII1II11111II1I1I1II11I1I.I11I1IIII1II11111II1I1I1II11III(salt)
-        decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(key, iv.decode('hex')))
+        decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(I11I1IIII1II11111II1I1I1II11I1I(salt), binascii.unhexlify(iv)))
         decrypted = decrypter.feed(base64.b64decode(ciphertext))  + decrypter.feed()
-        sUrl = decrypted
+        sUrl = decrypted.decode()
+
+ 
         if not 'nurhdfilm' in sUrl.lower():
             hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
             hosters.append(hoster)
