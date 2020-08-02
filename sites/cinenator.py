@@ -11,7 +11,6 @@ SITE_NAME = 'Cinenator'
 SITE_ICON = 'cinenator.png'
 URL_MAIN = 'https://cinenator.to/'
 URL_FILME = URL_MAIN + 'movies'
-URL_SERIE = URL_MAIN + 'tvshows'
 URL_SEARCH = URL_MAIN + '?s=%s'
 
 def load():
@@ -19,8 +18,6 @@ def load():
     params = ParameterHandler()
     params.setParam('sUrl', URL_FILME)
     cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
-    params.setParam('sUrl', URL_SERIE)
-    cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('Value', 'Genres')
     cGui().addFolder(cGuiElement('Genres', SITE_IDENTIFIER, 'showValue'), params)
     params.setParam('Value', 'Release year')
@@ -33,7 +30,6 @@ def showValue():
     sHtmlContent = cRequestHandler(URL_MAIN).request()
     pattern = '<h2>%s</h2>.*?</ul></nav>' % params.getValue('Value')
     isMatch, sHtmlContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-
     if isMatch:
         pattern = '<a[^>]*href="([^"]+)".*?>([^"]+)</a>'
         isMatch, aResult = cParser.parse(sHtmlContainer, pattern)
@@ -51,21 +47,20 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
-    pattern = '<div[^>]*class="poster">.*?<img[^>]*src="([^"]+).*?<a[^>]*href="([^"]+)">([^<]+).*?(?:<span>([^<]+)?).*?(?:<div[^>]*class="texto">([^<]+)?)'
+    pattern = 'poster.*?src="([^"]+).*?href="([^"]+).*?">([^<]+)(.*?)texto">([^"]+)</div>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         pattern = '<div[^>]*class="search_page_form">.*?</div></div></div>'
         isMatch, sHtmlContainer = cParser.parseSingleResult(sHtmlContent, pattern)
         if  isMatch:
-            pattern = '<img[^>]*src="([^"]+).*?<a[^>]*href="([^"]+)">([^<]+)</a>.*?(?:<span[^>]*class="year">([^<]+)?).*?<p>([^<]+)'
+            pattern = 'src="([^"]+).*?href="([^"]+).*?>([^<]+)(.*?)contenido">([^"]+)</p>'
             isMatch, aResult = cParser.parse(sHtmlContainer, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
 
     total = len(aResult)
-    for sThumbnail, sUrl, sName, sYear, sDesc in aResult:
+    for sThumbnail, sUrl, sName, sValue, sDesc in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         sThumbnail = cParser.replace('-\d+x\d+\.', '.', sThumbnail)
@@ -74,13 +69,18 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
-        oGuiElement.setYear(sYear)
+        isYear, sYear = cParser.parse(sValue, '>([\d]+)<')
+        isDuration, sDuration = cParser.parse(sValue, '<span>([\d]+)[^>]min')
+        if isYear:
+            oGuiElement.setYear(sYear[0])
+        if isDuration:
+            oGuiElement.addItemValue('duration', int(sDuration[0]) * 60)
         oGuiElement.setDescription(sDesc)
         params.setParam('entryUrl', sUrl)
         params.setParam('sName', sName)
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
-    if not sGui:
+    if not sGui and not sSearchText:
         pattern = "class=[^>]current.*?href='([^']+)"
         isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, pattern)
         if isMatchNextPage:
@@ -97,7 +97,6 @@ def showSeasons():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = '<span[^>]class="title">.*?([\d]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -123,7 +122,6 @@ def showEpisodes():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = '<span[^>]*class="se-t[^"]*">%s</span>.*?<ul[^>]*class="episodios"[^>]*>(.*?)</ul>' % sSeasonNr
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-
     if isMatch:
         pattern = '<a[^>]*href="([^"]+)"[^>]*>\s*(?:<img[^>]*src="([^"]+)?).*?<div[^>]*class="numerando">[^-]*-\s*(\d+)\s*?</div>.*?<a[^>]*>([^<]*)</a>'
         isMatch, aResult = cParser.parse(sContainer, pattern)
