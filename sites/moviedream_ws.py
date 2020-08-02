@@ -193,7 +193,7 @@ def showHosters():
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '''writesout[^>]'([^']+).*?"y":"([^"]+).*?fast":"([^"]+).*?bald":"([^"]+)'''
+    pattern = '''a[^>]href="'[^>]writesout[^>]'([^']+).*?"y":"([^"]+).*?fast":"([^"]+).*?bald":"([^"]+)'''
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     for password, ciphertext, iv, salt in aResult:
@@ -201,8 +201,6 @@ def showHosters():
         decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(I11I1IIII1II11111II1I1I1II11I1I(salt), binascii.unhexlify(iv)))
         decrypted = decrypter.feed(base64.b64decode(ciphertext))  + decrypter.feed()
         sUrl = decrypted.decode()
-
- 
         if not 'nurhdfilm' in sUrl.lower():
             hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
             hosters.append(hoster)
