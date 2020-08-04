@@ -25,6 +25,7 @@
    <news>
 
 3.5.16~nightly1
+- [xcine] remove cloudflare problem
 - [Cinenator] add duration fix year
 - [moviedream] add top10 fix for py23
 - [topstreamfilm] fix hoster
