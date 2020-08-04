@@ -153,14 +153,13 @@ def showHosters():
             isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, '(http[^"]+)')
             if 'cloudplayer' in sUrl:
                 from resources.lib import jsunpacker
-                import base64
                 sHtmlContent = cRequestHandler(sUrl).request()
                 isMatch, sUrl = cParser.parse(sHtmlContent, 'src":"([^"]+)')
                 if isMatch:
                     sHtmlContent = cRequestHandler(sUrl[0], ignoreErrors=True).request()
                     isMatch, sUrl = cParser.parse(sHtmlContent, 'JuicyCodes.Run[^>]"(.*?)"[^>];')
                 if isMatch:
-                    sHtmlContent = base64.b64decode(sUrl[0].replace('"+"', ''))
+                    sHtmlContent = cParser.B64decode(sUrl[0].replace('"+"', ''))
                     isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\(function\(p,a,c,k,e,d\).+)\s+?')
                 if isMatch:
                     sHtmlContent = jsunpacker.unpack(sUrl[0])
@@ -170,11 +169,10 @@ def showHosters():
                         hosters.append(hoster)
             if 'uniquestream' in sUrl:
                 from resources.lib import jsunpacker
-                import base64
                 sHtmlContent = cRequestHandler(sUrl, ignoreErrors=True).request()
                 isMatch, sUrl = cParser.parse(sHtmlContent, 'JuicyCodes.Run[^>]"(.*?)"[^>];')
                 if isMatch:
-                    sHtmlContent = base64.b64decode(sUrl[0].replace('"+"', ''))
+                    sHtmlContent = cParser.B64decode(sUrl[0].replace('"+"', ''))
                     isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\(function\(p,a,c,k,e,d\).+)\s+?')
                 if isMatch:
                     sHtmlContent = jsunpacker.unpack(sUrl[0])
