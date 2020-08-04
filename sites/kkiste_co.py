@@ -15,7 +15,7 @@ def load():
     logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('sUrl', URL_MAIN)
-    cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Filme & Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('Value', 'Genres')
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
     params.setParam('Value', 'Release Jahre')
