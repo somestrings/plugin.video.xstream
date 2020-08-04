@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
-import urllib, sys, urlparse
+import sys
+try:
+    from urlparse import parse_qsl, urlsplit
+    from urllib import unquote_plus, urlencode
+except ImportError:
+    from urllib.parse import parse_qsl, urlsplit, unquote_plus, urlencode
+
 
 class ParameterHandler:
     def __init__(self):
         params = dict()
         if len(sys.argv) >= 3 and len(sys.argv[2]) > 0:
-            params = dict(urlparse.parse_qsl(urlparse.urlsplit(sys.argv[2]).query))
+            params = dict(parse_qsl(urlsplit(sys.argv[2]).query))
         self.__params = params
 
     def getAllParameters(self):
@@ -17,7 +23,7 @@ class ParameterHandler:
         if self.exist(paramName):
             return self.__params[paramName]
             # paramValue = self.__params[paramName]
-            # return urllib.unquote_plus(paramValue)
+            # return unquote_plus(paramValue)
         return False
 
     def exist(self, paramName):
@@ -61,6 +67,6 @@ class ParameterHandler:
             for param in self.__params:
                 if len(self.__params[param]) < 1:
                     continue
-                outParams[param] = urllib.unquote_plus(self.__params[param])
-            return urllib.urlencode(outParams)
+                outParams[param] = unquote_plus(self.__params[param])
+            return urlencode(outParams)
         return 'params=0'
