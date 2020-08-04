@@ -77,3 +77,12 @@ class cParser:
     @staticmethod
     def quotePlus(sUrl):
         return quote_plus(sUrl)
+
+    @staticmethod
+    def B64decode(text):
+        import base64, sys
+        if sys.version_info[0] == 2:
+            b = base64.b64decode(text)
+        else:
+            b = base64.b64decode(text).decode('utf-8')
+        return b
