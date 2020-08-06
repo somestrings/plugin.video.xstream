@@ -5,7 +5,7 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 
-import xbmc
+import xbmc, xbmcvfs
 from xbmc import LOGDEBUG, LOGERROR, LOGFATAL, LOGINFO, LOGNONE, LOGNOTICE, LOGSEVERE, LOGWARNING
 from xbmc import translatePath
 from xbmcgui import Dialog
@@ -66,8 +66,9 @@ def Update(username, plugin_id, branch, token, silent):
         LOCAL_FILE_NAME_PLUGIN = os.path.join(ADDON_DIR, 'update-' + plugin_id + '.zip')
         if not os.path.exists(ADDON_DIR): os.mkdir(ADDON_DIR)
 #ka - Update erzwingen
-        if addon().getSetting('enforceUpdate') == 'true': os.remove(LOCAL_PLUGIN_VERSION)
-        # if silent == False and os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
+        if addon().getSetting('enforceUpdate') == 'true':
+            if xbmcvfs.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
+            # if os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION) # oder so!
 
         path = addon(plugin_id).getAddonInfo('Path')
         commitXML = _getXmlString(REMOTE_PLUGIN_COMMITS, auth)
