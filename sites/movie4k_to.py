@@ -6,13 +6,13 @@ from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler2 import cRequestHandler
+from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'movie4k_to'
 SITE_NAME = 'Movie4k'
 SITE_ICON = 'movie4k.png'
-SITE_SETTINGS = '<setting default="movie4k.me" enable="!eq(-2,false)" id="movie4k_to-domain" label="30051" type="labelenum" values="movie4k.to|movie4k.lol|movie.to|movie4k.me|movie4k.org|movie4k.pe|movie4k.am" />'
+SITE_SETTINGS = '<setting default="movie4k.to" enable="!eq(-2,false)" id="movie4k_to-domain" label="30051" type="labelenum" values="movie4k.to|movie4k.lol|movie.to|movie4k.me|movie4k.org|movie4k.pe|movie4k.am" />'
 
 DOMAIN = cConfig().getSetting('movie4k_to-domain')
 URL_MAIN = 'https://' + DOMAIN
@@ -20,15 +20,12 @@ URL_MAIN = 'https://' + DOMAIN
 URL_MOVIES = URL_MAIN + '/index.php'
 URL_MOVIES_ALL = URL_MAIN + '/movies-all'
 URL_MOVIES_GENRE = URL_MAIN + '/genres-movies.html'
-
 URL_SERIES = URL_MAIN + '/tvshows_featured.php'
 URL_SERIES_ALL = URL_MAIN + '/tvshows-all'
 URL_SERIES_GENRE = URL_MAIN + '/genres-tvshows.html'
-
 URL_XXX = URL_MAIN + '/xxx-updates.html'
 URL_XXX_ALL = URL_MAIN + '/xxx-all'
 URL_XXX_GENRE = URL_MAIN + '/genres-xxx.html'
-
 URL_SEARCH = URL_MAIN + '/movies.php?list=search&search=%s'
 
 
@@ -130,10 +127,8 @@ def __clearProtection():
 
 def showCharacters():
     oGui = cGui()
-
     params = ParameterHandler()
     baseUrl = params.getValue('sUrl')
-
     __createCharacters(oGui, '#', baseUrl)
     import string
     for letter in string.uppercase[:26]:
@@ -202,7 +197,6 @@ def showAllEpisodes():
     sHtmlContent = aResult[1][0]
     pattern = '<SELECT name="episode".*?>(.*?)</SELECT>'
     aResult = cParser().parse(sHtmlContent, pattern)
-
     if not aResult[0]:
         return
     pattern = '<OPTION value="([^"]+)".*?>([^<]+)</OPTION>'
@@ -215,7 +209,6 @@ def showAllEpisodes():
             sUrl = URL_MAIN + '/' + sUrl
         sMovieTitle = aEntry[1].strip()
         episodeNr = aEntry[1].strip().split(' ')[-1]
-
         oGuiElement = cGuiElement(sMovieTitle, SITE_IDENTIFIER, 'showHostersSeries')
         oGuiElement.setEpisode(episodeNr)
         if sSeason:
@@ -227,19 +220,6 @@ def showAllEpisodes():
         oGui.addFolder(oGuiElement, params, bIsFolder=False, iTotal=len(aResult[1]))
     oGui.setView('episodes')
     oGui.setEndOfDirectory()
-
-
-def showSearch():
-    oGui = cGui()
-    sSearchText = oGui.showKeyBoard()
-    if not sSearchText: return
-    _search(False, sSearchText)
-    oGui.setEndOfDirectory()
-
-
-def _search(oGui, sSearchText):
-    if not sSearchText: return
-    __parseMovieSimpleList(URL_SEARCH % sSearchText.strip(), 1, oGui)
 
 
 def __checkForNextPage(sHtmlContent, iCurrentPage):
@@ -254,18 +234,15 @@ def __checkForNextPage(sHtmlContent, iCurrentPage):
 def showGenre():
     oGui = cGui()
     params = ParameterHandler()
-
     if params.exist('sUrl'):
         sUrl = params.getValue('sUrl')
-
         sHtmlContent = cRequestHandler(sUrl).request()
         pattern = '<tr>\s*<td[^>]*id="tdmovies"[^>]*>\s*'
         pattern += '<a[^>]*href="([^"]+)"[^>]*>([^<]+)</a>\s*</td>\s*'
         pattern += '(?:<td[^>]*id="tdmovies"[^>]*>(\d+)</td>)?'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern, ignoreCase=True)
-
         if not isMatch:
-            oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+            oGui.showInfo()
             return
 
         for sUrl, sTitle, sCount in aResult:
@@ -273,7 +250,6 @@ def showGenre():
             if not sUrl.startswith('http'):
                 sUrl = URL_MAIN + '/' + sUrl
             sTitle = '%s (%s)' % (sTitle, sCount)
-
             oGuiElement = cGuiElement()
             oGuiElement.setSiteName(SITE_IDENTIFIER)
             oGuiElement.setFunction('parseMovieSimpleList')
@@ -281,7 +257,6 @@ def showGenre():
             params = ParameterHandler()
             params.setParam('sUrl', sUrl)
             oGui.addFolder(oGuiElement, params)
-
         oGui.setEndOfDirectory()
 
 
@@ -291,7 +266,6 @@ def parseMovieSimpleList():
         iPage = params.getValue('iPage')
     else:
         iPage = 1
-
     if params.exist('sUrl'):
         sUrl = params.getValue('sUrl')
         logger.info(sUrl)
@@ -319,7 +293,6 @@ def parseMovieSimpleList():
                                 sUrl = URL_MAIN + '/' + sUrl
                             if aEntry[2] == sLanguageToken:
                                 break
-
             else:
                 oRequest = cRequestHandler(sUrl)
                 sHtmlContent = oRequest.request()
@@ -336,20 +309,16 @@ def parseMovieSimpleList():
                         if not (sUrl.startswith('http')):
                             sUrl = URL_MAIN + '/' + sUrl
             __getAllSeasons(sUrl)
-
         else:
             __parseMovieSimpleList(sUrl, iPage, False)
 
 
 def __parseMovieSimpleList(sUrl, iPage, sGui, sHtmlContent=False):
     oGui = sGui if sGui else cGui()
-
     if not sHtmlContent:
         sHtmlContent = __getHtmlContent(sUrl, ignoreErrors=(oGui is not False))
-
     pattern = '<TR[^>]*>\s*<TD[^>]*id="tdmovies"[^>]*>\s*<a href="([^"]+)">(.*?)</a>.*?<img[^>]*border=0[^>]*src="/img/([^"]+)"[^>]*>.*?</TR>'
     aResult = cParser().parse(sHtmlContent, pattern)
-
     pattern = "coverPreview([0-9]+)\"\)\.hover.*?<p id='coverPreview'><img src='(.*?)' alt='Image preview'"
     result = re.finditer(pattern, sHtmlContent, re.DOTALL)
     thumbs = dict()
@@ -366,16 +335,13 @@ def __parseMovieSimpleList(sUrl, iPage, sGui, sHtmlContent=False):
             sMovieTitle = ' '.join(sMovieTitle.split())
             sMovieTitle = ' '.join(sMovieTitle.split())
             sLanguageToken = aEntry[2]
-
             oGuiElement = cGuiElement()
             oGuiElement.setSiteName(SITE_IDENTIFIER)
             oGuiElement.setTitle(sMovieTitle)
             oGuiElement.setLanguage(__getLanguage(sLanguageToken.replace('.png', '')))
-
             params = ParameterHandler()
             params.setParam('sMovieTitle', sMovieTitle)
             params.setParam('sUrl', newUrl)
-
             type, id = getTypeAndID(newUrl)
             if type == 'tvshow':
                 if sUrl.find('tvshows-') != -1:
@@ -391,12 +357,12 @@ def __parseMovieSimpleList(sUrl, iPage, sGui, sHtmlContent=False):
                 params.setParam('sLanguageToken', sLanguageToken)
                 oGuiElement.setFunction('parseMovieSimpleList')
             if id in thumbs:
-                oGuiElement.setThumbnail(URL_MAIN.replace('4k.to', '4k.tv') + thumbs[id])
+                oGuiElement.setThumbnail(URL_MAIN + thumbs[id])
+                oGuiElement.setFanart(URL_MAIN + thumbs[id])
             if type == 'movie':
                 oGui.addFolder(oGuiElement, params, bIsFolder=False, iTotal=total)
             else:
                 oGui.addFolder(oGuiElement, params, iTotal=total)
-
     if not sGui:
         sNextUrl = __checkForNextPage(sHtmlContent, iPage)
         if sNextUrl != False:
@@ -448,7 +414,10 @@ def showFeaturedMovies():
                 newUrl = aEntry[0]
                 if not (newUrl.startswith('http')):
                     newUrl = URL_MAIN + '/' + newUrl
-                sThumbnail = aEntry[1]
+                if aEntry[1].startswith('/'):
+                    sThumbnail = URL_MAIN + aEntry[1]
+                else:
+                    sThumbnail =  + aEntry[1]
                 sMovieTitle = aEntry[2].replace('kostenlos', '').replace('&amp;ouml;', 'ö')
                 oGuiElement = cGuiElement()
                 oGuiElement.setSiteName(SITE_IDENTIFIER)
@@ -457,7 +426,8 @@ def showFeaturedMovies():
                 fRating = float(aEntry[4])
                 oGuiElement.setDescription(aEntry[6])
                 oGuiElement.addItemValue('Rating', fRating)
-                oGuiElement.setThumbnail(sThumbnail.replace('https', 'http'))
+                oGuiElement.setThumbnail(sThumbnail)
+                oGuiElement.setFanart(sThumbnail)
                 oGuiElement.setTitle(sMovieTitle)
                 oGuiElement.setLanguage(__getLanguage(aEntry[3]))
                 oGuiElement._sQuality = aEntry[5]
@@ -473,10 +443,8 @@ def showFeaturedSeries():
     params = ParameterHandler()
     if params.exist('sUrl'):
         sUrl = params.getValue('sUrl')
-
         oRequest = cRequestHandler(sUrl)
         sHtmlContent = oRequest.request()
-
         pattern = '<div id="maincontenttvshow">(.*?)<BR><BR>'
         aResult = cParser().parse(sHtmlContent, pattern)
         if aResult[0] == True:
@@ -489,13 +457,17 @@ def showFeaturedSeries():
                     newUrl = str(aEntry[0]).strip()
                     if not (newUrl.startswith('http')):
                         newUrl = URL_MAIN + '/' + newUrl
-                    sThumbnail = aEntry[1]
+                    if aEntry[1].startswith('/'):
+                        sThumbnail = URL_MAIN + aEntry[1]
+                    else:
+                        sThumbnail = aEntry[1]
                     sMovieTitle = aEntry[2].strip().replace('\t', '')
                     oGuiElement = cGuiElement()
                     oGuiElement.setSiteName(SITE_IDENTIFIER)
                     oGuiElement.setFunction('showAllSeasons')
                     oGuiElement.setTitle(sMovieTitle)
-                    oGuiElement.setThumbnail(sThumbnail.replace('https', 'http'))
+                    oGuiElement.setThumbnail(sThumbnail)
+                    oGuiElement.setFanart(sThumbnail)
                     oGuiElement.setLanguage(__getLanguage(aEntry[3]))
                     oGuiElement.setMediaType('tvshow')
                     params = ParameterHandler()
@@ -535,7 +507,6 @@ def showHosters():
     if params.exist('sUrl') and params.exist('sMovieTitle'):
         sUrl = params.getValue('sUrl')
         sHtmlContent = cRequestHandler(sUrl).request()
-
         pattern = '<tr id="tablemoviesindex2">.*?<a href="([^"]+)">([^<]+)<.*?alt="(.*?) .*?width="16">.*?</a>.*?smileys/([1-9]).gif"'
         aResult = cParser().parse(sHtmlContent.replace('\\', ''), pattern)
         hosters = []
@@ -548,35 +519,26 @@ def showHosters():
                 if sHoster == 'Stream4k':
                     hoster['resolveable'] = True
                 hosters.append(hoster)
-
     pattern = '<SELECT name="hosterlist".*?>(.*?)</SELECT>'
-
     aResult = cParser().parse(sHtmlContent, pattern)
-
     if aResult[0] == True:
         pattern = '<OPTION value="([^"]+)".*?>([^<]+)</OPTION>'
         aResult = cParser().parse(aResult[1][0], pattern)
-
         if aResult[0] == True:
             for aEntry in aResult[1]:
                 sUrl = aEntry[0]
-
                 if not sUrl.startswith('http'):
                     sUrl = URL_MAIN + '/' + sUrl
-
                 sHosterFull = aEntry[1].strip()
-
                 hoster = {'name': sHosterFull.rsplit(' ', 1)[0], 'link': sUrl, 'displayedName': sHosterFull}
                 hosters.append(hoster)
 
     if len(hosters) > 0:
         hosters.append('showHoster')
         return hosters
-
     if aResult[0] == False:
         pattern = '<a target="_blank" href="([^"]+)'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
         if isMatch:
             hosters = []
             for sUrl in aResult:
@@ -615,7 +577,6 @@ def showHoster(sUrl=False):
 
 def __getMovieTitle(sHtmlContent):
     pattern = '<title>(.*?) online anschauen.*?</title>'
-
     aResult = cParser().parse(sHtmlContent, pattern)
 
     if aResult[0] == True:
@@ -623,14 +584,12 @@ def __getMovieTitle(sHtmlContent):
     else:
         pattern = 'Watch (.*?) online.*?</title>'
         aResult = cParser().parse(sHtmlContent, pattern)
-
         if aResult[0] == True:
             return str(aResult[1][0]).strip()
     return False
 
 
 def parseHosterDirect(sHtmlContent):
-
     # Link oder Iframe suchen der den Hosternamen enthält
     pattern = 'id="maincontent5".*?(?:target="_blank" href|iframe[^<]+src|value)="([^"]+)".*?id="underplayer">'
     aResult = cParser().parse(sHtmlContent, pattern)
@@ -684,3 +643,15 @@ def __createMainMenuItem(oGui, sTitle, sUrl, sFunction):
     if sUrl != '':
         params.setParam('sUrl', sUrl)
     oGui.addFolder(oGuiElement, params)
+
+def showSearch():
+    oGui = cGui()
+    sSearchText = oGui.showKeyBoard()
+    if not sSearchText: return
+    _search(False, sSearchText)
+    oGui.setEndOfDirectory()
+
+
+def _search(oGui, sSearchText):
+    if not sSearchText: return
+    __parseMovieSimpleList(URL_SEARCH % cParser().quotePlus(sSearchText), 1, oGui)
