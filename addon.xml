@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.xstream" name="xStream" version="3.5.16~nightly1" provider-name="xStream-Team">
  <requires>
-    <import addon="xbmc.python" version="2.14.0"/>
+    <!-- <import addon="xbmc.python" version="2.14.0"/> -->
     <import addon="script.module.requests"/>
     <import addon="script.module.urlresolver"/>
     <import addon="script.module.six" version="1.11.0"/>
@@ -25,6 +25,9 @@
    <news>
 
 3.5.16~nightly1
+- Suchergebnisse verbessert mehrere seiten
+- [HDfilme Suche fix 
+-  mehrere seiten py23 kompatibel
 - [xcine] remove cloudflare problem
 - [Cinenator] add duration fix year
 - [moviedream] add top10 fix for py23
