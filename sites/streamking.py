@@ -3,7 +3,7 @@ from resources.lib import logger
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler2 import cRequestHandler
+from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'streamking'
@@ -167,4 +167,4 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
+    showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
