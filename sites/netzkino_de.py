@@ -73,12 +73,12 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             FSK = ','.join(item['custom_fields']['FSK'])
             if not isShowAdult and '18' in FSK.lower():
                 continue
-            if sSearchText and not cParser().search(sSearchText, item['title'].encode('utf-8', 'ignore')):
+            if sSearchText and not cParser().search(sSearchText, item['title']):
                 continue
-            oGuiElement = cGuiElement(item['title'].encode('utf-8', 'ignore'), SITE_IDENTIFIER, 'getHosterUrl')
-            oGuiElement.setThumbnail(item['thumbnail'].encode('utf-8', 'ignore'))
+            oGuiElement = cGuiElement(item['title'], SITE_IDENTIFIER, 'getHosterUrl')
+            oGuiElement.setThumbnail(item['thumbnail'])
             sFanart = ','.join(item['custom_fields']['featured_img_all'])
-            oGuiElement.setFanart(sFanart.encode('utf-8', 'ignore'))
+            oGuiElement.setFanart(sFanart)
             sYahr = ','.join(item['custom_fields']['Jahr'])
             oGuiElement.setYear(sYahr)
             oGuiElement.setDescription(item['content'])
@@ -102,7 +102,8 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % sSearchText.strip(), oGui, sSearchText)
+    showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, cParser().quotePlus(sSearchText))
+
 
 def showAdult():
     if cConfig().getSetting('showAdult') == 'true':
