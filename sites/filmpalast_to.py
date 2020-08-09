@@ -17,7 +17,7 @@ URL_ENGLISH = URL_MAIN + '/search/genre/Englisch'
 URL_SEARCH = URL_MAIN + '/search/title/%s'
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('sUrl', URL_MAIN)
     cGui().addFolder(cGuiElement('Neues', SITE_IDENTIFIER, 'showEntries'), params)
@@ -56,7 +56,6 @@ def showValue():
     sHtmlContent = cRequestHandler(params.getValue('sUrl')).request()
     pattern = '<section[^>]id="%s">(.*?)</section>' % value
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-
     if isMatch:
         pattern = 'href="([^"]+)">([^<]+)'
         isMatch, aResult = cParser.parse(sContainer, pattern)
@@ -80,7 +79,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not isMatch:
         pattern = '</div><a[^>]href="([^"]+)"[^>]title="([^"]+)">.*?src="([^"]+)(.*?)alt'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
@@ -130,7 +128,6 @@ def showSeasons():
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = '<a[^>]*class="staffTab"[^>]*data-sid="(\d+)"[^>]*>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -159,7 +156,6 @@ def showEpisodes():
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = '<div[^>]*class="staffelWrapperLoop[^"]*"[^>]*data-sid="%s">(.*?)</div></li></ul></div>' % sSeason
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -215,4 +211,4 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
+    showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
