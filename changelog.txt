@@ -1,4 +1,7 @@
 3.5.16~nightly1
+- Suchergebnisse verbessert mehrere seiten
+- [HDfilme Suche fix 
+-  mehrere seiten py23 kompatibel
 - [xcine] remove cloudflare problem
 - [Cinenator] add duration fix year
 - [moviedream] add top10 fix for py23
