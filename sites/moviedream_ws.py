@@ -13,7 +13,7 @@ URL_MAIN = 'https://moviedream.ws/'
 URL_SEARCH = URL_MAIN + 'suchergebnisse.php?text=%s&sprache=Deutsch'
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('value', 'film')
     cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showMenu'), params)
@@ -31,7 +31,6 @@ def showMenu():
     sHtmlContent = cRequestHandler(URL_MAIN).request()
     pattern = 'href="(?:\.\.\/)*([neu|beliebt]+%s[^"]*)"[^>]*>([^<]+)<\/a><\/li>' % value
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     for sID, sName in aResult:
         params.setParam('sUrl', URL_MAIN + sID)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
@@ -41,14 +40,12 @@ def showMenu():
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
     cGui().setEndOfDirectory()
 
-
 def top10(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     sHtmlContent = cRequestHandler(URL_MAIN).request()
     pattern = 'class="carouselbox">.*?src="([^"]+).*?">([^<]+).*?</b>([\d]+).*?">([^<]+).*?href="([^"]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -67,7 +64,6 @@ def top10(entryUrl=False, sGui=False, sSearchText=False):
         oGui.addFolder(oGuiElement, params, False, total)
     cGui().setEndOfDirectory()
 
-
 def showGenre():
     params = ParameterHandler()
     entryUrl = params.getValue('sUrl')
@@ -75,7 +71,6 @@ def showGenre():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = 'href="(/%s[^"]+)">([^<]+)' % value
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -84,7 +79,6 @@ def showGenre():
         params.setParam('sUrl', entryUrl + sUrl)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
-
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -98,7 +92,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     sHtmlContent = oRequest.request()
     pattern = 'class="linkto.*?href="([^"]+).*?src="([^"]+).*?>([^>]+)</div>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
@@ -119,7 +112,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sThumbnail', sThumbnail)
         params.setParam('isTvshow', isTvshow)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
-    if not sGui:
+    if not sGui and not sSearchText:
         sPageNr = int(params.getValue('page'))
         if sPageNr == 0:
             sPageNr = 2
@@ -162,7 +155,6 @@ def showEpisodes():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = 'href="([^"]+)" class="episodebutton" id="episodebutton\d+">#([\d]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -195,7 +187,6 @@ def showHosters():
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = '''a[^>]href="'[^>]writesout[^>]'([^']+).*?"y":"([^"]+).*?fast":"([^"]+).*?bald":"([^"]+)'''
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     for password, ciphertext, iv, salt in aResult:
         hoster = {}
         decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(I11I1IIII1II11111II1I1I1II11I1I(salt), binascii.unhexlify(iv)))
@@ -218,4 +209,4 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
+    showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
