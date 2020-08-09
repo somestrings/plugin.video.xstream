@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-import urllib
 from json import loads
 from resources.lib import logger
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler2 import cRequestHandler
+from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'kinox_to'
@@ -27,7 +26,7 @@ URL_FAVOURITE_SERIE_PAGE = URL_MAIN + '/Popular-Series.html'
 URL_FAVOURITE_DOCU_PAGE = URL_MAIN + '/Popular-Documentations.html'
 URL_LATEST_SERIE_PAGE = URL_MAIN + '/Latest-Series.html'
 URL_LATEST_DOCU_PAGE = URL_MAIN + '/Latest-Documentations.html'
-URL_SEARCH = URL_MAIN + '/Search.html'
+URL_SEARCH = URL_MAIN + '/Search.html?q=%s'
 URL_MIRROR = URL_MAIN + '/aGET/Mirror/'
 URL_EPISODE_URL = URL_MAIN + '/aGET/MirrorByEpisode/'
 URL_AJAX = URL_MAIN + '/aGET/List/'
@@ -35,7 +34,7 @@ URL_LANGUAGE = URL_MAIN + '/aSET/PageLang/1'
 
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     parms = ParameterHandler()
     oGui = cGui()
     oRequest = cRequestHandler(URL_MAIN)
@@ -64,7 +63,7 @@ def __createMenuEntry(oGui, sFunction, sLabel, dOutputParameter):
     try:
         for param, value in dOutputParameter.items():
             parms.setParam(param, value)
-    except Exception, e:
+    except Exception as e:
         logger.error("Can't add parameter to menu entry with label: %s: %s" % (sLabel, e))
     oGuiElement = cGuiElement()
     oGuiElement.setSiteName(SITE_IDENTIFIER)
@@ -147,19 +146,6 @@ def __getPreferredLanguage():
     else:
         sPrefLang = ''
     return sPrefLang
-
-
-def showSearch():
-    oGui = cGui()
-    sSearchText = oGui.showKeyBoard()
-    if not sSearchText: return
-    _search(False, sSearchText)
-    oGui.setEndOfDirectory()
-
-
-def _search(oGui, sSearchText):
-    sHtmlContent = __getHtmlContent(URL_SEARCH + "?q=%s" % sSearchText, ignoreErrors=(oGui is not False))
-    __displayItems(oGui, sHtmlContent)
 
 
 def __displayItems(sGui, sHtmlContent):
@@ -603,7 +589,7 @@ def showHosters():
             if aResult[0]:
                 mirrors = int(aResult[1][0])
             for i in range(1, mirrors + 1):
-                sUrl = URL_MIRROR + urllib.unquote_plus(aEntry[0])
+                sUrl = URL_MIRROR + cParser().unquotePlus(aEntry[0])
                 mirrorName = ""
                 if mirrors > 1:
                     mirrorName = "  Mirror " + str(i)
@@ -647,3 +633,15 @@ def getHosterUrl(sUrl=False):
         if isMatch:
             results.append({'streamUrl': sStreamUrl, 'resolved': False})
     return results
+
+def showSearch():
+    oGui = cGui()
+    sSearchText = oGui.showKeyBoard()
+    if not sSearchText: return
+    _search(False, sSearchText)
+    oGui.setEndOfDirectory()
+
+
+def _search(oGui, sSearchText):
+    sHtmlContent = __getHtmlContent(URL_SEARCH % cParser().quotePlus(sSearchText), ignoreErrors=(oGui is not False))
+    __displayItems(oGui, sHtmlContent)
