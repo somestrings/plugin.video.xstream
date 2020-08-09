@@ -14,7 +14,7 @@ URL_MAIN = 'http://www.dokus4.me/'
 URL_SEARCH = URL_MAIN + '?s=%s'
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('sUrl', URL_MAIN)
     cGui().addFolder(cGuiElement('Dokus', SITE_IDENTIFIER, 'showEntries'), params)
@@ -28,7 +28,6 @@ def showGenre():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = 'cat-item.*?href="([^"]+)">([^<]+)</a>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -45,7 +44,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
     pattern = 'tbl_titel.*?title="([^"]+).*?href="([^"]+)/"><img src="([^"]+).*?vid_desc">([^<]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
@@ -83,4 +81,4 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
+    showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
