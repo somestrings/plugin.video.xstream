@@ -7,7 +7,7 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'hd-streams_to'
-SITE_NAME = 'HD-Streams.to'
+SITE_NAME = 'HD-Streams'
 SITE_ICON = 'hd-streams_to.png'
 URL_MAIN = 'https://hd-streams.to/de/'
 URL_FILME = URL_MAIN + 'movies/'
@@ -16,7 +16,7 @@ URL_SEARCH = URL_MAIN + '?s=%s'
 
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     oGui = cGui()
     params = ParameterHandler()
     params.setParam('sUrl', URL_FILME)
@@ -35,7 +35,6 @@ def showValue():
     params = ParameterHandler()
     sHtmlContent = cRequestHandler(URL_MAIN).request()
     isMatch, sContainer = cParser.parse(sHtmlContent, '">%s<.*?</ul>' % params.getValue('sCont'))
-
     if isMatch:
         pattern = '<a[^>]*href="([^"]+)".*?>([^"]+)</a>'
         isMatch, aResult = cParser.parse(sContainer[0], pattern)
@@ -57,7 +56,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     sHtmlContent = oRequest.request()
     pattern = '<article id="post-\d.*?src="([^"]+).*?href="([^"]+)">([^<]+).*?span>([\d]+).*?texto">([^<]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         pattern = '<article>.*?<img src="([^"]+).*?href="([^"]+)">([^<]+).*?year">([\d]+).*?contenido">([^"]+)</div>'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
@@ -97,7 +95,6 @@ def showSeasons():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = "<span[^>]class='title'>.*?([\d]+)"
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -125,7 +122,6 @@ def showEpisodes():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = "title'>Season[^>]%s[^<]<i>.*?<span class='date'" % sSeasonNr
     isMatch, sContainer = cParser.parse(sHtmlContent, pattern)
-
     if isMatch:
         pattern = "numerando'>[^-]*-\s*(\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
         isMatch, aResult = cParser.parse(sContainer[0], pattern)
@@ -188,4 +184,4 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
+    showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
