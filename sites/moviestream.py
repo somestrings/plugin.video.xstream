@@ -19,7 +19,7 @@ URL_GENRES_FILME = 'https://movie-stream.eu/secure/titles?type=movie&genre=%s'
 URL_GENRES_SERIE = 'https://movie-stream.eu/secure/titles?type=series&genre=%s'
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('page', (1))
     params.setParam('sUrl', URL_FILME)
@@ -53,7 +53,6 @@ def showEntries(entryUrl=False, sGui=False):
     sHtmlContent = oRequest.request()
     pattern = '"id":([\d]+).*?"name":"([^"]+).*?year":([\d]+).*?description":"([^"]+).*?poster":"([^"]+).*?backdrop":"([^"]+)","runtime":([\d]+).*?is_series":([^"]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
@@ -89,7 +88,6 @@ def showSeasons():
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = 'number":([\d]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -116,7 +114,6 @@ def showEpisodes():
     sHtmlContent = cRequestHandler(sSeasonNr).request()
     pattern = 'id":\d+,"name":"([^"]+)","description":"([^"]+).*?poster":"([^"]+).*?episode_number":([\d]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -142,7 +139,6 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
     sHtmlContent = oRequest.request()
     pattern = '"id":([^,]+),"name":"([^"]+)","year":([\d,]+),"description":"([^"]+)","poster":"([^"]+)","is_series":([^,]+).*?type":"title'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
@@ -196,4 +192,4 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showSearchEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
+    showSearchEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
