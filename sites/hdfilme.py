@@ -3,7 +3,7 @@ from resources.lib import logger
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.requestHandler2 import cRequestHandler
+from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'hdfilme'
@@ -15,7 +15,7 @@ URL_SHOWS = URL_MAIN + 'serien1?'
 URL_SEARCH = URL_MAIN + 'search?key=%s'
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('sUrl', URL_MOVIES)
     cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showMenu'), params)
@@ -49,7 +49,6 @@ def showGenre():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = 'Genre</option>.*?</div>'
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-
     if  isMatch:
         pattern = 'value="([^"]+)">([^<]+)'
         isMatch, aResult = cParser.parse(sContainer, pattern)
@@ -59,7 +58,7 @@ def showGenre():
 
     for sID, sName in sorted(aResult, key=lambda k: k[1]):
         params.setParam('sUrl', entryUrl + 'category=' + sID + '&country=&sort=&key=&sort_type=desc')
-        cGui().addFolder(cGuiElement(sName.strip(), SITE_IDENTIFIER, 'showEntries'), params)
+        cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
@@ -68,14 +67,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     iPage = int(params.getValue('page'))
     oRequest = cRequestHandler(entryUrl + '&page=' + str(iPage) if iPage > 0 else entryUrl, ignoreErrors=(sGui is not False))
-    oRequest.addHeaderEntry('Referer', 'https://hdfilme.cc/')
+    oRequest.addHeaderEntry('Referer', URL_MAIN)
     oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-    oRequest.addParameters('load', 'full-page')
-    oRequest.setRequestType(1)
+    if not sSearchText:
+        oRequest.addParameters('load', 'full-page')
     sHtmlContent = oRequest.request()
     pattern = '<ul[^>]class="products row">(.*?)</ul>'
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-
     if isMatch:
         pattern = '<div class="box-product clearfix" data-popover.*?href="([^"]+).*?data-src="([^"]+).*?title=".*?">([^<]+)'
         isMatch, aResult = cParser.parse(sContainer, pattern)
@@ -109,7 +107,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sName', sName)
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
-    if not sGui:
+    if not sGui and not sSearchText:
         sPageNr = int(params.getValue('page'))
         if sPageNr == 0:
             sPageNr = 2
@@ -130,7 +128,6 @@ def showEpisodes():
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     pattern = 'data-movie-id="([\d]+)'
     isMatch, sID = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -203,7 +200,7 @@ def showAllHosters():
 	return hosters
 
 def getHosterUrl(sUrl=False):
-    sUrl = sUrl + '|verifypeer=false&Origin=https%3A%2F%2Fhdfilme.cx%2F&Referer=https%3A%2F%2Fhdfilme.cx%2F'
+    sUrl = sUrl + '|Origin=https%3A%2F%2Fhdfilme.cx%2F&Referer=https%3A%2F%2Fhdfilme.cx%2F'
     return [{'streamUrl': sUrl, 'resolved': True}]
 
 def showSearch():
