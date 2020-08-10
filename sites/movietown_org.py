@@ -192,4 +192,4 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showSearchEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
+    showSearchEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
