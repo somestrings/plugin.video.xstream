@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import xbmc
+import xbmc, sys
 from resources.lib import common
 from resources.lib.handler.ParameterHandler import ParameterHandler
 
@@ -23,8 +23,9 @@ def fatal(sInfo):
 def __writeLog(sLog, cLogLevel=xbmc.LOGDEBUG):
     params = ParameterHandler()
     try:
-        if isinstance(sLog, unicode):
-            sLog = '%s (ENCODED)' % (sLog.encode('utf-8'))
+        if sys.version_info[0] == 2:
+            if isinstance(sLog, unicode):
+                sLog = '%s (ENCODED)' % (sLog.encode('utf-8'))
         if params.exist('site'):
             site = params.getValue('site')
             sLog = "\t[%s] -> %s: %s" % (common.addonName, site, sLog)
