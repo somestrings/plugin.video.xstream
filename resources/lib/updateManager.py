@@ -1,16 +1,13 @@
 # -*- coding: UTF-8 -*-
 
-import os
+import os, base64, sys
 import json
 import requests
 from requests.auth import HTTPBasicAuth
-
 import xbmc, xbmcvfs
-from xbmc import LOGDEBUG, LOGERROR, LOGFATAL, LOGINFO, LOGNONE, LOGNOTICE, LOGSEVERE, LOGWARNING
-from xbmc import translatePath
+from xbmc import translatePath, LOGERROR, LOGNOTICE
 from xbmcgui import Dialog
 from xbmcaddon import Addon as addon
-
 ## Android K18 ZIP Fix.
 if xbmc.getCondVisibility('system.platform.android') and int(xbmc.getInfoLabel('System.BuildVersion')[:2]) >= 18:
     import fixetzipfile as zipfile
@@ -19,8 +16,6 @@ else:
 
 # Text/Überschrift im Dialog
 PLUGIN_NAME = addon().getAddonInfo('name')  # ist z.B. 'xstream'
-PLUGIN_ID = addon().getAddonInfo('id')  # ist z.B. 'plugin.video.xstream'
-
 
 ## URLRESOLVER
 def urlResolverUpdate(silent=False):
@@ -28,7 +23,7 @@ def urlResolverUpdate(silent=False):
     plugin_id = 'script.module.urlresolver'
     branch = 'nightly'
     token = 'YTg1OWU1OGE1ZDU5M2QwN2EwZjEwNDg0MWJjMDE4ZWE3ZDIxM2VhYQ=='
-
+    token = base64.b64decode(token)
     try:
         return Update(username, plugin_id, branch, token, silent)
 
@@ -57,11 +52,16 @@ def xStreamUpdate(silent=False):
 def Update(username, plugin_id, branch, token, silent):
     REMOTE_PLUGIN_COMMITS = "https://api.github.com/repos/%s/%s/commits/%s" % (username, plugin_id, branch)
     REMOTE_PLUGIN_DOWNLOADS = "https://api.github.com/repos/%s/%s/zipball/%s" % (username, plugin_id, branch)
-    auth = HTTPBasicAuth(username, token.decode('base64'))
-
+    
+    auth = HTTPBasicAuth(username, token)
+    
     xbmc.log('%s - Search for update ' % plugin_id, LOGNOTICE)
     try:
-        ADDON_DIR = translatePath(addon(plugin_id).getAddonInfo('profile')).decode('utf-8')
+        if sys.version_info[0] == 2:
+            ADDON_DIR = translatePath(addon(plugin_id).getAddonInfo('profile')).decode('utf-8')
+        else:
+            ADDON_DIR = translatePath(addon(plugin_id).getAddonInfo('profile'))
+
         LOCAL_PLUGIN_VERSION = os.path.join(ADDON_DIR, "update_sha")
         LOCAL_FILE_NAME_PLUGIN = os.path.join(ADDON_DIR, 'update-' + plugin_id + '.zip')
         if not os.path.exists(ADDON_DIR): os.mkdir(ADDON_DIR)
@@ -173,22 +173,6 @@ def _getXmlString(xml_url, auth):
     except Exception as e:
         xbmc.log(e)
 
-
-def log(msg, level=LOGDEBUG):
-    DEBUGPREFIX = '[ ' + PLUGIN_ID + ' DEBUG ]'
-    # override message level to force logging when addon logging turned on
-    level = LOGNOTICE
-    try:
-        if isinstance(msg, unicode):
-            msg = '%s (ENCODED)' % (msg.encode('utf-8'))
-        xbmc.log('%s: %s' % (DEBUGPREFIX, msg), level)
-    except Exception as e:
-        try:
-            xbmc.log('Logging Failure: %s' % (e), level)
-        except:
-            pass  # just give up
-
-
 # todo Verzeichnis packen -für zukünftige Erweiterung "Backup"
 def zipfolder(foldername, target_dir):
     zipobj = zipfile.ZipFile(foldername + '.zip', 'w', zipfile.ZIP_DEFLATED)
@@ -207,7 +191,6 @@ def devAutoUpdates(silent=False):
             status1 = xStreamUpdate(silent)
         if addon().getSetting('githubUpdateUrlResolver') == 'true' or addon().getSetting('enforceUpdate') == 'true':
             status2 = urlResolverUpdate(silent)
-
         if status1 == status2:
             return status1
         elif status1 == False or status2 == False:
