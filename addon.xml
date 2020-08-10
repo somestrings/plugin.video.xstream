@@ -23,6 +23,7 @@
    <news>
 
 3.5.16~nightly1
+- [ddl] entfernt keine streams
 - Suchergebnisse verbessert mehrere seiten
 - [HDfilme] Suche fix 
 -  mehrere seiten py23 kompatibel
