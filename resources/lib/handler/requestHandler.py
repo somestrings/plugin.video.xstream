@@ -1,9 +1,20 @@
 # -*- coding: utf-8 -*-
-import cookielib, hashlib, httplib, os, socket, sys, time, urllib, urllib2, xbmcgui
-from resources.lib import logger, cookie_helper, common
-from resources.lib.cBFScrape import cBFScrape
-from resources.lib.cCFScrape import cCFScrape
+import socket, os, sys, hashlib, time, xbmcgui
+from resources.lib import logger, common
 from resources.lib.config import cConfig
+try:
+    from urlparse import urlparse
+    from urllib import quote, urlencode
+    from urllib2 import HTTPError, URLError, HTTPHandler, HTTPSHandler, HTTPCookieProcessor, build_opener, Request, urlopen
+    from cookielib import LWPCookieJar
+    from httplib import HTTPSConnection, HTTPException
+except ImportError:
+    from urllib.parse import quote, urlencode, urlparse
+    from urllib.error import HTTPError, URLError
+    from urllib.request import HTTPHandler, HTTPSHandler, HTTPCookieProcessor, build_opener, Request, urlopen
+    from http.cookiejar import LWPCookieJar
+    from http.client import HTTPSConnection, HTTPException
+
 
 class cRequestHandler:
     def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True):
@@ -47,11 +58,11 @@ class cRequestHandler:
         if sHeaderKey in self.__headerEntries:
             return self.__headerEntries[sHeaderKey]
 
-    def addParameters(self, key, value, quote=False):
-        if not quote:
+    def addParameters(self, key, value, quote2=False):
+        if not quote2:
             self.__aParameters[key] = value
         else:
-            self.__aParameters[key] = urllib.quote(str(value))
+            self.__aParameters[key] = quote(str(value))
 
     def addResponse(self, key, value):
         self.__aResponses[key] = value
@@ -67,10 +78,10 @@ class cRequestHandler:
         return self.__callRequest()
 
     def getRequestUri(self):
-        return self.__sUrl + '?' + urllib.urlencode(self.__aParameters)
+        return self.__sUrl + '?' + urlencode(self.__aParameters)
 
     def __setDefaultHeader(self):
-        self.addHeaderEntry('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0')
+        self.addHeaderEntry('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0')
         self.addHeaderEntry('Accept-Language', 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3')
         self.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
         if self.compression:
@@ -81,35 +92,41 @@ class cRequestHandler:
             sContent = self.readCache(self.getRequestUri())
             if sContent:
                 return sContent
-        cookieJar = cookielib.LWPCookieJar(filename=self._cookiePath)
+        cookieJar = LWPCookieJar(filename=self._cookiePath)
         try:
             cookieJar.load(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
         except Exception as e:
             logger.info(e)
-        sParameters = urllib.urlencode(self.__aParameters, True)
-        handlers = [urllib2.HTTPHandler(), urllib2.HTTPSHandler(), urllib2.HTTPCookieProcessor(cookiejar=cookieJar)]
+        if sys.version_info[0] == 2:
+            sParameters = urlencode(self.__aParameters, True)
+        else:
+            sParameters = urlencode(self.__aParameters, True).encode()
 
+        handlers = [HTTPHandler(), HTTPSHandler(), HTTPCookieProcessor(cookiejar=cookieJar)]
         if (2, 7, 9) <= sys.version_info < (2, 7, 11):
             handlers.append(newHTTPSHandler)
-        opener = urllib2.build_opener(*handlers)
+        opener = build_opener(*handlers)
         if (len(sParameters) > 0):
-            oRequest = urllib2.Request(self.__sUrl, sParameters)
+            oRequest = Request(self.__sUrl, sParameters)
         else:
-            oRequest = urllib2.Request(self.__sUrl)
+            oRequest = Request(self.__sUrl)
 
         for key, value in self.__headerEntries.items():
             oRequest.add_header(key, value)
         cookieJar.add_cookie_header(oRequest)
-        user_agent = self.__headerEntries.get('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0')
 
         try:
             oResponse = opener.open(oRequest, timeout=self.requestTimeout)
-        except urllib2.HTTPError as e:
+        except HTTPError as e:
             if e.code == 503 and e.headers.get('Server') == 'cloudflare':
-                html = e.read()
-                oResponse = self.__check_protection(html, user_agent, cookieJar)
+                #html = e.read()
+                oResponse = None
+
                 if not oResponse:
-                    logger.error('Failed to get CF-Cookie for Url: ' + self.__sUrl)
+
+                    if not self.ignoreErrors:
+                        logger.error('Failed to get CF-Cookie for Url: ' + self.__sUrl)
+                        return ''
                     return ''
             elif not self.ignoreErrors:
                 xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url:', self.__sUrl, str(e))
@@ -117,7 +134,7 @@ class cRequestHandler:
                 return ''
             else:
                 oResponse = e
-        except urllib2.URLError as e:
+        except URLError as e:
             if not self.ignoreErrors:
                 if hasattr(e.reason, 'args') and e.reason.args[0] == 1 and sys.version_info < (2, 7, 9):
                     xbmcgui.Dialog().ok('xStream', str(e.reason), '', 'For this request is Python v2.7.9 or higher required.')
@@ -125,7 +142,7 @@ class cRequestHandler:
                     xbmcgui.Dialog().ok('xStream', str(e.reason))
             logger.error('URLError ' + str(e.reason) + ' Url: ' + self.__sUrl)
             return ''
-        except httplib.HTTPException as e:
+        except HTTPException as e:
             if not self.ignoreErrors:
                 xbmcgui.Dialog().ok('xStream', str(e))
             logger.error('HTTPException ' + str(e) + ' Url: ' + self.__sUrl)
@@ -134,17 +151,19 @@ class cRequestHandler:
         self.__sResponseHeader = oResponse.info()
 
         if self.__sResponseHeader.get('Content-Encoding') == 'gzip':
-            import gzip
-            import StringIO
-            sContent = gzip.GzipFile(fileobj=StringIO.StringIO(oResponse.read())).read()
+            import io, gzip
+            sContent = gzip.GzipFile(fileobj=io.BytesIO(oResponse.read())).read()
+            if sys.version_info[0] == 2:
+                sContent = sContent
+            else:
+                sContent = sContent.decode('utf-8').encode('cp850','replace').decode('cp850')
         else:
-            sContent = oResponse.read()
+            if sys.version_info[0] == 2:
+                sContent = oResponse.read()
+            else:
+                sContent = (oResponse.read()).decode('utf-8').encode('cp850','replace').decode('cp850')
 
-        checked_response = self.__check_protection(sContent, user_agent, cookieJar)
-        if checked_response:
-            oResponse = checked_response
-            sContent = oResponse.read()
-        cookie_helper.check_cookies(cookieJar)
+
         cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
 
         if (self.__bRemoveNewLines == True):
@@ -160,17 +179,8 @@ class cRequestHandler:
             self.writeCache(self.getRequestUri(), sContent)
         return sContent
 
-    def __check_protection(self, html, user_agent, cookie_jar):
-        oResponse = None
-        if 'cf-browser-verification' in html:
-            self.__sUrl = self.__sUrl.replace('https', 'http')
-            oResponse = cCFScrape().resolve(self.__sUrl, cookie_jar, user_agent)
-        elif 'Blazingfast.io' in html or 'xhr.open("GET","' in html:
-            oResponse = cBFScrape().resolve(self.__sUrl, cookie_jar, user_agent)
-        return oResponse
-
     def getHeaderLocationUrl(self):
-        opened = urllib2.urlopen(self.__sUrl)
+        opened = urlopen(self.__sUrl)
         return opened.geturl()
 
     def __setCookiePath(self):
@@ -182,7 +192,7 @@ class cRequestHandler:
         self._cookiePath = cookieFile
 
     def getCookie(self, sCookieName, sDomain=''):
-        cookieJar = cookielib.LWPCookieJar()
+        cookieJar = LWPCookieJar()
         try:
             cookieJar.load(self._cookiePath, self.__bIgnoreDiscard, self.__bIgnoreExpired)
         except Exception as e:
@@ -196,7 +206,7 @@ class cRequestHandler:
         return False
 
     def setCookie(self, oCookie):
-        cookieJar = cookielib.LWPCookieJar()
+        cookieJar = LWPCookieJar()
         try:
             cookieJar.load(self._cookiePath, self.__bIgnoreDiscard, self.__bIgnoreExpired)
         except Exception as e:
@@ -214,18 +224,22 @@ class cRequestHandler:
         if not cache:
             profilePath = common.profilePath
             cache = os.path.join(profilePath, 'htmlcache')
+
         if not os.path.exists(cache):
             os.makedirs(cache)
         self.__cachePath = cache
 
     def readCache(self, url):
-        h = hashlib.md5(url).hexdigest()
+        if sys.version_info[0] == 2:
+            h = hashlib.md5(url).hexdigest()
+        else:
+            h = hashlib.md5(url.encode('utf8')).hexdigest()
         cacheFile = os.path.join(self.__cachePath, h)
         fileAge = self.getFileAge(cacheFile)
         if 0 < fileAge < self.cacheTime:
             try:
-                fhdl = file(cacheFile, 'r')
-                content = fhdl.read()
+                with open(cacheFile, 'r') as f:
+                    content = f.read()
             except:
                 logger.info('Could not read Cache')
             if content:
@@ -234,11 +248,18 @@ class cRequestHandler:
         return ''
 
     def writeCache(self, url, content):
-        h = hashlib.md5(url).hexdigest()
+        if sys.version_info[0] == 2:
+            h = hashlib.md5(url).hexdigest()
+        else:
+            h = hashlib.md5(url.encode('utf8')).hexdigest()
         cacheFile = os.path.join(self.__cachePath, h)
         try:
-            fhdl = file(cacheFile, 'w')
-            fhdl.write(content)
+            if sys.version_info[0] == 2:
+                with open(cacheFile, 'w') as f:
+                    f.write(content)
+            else:
+                with open(cacheFile, 'wb') as f:
+                    f.write(content.encode('utf8'))
         except:
             logger.info('Could not write Cache')
 
@@ -260,8 +281,7 @@ class cRequestHandler:
 
     @staticmethod
     def createUrl(Url, oRequest):
-        import urlparse
-        parsed_url = urlparse.urlparse(Url)
+        parsed_url = urlparse(Url)
         netloc = parsed_url.netloc[4:] if parsed_url.netloc.startswith('www.') else parsed_url.netloc
         cfId = oRequest.getCookie('__cfduid', '.' + netloc)
         cfClear = oRequest.getCookie('cf_clearance', '.' + netloc)
@@ -276,14 +296,14 @@ class cRequestHandler:
 
 
 # python 2.7.9 and 2.7.10 certificate workaround
-class newHTTPSHandler(urllib2.HTTPSHandler):
+class newHTTPSHandler(HTTPSHandler):
     def do_open(self, conn_factory, req, **kwargs):
         conn_factory = newHTTPSConnection
-        return urllib2.HTTPSHandler.do_open(self, conn_factory, req)
+        return HTTPSHandler.do_open(self, conn_factory, req)
 
 
-class newHTTPSConnection(httplib.HTTPSConnection):
+class newHTTPSConnection(HTTPSConnection):
     def __init__(self, host, port=None, key_file=None, cert_file=None, strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT, source_address=None, context=None):
         import ssl
         context = ssl._create_unverified_context()
-        httplib.HTTPSConnection.__init__(self, host, port, key_file, cert_file, strict, timeout, source_address, context)
+        HTTPSConnection.__init__(self, host, port, key_file, cert_file, strict, timeout, source_address, context)
