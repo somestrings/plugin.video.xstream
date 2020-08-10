@@ -69,11 +69,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     total = len(aResult)
     for sName, sUrl in aResult:
+        if sSearchText and not cParser().search(sSearchText, sName):
+            continue
         isTvshow = True if 'serie' in sUrl else False
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         params.setParam('entryUrl', sUrl)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
-    if not sGui:
+    if not sGui and not sSearchText:
         isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, "<span class=[^>]current.*?href='([^']+)'[^>]class")
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
@@ -195,13 +197,13 @@ def Language(sLang):
     elif 'espsub' in sLang:
         return ' (Spanische Untertitel) '
     elif 'trsub' in sLang:
-        return ' (Turkische Untertitel) '
+        return ' (Tuerkische Untertitel) '
     elif 'de.png' in sLang:
         return ' (Deutsch) '
     elif 'en.png' in sLang:
         return ' (Englische) '
     else:
-        return ''
+        return ' '
 
 def getHosterUrl(sUrl=False):
     if 'cloudplayer' in sUrl or 'uniquestream' in sUrl:
@@ -216,4 +218,4 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
+    showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
