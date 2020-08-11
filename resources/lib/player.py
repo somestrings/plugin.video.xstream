@@ -29,7 +29,7 @@ class XstreamPlayer(xbmc.Player):
             meta = get_metahandler()
             if meta:
                 try:
-                    percent = self.playedTime / self.totalTime
+                    percent = self.playedTime // self.totalTime
                     logger.info('Watched percent ' + str(int(percent * 100)))
                     if percent >= 0.80:
                         logger.info('Attemt to change watched status')
@@ -85,8 +85,9 @@ class cPlayer:
     def startPlayer(self):
         logger.info('start player')
         xbmcPlayer = XstreamPlayer()
-        while (not xbmc.abortRequested) & (not xbmcPlayer.streamFinished):
+        monitor = xbmc.Monitor()
+        while (not monitor.abortRequested()) & (not xbmcPlayer.streamFinished):
             if xbmcPlayer.isPlayingVideo():
                 xbmcPlayer.playedTime = xbmcPlayer.getTime()
-            xbmc.sleep(1000)
+            monitor.waitForAbort(10)
         return xbmcPlayer.streamSuccess
