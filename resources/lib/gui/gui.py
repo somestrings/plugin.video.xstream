@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
-import sys, urllib, xbmc, xbmcgui, xbmcplugin
+import sys, xbmc, xbmcgui, xbmcplugin
 from resources.lib import common
 from resources.lib.config import cConfig
 from resources.lib.gui.contextElement import cContextElement
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
+try:
+    from urllib import quote_plus, urlencode
+except ImportError:
+    from urllib.parse import quote_plus, urlencode
+
 
 class cGui:
     # This class "abstracts" a list of xbmc listitems.
@@ -31,7 +36,7 @@ class cGui:
     def addFolder(self, oGuiElement, params='', bIsFolder=True, iTotal=0, isHoster=False):
         # add GuiElement to Gui, adds listitem to a list
         # abort xbmc list creation if user requests abort
-        if xbmc.abortRequested:
+        if xbmc.Monitor().abortRequested():
             self.setEndOfDirectory(False)
             raise RuntimeError('UserAborted')
         # store result in list if we searched global for other sources
@@ -77,7 +82,10 @@ class cGui:
         if infoString:
             infoString = '[I]%s[/I]' % infoString
         itemValues['title'] = itemTitle + infoString
-        listitem = xbmcgui.ListItem(itemTitle + infoString, oGuiElement.getTitleSecond(), oGuiElement.getIcon(), oGuiElement.getThumbnail())
+        # kodi 19 funktioniert nicht
+        #listitem = xbmcgui.ListItem(itemTitle + infoString, oGuiElement.getTitleSecond(), oGuiElement.getIcon(), oGuiElement.getThumbnail())
+        listitem = xbmcgui.ListItem(itemTitle + infoString, oGuiElement.getIcon(), oGuiElement.getThumbnail())
+        
         listitem.setInfo(oGuiElement.getType(), itemValues)
         listitem.setProperty('fanart_image', oGuiElement.getFanart())
         listitem.setArt({'poster': oGuiElement.getThumbnail()})
@@ -104,7 +112,7 @@ class cGui:
         searchParams = {'searchTitle': oGuiElement.getTitle()}
         if 'imdb_id' in itemValues:
             searchParams['searchImdbID'] = itemValues['imdb_id']
-        contextmenus += [(contextitem.getTitle(), "XBMC.Container.Update(%s?function=searchAlter&%s)" % (self.pluginPath, urllib.urlencode(searchParams),),)]
+        contextmenus += [(contextitem.getTitle(), "XBMC.Container.Update(%s?function=searchAlter&%s)" % (self.pluginPath, urlencode(searchParams),),)]
         if 'imdb_id' in itemValues and 'title' in itemValues:
             metaParams = {}
             if itemValues['title']:
@@ -129,12 +137,12 @@ class cGui:
                     contextitem.setTitle("Als ungesehen markieren")
                 else:
                     contextitem.setTitle("Als gesehen markieren")
-                contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s?function=changeWatched&%s)" % (self.pluginPath, urllib.urlencode(metaParams),),)]
+                contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s?function=changeWatched&%s)" % (self.pluginPath, urlencode(metaParams),),)]
             # if year is set we can search reliably for metainfos via metahandler
             if 'year' in itemValues and itemValues['year']:
                 metaParams['year'] = itemValues['year']
             contextitem.setTitle("Suche Metainfos")
-            contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s?function=updateMeta&%s)" % (self.pluginPath, urllib.urlencode(metaParams),),)]
+            contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s?function=updateMeta&%s)" % (self.pluginPath, urlencode(metaParams),),)]
         # context options for movies or episodes
         if not bIsFolder:
             contextitem.setTitle("add to Playlist")
@@ -219,9 +227,9 @@ class cGui:
                 params.setParam('mediaType', 'episode')
         sParams = params.getParameterAsUri()
         if len(oGuiElement.getFunction()) == 0:
-            sUrl = "%s?site=%s&title=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), urllib.quote_plus(oGuiElement.getTitle()), sParams)
+            sUrl = "%s?site=%s&title=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), quote_plus(oGuiElement.getTitle()), sParams)
         else:
-            sUrl = "%s?site=%s&function=%s&title=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), oGuiElement.getFunction(), urllib.quote_plus(oGuiElement.getTitle()), sParams)
+            sUrl = "%s?site=%s&function=%s&title=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), oGuiElement.getFunction(), quote_plus(oGuiElement.getTitle()), sParams)
             if not bIsFolder:
                 sUrl += '&playMode=play'
         return sUrl
@@ -273,4 +281,3 @@ class cGui:
         else:
             iSeconds = iSeconds * 1000
         xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % (str(sTitle), (str(sDescription)), iSeconds, common.addon.getAddonInfo('icon')))
-
