@@ -4,7 +4,6 @@ from resources.lib import logger
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
-from resources.lib.jsnprotect import *
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.pluginHandler import cPluginHandler
 
@@ -31,7 +30,7 @@ def changeWatched(params):
             xbmc.executebuiltin('XBMC.Container.Refresh')
     else:
         META = False
-        logger.info('Could not import package metahandler')
+        logger.error('Could not import package metahandler')
     return
 
 
@@ -42,8 +41,8 @@ def updateMeta(params):
     try:
         from metahandler import metahandlers
     except Exception as e:
-        logger.info('Could not import package metahandler')
-        logger.info(e)
+        logger.error('Could not import package metahandler')
+        logger.error(e)
         return
     meta = get_metahandler()
     if not meta:
@@ -64,7 +63,7 @@ def updateMeta(params):
             try:
                 foundInfo = meta.search_movies(sSearchText)
             except:
-                logger.info('error or nothing found')
+                logger.error('error or nothing found')
                 foundInfo = False
         elif mediaType == 'tvshow':
             foundInfo = metahandlers.TheTVDB().get_matching_shows(sSearchText, language="all", want_raw=True)
@@ -119,10 +118,10 @@ def updateMeta(params):
 def get_metahandler():
     try:
         from metahandler import metahandlers
-        return metahandlers.MetaData(tmdb_api_key=I11I1I1II1I1I1I1I1I())
+        return metahandlers.MetaData(tmdb_api_key='86dd18b04874d9c94afadde7993d94e3')
     except Exception as e:
-        logger.info('Could not import package metahandler')
-        logger.info(e)
+        logger.error('Could not import package metahandler')
+        logger.error(e)
         return False
 
 
@@ -172,7 +171,7 @@ def parseUrl():
             else:
                 logger.info("Could not play remote url '%s'" % sLink)
         except urlresolver.resolver.ResolverError as e:
-            logger.info('ResolverError: %s' % e)
+            logger.error('ResolverError: %s' % e)
         return
     else:
         sFunction = 'load'
@@ -359,14 +358,18 @@ def searchGlobal(sSearchText=False):
     for count, pluginEntry in enumerate(aPlugins):
         if not pluginEntry['globalsearch']:
             continue
-        dialog.update((count + 1) * 50 / numPlugins, 'Searching: ' + str(pluginEntry['name']) + '...')
-        logger.info('Searching for %s at %s' % (sSearchText.decode('utf-8'), pluginEntry['id']))
+        dialog.update((count + 1) * 50 // numPlugins, 'Searching: ' + str(pluginEntry['name']) + '...')
+        if sys.version_info[0] == 2:
+            logger.info('Searching for %s at %s' % (sSearchText.decode('utf-8'), pluginEntry['id']))
+        else:
+            logger.info('Searching for %s at %s' % (sSearchText, pluginEntry['id']))
+
         t = threading.Thread(target=_pluginSearch, args=(pluginEntry, sSearchText, oGui), name=pluginEntry['name'])
         threads += [t]
         t.start()
     for count, t in enumerate(threads):
         t.join()
-        dialog.update((count + 1) * 50 / numPlugins + 50, t.getName() + ' returned')
+        dialog.update((count + 1) * 50 // numPlugins + 50, t.getName() + ' returned')
     dialog.close()
     # deactivate collectMode attribute because now we want the elements really added
     oGui._collectMode = False
@@ -375,7 +378,7 @@ def searchGlobal(sSearchText=False):
     dialog.create('xStream', 'Gathering info...')
     for count, result in enumerate(sorted(oGui.searchResults, key=lambda k: k['guiElement'].getSiteName()), 1):
         oGui.addFolder(result['guiElement'], result['params'], bIsFolder=result['isFolder'], iTotal=total)
-        dialog.update(count * 100 / total, str(count) + ' of ' + str(total) + ': ' + result['guiElement'].getTitle())
+        dialog.update(count * 100 // total, str(count) + ' of ' + str(total) + ': ' + result['guiElement'].getTitle())
     dialog.close()
     oGui.setView()
     oGui.setEndOfDirectory()
@@ -397,14 +400,14 @@ def searchAlter(params):
     numPlugins = len(aPlugins)
     threads = []
     for count, pluginEntry in enumerate(aPlugins):
-        dialog.update((count + 1) * 50 / numPlugins, 'Searching: ' + str(pluginEntry['name']) + '...')
+        dialog.update((count + 1) * 50 // numPlugins, 'Searching: ' + str(pluginEntry['name']) + '...')
         logger.info('Searching for ' + searchTitle + pluginEntry['id'].encode('utf-8'))
         t = threading.Thread(target=_pluginSearch, args=(pluginEntry, searchTitle, oGui), name=pluginEntry['name'])
         threads += [t]
         t.start()
     for count, t in enumerate(threads):
         t.join()
-        dialog.update((count + 1) * 50 / numPlugins + 50, t.getName() + ' returned')
+        dialog.update((count + 1) * 50 // numPlugins + 50, t.getName() + ' returned')
     dialog.close()
     # check results, put this to the threaded part, too
     filteredResults = []
@@ -431,6 +434,6 @@ def _pluginSearch(pluginEntry, sSearchText, oGui):
         function = getattr(plugin, '_search')
         function(oGui, sSearchText)
     except:
-        logger.info(pluginEntry['name'] + ': search failed')
+        logger.error(pluginEntry['name'] + ': search failed')
         import traceback
         logger.debug(traceback.format_exc())
