@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-import htmlentitydefs, re, hashlib, urllib
+import re, hashlib,sys
 from resources.lib import pyaes
+try:
+    from htmlentitydefs import name2codepoint
+except ImportError:
+    from html.entities import name2codepoint
 
 class cUtil:
     @staticmethod
@@ -10,7 +14,7 @@ class cUtil:
 
     @staticmethod
     def formatTime(iSeconds):
-        iMinutes = int(iSeconds / 60)
+        iMinutes = int(iSeconds // 60)
         iSeconds = iSeconds - (iMinutes * 60)
         if iSeconds < 10:
             iSeconds = '0' + str(iSeconds)
@@ -18,21 +22,6 @@ class cUtil:
             iMinutes = '0' + str(iMinutes)
         return str(iMinutes) + ':' + str(iSeconds)
 
-    @staticmethod
-    def urlDecode(sUrl):
-        return urllib.unquote(sUrl)
-
-    @staticmethod
-    def urlEncode(sUrl):
-        return urllib.quote(sUrl)
-
-    @staticmethod
-    def unquotePlus(sUrl):
-        return urllib.unquote_plus(sUrl)
-
-    @staticmethod
-    def quotePlus(sUrl):
-        return urllib.quote_plus(sUrl)
     # Removes HTML character references and entities from a text string.
     @staticmethod
     def unescape(text):
@@ -51,7 +40,7 @@ class cUtil:
             else:
                 # named entity
                 try:
-                    text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+                    text = unichr(name2codepoint[text[1:-1]])
                 except KeyError:
                     pass
             # replace nbsp with a space
@@ -71,10 +60,11 @@ class cUtil:
     @staticmethod
     def cleanse_text(text):
         if text is None: text = ''
-        text = cUtil.unescape(text)
         text = cUtil.removeHtmlTags(text)
-        if isinstance(text, unicode):
-            text = text.encode('utf-8')
+        if sys.version_info[0] == 2:
+            text = cUtil.unescape(text)
+            if isinstance(text, unicode):
+                text = text.encode('utf-8')
         return text
 
     @staticmethod
