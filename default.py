@@ -24,5 +24,6 @@ except Exception as err:
     else:
         import traceback
         import xbmcgui
-        logger.debug(traceback.format_exc())
-        dialog = xbmcgui.Dialog().ok('Error', str(err.__class__.__name__) + " : " + str(err), str(traceback.format_exc().splitlines()[-3].split('addons')[-1]))
+        logger.error(traceback.format_exc())
+        value = (str(err.__class__.__name__) + " : " + str(err), str(traceback.format_exc().splitlines()[-3].split('addons')[-1]))
+        dialog = xbmcgui.Dialog().ok('Error', str(value))
