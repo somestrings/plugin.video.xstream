@@ -49,7 +49,7 @@ class cHosterGui:
                 oGui.showError('xStream', 'kein Hosterlink übergeben', 5)
                 return False
         except urlresolver.resolver.ResolverError as e:
-            logger.info('ResolverError: %s' % e)
+            logger.error('ResolverError: %s' % e)
             oGui.showError('xStream', 'Stream nicht mehr verfügbar oder Link fehlerhaft', 7)
             return False
         # resolver response
@@ -73,7 +73,7 @@ class cHosterGui:
         list_item = xbmcgui.ListItem(path=data['link'])
         info = {'Title': data['title']}
         if data['thumb']:
-            list_item.setThumbnailImage(data['thumb'])
+            list_item.setArt(data['thumb'])
         if data['showTitle']:
             info['Episode'] = data['episode']
             info['Season'] = data['season']
@@ -308,8 +308,8 @@ class cHosterGui:
             self.dialog.create('xStream', 'try hosters...')
             total = len(hosters)
             for count, hoster in enumerate(hosters):
-                if self.dialog.iscanceled() or xbmc.abortRequested or check: return
-                percent = (count + 1) * 100 / total
+                if self.dialog.iscanceled() or xbmc.Monitor().abortRequested() or check: return
+                percent = (count + 1) * 100 // total
                 try:
                     logger.info('try hoster %s' % hoster['name'])
                     self.dialog.create('xStream', 'try hosters...')
@@ -322,7 +322,7 @@ class cHosterGui:
                         return True
                 except:
                     self.dialog.update(percent, 'hoster %s failed' % hoster['name'])
-                    logger.info('playback with hoster %s failed' % hoster['name'])
+                    logger.error('playback with hoster %s failed' % hoster['name'])
         # field "resolved" marks streamlinks
         elif 'resolved' in siteResult[0]:
             for stream in siteResult:
