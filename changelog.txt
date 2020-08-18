@@ -1,4 +1,7 @@
-3.5.16~nightly1
+3.5.17~nightly
+
+3.5.16
+  18.08.2020
 - [xStream] Kodi 19 Support Beta
 - [ddl] entfernt keine streams
 - Suchergebnisse verbessert mehrere seiten
