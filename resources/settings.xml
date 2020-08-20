@@ -22,7 +22,7 @@
     <setting type="sep" />
     <setting label="30034" type="lsep" />
     <setting default="dialog" id="hosterSelect" label="30005" type="labelenum" values="Dialog|Auto|List" />
-    <setting default="100" id="maxHoster" label="30007" option="int" range="10,5,100" type="slider" />
+    <setting default="100" id="maxHoster" label="30007" option="int" range="10,1,1000" type="slider" />
     <setting default="false" enable="!eq(-2,1)" id="presortHoster" label="30009" type="bool" />
     <setting type="sep" />
     <setting label="30035" type="lsep" />
