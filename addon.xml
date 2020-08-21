@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.xstream" name="xStream" version="3.5.16" provider-name="xStream-Team">
+<addon id="plugin.video.xstream" name="xStream" version="3.5.17~nightly" provider-name="xStream-Team">
  <requires>
     <!-- <import addon="xbmc.python" version="2.14.0"/> -->
     <import addon="script.module.requests"/>
@@ -21,6 +21,9 @@
    <license>GNU GPLv3</license>
    <platform>all</platform>
    <news>
+3.5.17~nightly
+- [xStream] Kodi 19 Contextmenu fix usw.
+
 3.5.16
 - [xStream] Kodi 19 Support Beta
 - [ddl] entfernt keine streams
