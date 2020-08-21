@@ -102,17 +102,17 @@ class cGui:
                 params = contextitem.getOutputParameterHandler()
                 sParams = params.getParameterAsUri()
                 sTest = "%s?site=%s&function=%s&%s" % (self.pluginPath, contextitem.getFile(), contextitem.getFunction(), sParams)
-                contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s)" % (sTest,),)]
+                contextmenus += [(contextitem.getTitle(), "RunPlugin(%s)" % (sTest,),)]
         itemValues = oGuiElement.getItemValues()
         contextitem = cContextElement()
         contextitem.setTitle("Info")
-        contextmenus += [(contextitem.getTitle(), "XBMC.Action(Info)",)]
+        contextmenus += [(contextitem.getTitle(), "Action(Info)",)]
         # search for alternative source
         contextitem.setTitle("Weitere Quellen")
         searchParams = {'searchTitle': oGuiElement.getTitle()}
         if 'imdb_id' in itemValues:
             searchParams['searchImdbID'] = itemValues['imdb_id']
-        contextmenus += [(contextitem.getTitle(), "XBMC.Container.Update(%s?function=searchAlter&%s)" % (self.pluginPath, urlencode(searchParams),),)]
+        contextmenus += [(contextitem.getTitle(), "Container.Update(%s?function=searchAlter&%s)" % (self.pluginPath, urlencode(searchParams),),)]
         if 'imdb_id' in itemValues and 'title' in itemValues:
             metaParams = {}
             if itemValues['title']:
@@ -137,30 +137,30 @@ class cGui:
                     contextitem.setTitle("Als ungesehen markieren")
                 else:
                     contextitem.setTitle("Als gesehen markieren")
-                contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s?function=changeWatched&%s)" % (self.pluginPath, urlencode(metaParams),),)]
+                contextmenus += [(contextitem.getTitle(), "RunPlugin(%s?function=changeWatched&%s)" % (self.pluginPath, urlencode(metaParams),),)]
             # if year is set we can search reliably for metainfos via metahandler
             if 'year' in itemValues and itemValues['year']:
                 metaParams['year'] = itemValues['year']
             contextitem.setTitle("Suche Metainfos")
-            contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s?function=updateMeta&%s)" % (self.pluginPath, urlencode(metaParams),),)]
+            contextmenus += [(contextitem.getTitle(), "RunPlugin(%s?function=updateMeta&%s)" % (self.pluginPath, urlencode(metaParams),),)]
         # context options for movies or episodes
         if not bIsFolder:
             contextitem.setTitle("add to Playlist")
-            contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s&playMode=enqueue)" % (sUrl,),)]
+            contextmenus += [(contextitem.getTitle(), "RunPlugin(%s&playMode=enqueue)" % (sUrl,),)]
             contextitem.setTitle("download")
-            contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s&playMode=download)" % (sUrl,),)]
+            contextmenus += [(contextitem.getTitle(), "RunPlugin(%s&playMode=download)" % (sUrl,),)]
             if cConfig().getSetting('jd_enabled') == 'true':
                 contextitem.setTitle("send to JDownloader")
-                contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s&playMode=jd)" % (sUrl,),)]
+                contextmenus += [(contextitem.getTitle(), "RunPlugin(%s&playMode=jd)" % (sUrl,),)]
             if cConfig().getSetting('jd2_enabled') == 'true':
                 contextitem.setTitle("send to JDownloader2")
-                contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s&playMode=jd2)" % (sUrl,),)]
+                contextmenus += [(contextitem.getTitle(), "RunPlugin(%s&playMode=jd2)" % (sUrl,),)]
             if cConfig().getSetting('pyload_enabled') == 'true':
                 contextitem.setTitle("send to PyLoad")
-                contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s&playMode=pyload)" % (sUrl,),)]
+                contextmenus += [(contextitem.getTitle(), "RunPlugin(%s&playMode=pyload)" % (sUrl,),)]
             if cConfig().getSetting('hosterSelect') == 'Auto':
                 contextitem.setTitle("select hoster")
-                contextmenus += [(contextitem.getTitle(), "XBMC.RunPlugin(%s&playMode=play&manual=1)" % (sUrl,),)]
+                contextmenus += [(contextitem.getTitle(), "RunPlugin(%s&playMode=play&manual=1)" % (sUrl,),)]
         listitem.addContextMenuItems(contextmenus)
         # listitem.addContextMenuItems(contextmenus, True)
         return listitem
