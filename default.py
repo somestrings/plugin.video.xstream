@@ -18,12 +18,12 @@ logger.info('Python-Version: %s' % platform.python_version())
 
 try:
     run()
-except Exception as err:
-    if str(err) == 'UserAborted':
+except Exception as e:
+    if str(e) == 'UserAborted':
         logger.error("User aborted list creation")
     else:
         import traceback
         import xbmcgui
         logger.error(traceback.format_exc())
-        value = (str(err.__class__.__name__) + " : " + str(err), str(traceback.format_exc().splitlines()[-3].split('addons')[-1]))
+        value = (str(e.__class__.__name__) + " : " + str(e), str(traceback.format_exc().splitlines()[-3].split('addons')[-1]))
         dialog = xbmcgui.Dialog().ok('Error', str(value))
