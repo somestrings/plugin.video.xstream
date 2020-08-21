@@ -109,7 +109,7 @@ class cPluginHandler:
                     pluginElem = elem
                     break
             if pluginElem is None:
-                logger.info('could not update settings, pluginElement not found')
+                logger.error('could not update settings, pluginElement not found')
                 return False
             pluginElements = pluginElem.findall('setting')
             for elem in pluginElements:
@@ -138,7 +138,7 @@ class cPluginHandler:
                     try:
                         customSettings = ET.XML(xmlString % plugin['settings']).findall('setting')
                     except:
-                        logger.info('Parsing of custom settings for % failed.' % plugin['name'])
+                        logger.error('Parsing of custom settings for % failed.' % plugin['name'])
                     for setting in customSettings:
                         setting.tail = '\n    '
                         pluginElem.append(setting)
@@ -148,7 +148,7 @@ class cPluginHandler:
             try:
                 ET.dump(pluginElem)
             except:
-                logger.info('Settings update failed')
+                logger.error('Settings update failed')
                 return
             tree.write(self.settingsFile)
 
