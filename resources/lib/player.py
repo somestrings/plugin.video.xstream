@@ -55,11 +55,11 @@ class XstreamPlayer(xbmc.Player):
                                 metaInfo = meta.get_episode_meta(TVShowTitle, imdbID, str(season), str(episode))
                             if metaInfo and int(metaInfo['overlay']) == 6:
                                 meta.change_watched(mediaType, name, imdbID, season=season, episode=episode)
-                                xbmc.executebuiltin('XBMC.Container.Refresh')
+                                xbmc.executebuiltin('Container.Refresh')
                         else:
                             logger.info('Could not change watched status; imdbID or mediaType missing')
                 except Exception as e:
-                    logger.info(e)
+                    logger.error(e)
 
     def onPlayBackEnded(self):
         logger.info('Playback completed')
