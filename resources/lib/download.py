@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
-import os, sys, time, urllib2, xbmc, xbmcgui, logger
+import os, sys, time, xbmc, xbmcgui, logger
 from resources.lib import common
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
+try:
+    from urllib2 import Request, urlopen
+except ImportError:
+    from urllib.request import Request, urlopen
+
 
 class cDownload:
     def __createProcessDialog(self, downloadDialogTitle):
@@ -17,7 +22,7 @@ class cDownload:
         return filename
 
     def download(self, url, sTitle, showDialog=True, downloadDialogTitle='Download'):
-        sTitle = u'%s' % sTitle.decode('utf-8')
+        sTitle = '%s' % sTitle
         self.__processIsCanceled = False
         # extract header
         try:
@@ -48,8 +53,8 @@ class cDownload:
         try:
             logger.info('download file: ' + str(url) + ' to ' + str(sDownloadPath))
             self.__createProcessDialog(downloadDialogTitle)
-            request = urllib2.Request(url, headers=header)
-            self.__download(urllib2.urlopen(request), sDownloadPath)
+            request = Request(url, headers=header)
+            self.__download(urlopen(request, timeout=60), sDownloadPath)
         except Exception as e:
             logger.error(e)
         self.__oDialog.close()
@@ -58,10 +63,10 @@ class cDownload:
         headers = oUrlHandler.info()
         iTotalSize = -1
         if 'content-length' in headers:
-            iTotalSize = int(headers['Content-Length'])
+            iTotalSize = (headers['Content-Length'])
         chunk = 4096
         if sys.platform.startswith('win'):
-            f = open(r'%s' % fpath.decode('utf-8'), 'wb')
+            f = open(r'%s' % fpath, 'wb')
         else:
             f = open(r'%s' % fpath, 'wb')
         iCount = 0
@@ -86,13 +91,14 @@ class cDownload:
 
     def __stateCallBackFunction(self, iCount, iBlocksize, iTotalSize):
         timedif = time.time() - self._startTime
-        currentLoaded = float(iCount * iBlocksize)
+        currentLoaded = int(iCount) * iBlocksize
+        iPercent = (currentLoaded * 100 // int(iTotalSize))
         if timedif > 0.0:
-            avgSpd = int(currentLoaded / timedif / 1024.0)
+            avgSpd = (currentLoaded // timedif // 1024.0)
         else:
             avgSpd = 5
-        iPercent = int(currentLoaded * 100 / iTotalSize)
-        self.__oDialog.update(iPercent, self.__sTitle, '%s/%s@%dKB/s' % (self.__formatFileSize(currentLoaded), self.__formatFileSize(iTotalSize), avgSpd))
+        value = self.__sTitle, str('%s/%s@%dKB/s' % (self.__formatFileSize(currentLoaded), self.__formatFileSize(iTotalSize), avgSpd))
+        self.__oDialog.update(iPercent, str(value))
         if (self.__oDialog.iscanceled()):
             self.__processIsCanceled = True
             self.__oDialog.close()
@@ -101,4 +107,4 @@ class cDownload:
         iBytes = int(iBytes)
         if (iBytes == 0):
             return '%.*f %s' % (2, 0, 'MB')
-        return '%.*f %s' % (2, iBytes / (1024 * 1024.0), 'MB')
+        return '%.*f %s' % (2, int(iBytes) // (1024 * 1024.0), 'MB')
