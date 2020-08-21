@@ -87,7 +87,7 @@ class cGuiElement:
         if mediaType in self.MEDIA_TYPES:
             self._mediaType = mediaType
         else:
-            logger.info('Unknown MediaType given for %s' % self.getTitle())
+            logger.error('Unknown MediaType given for %s' % self.getTitle())
 
     def setSeason(self, season):
         self._season = season
@@ -104,17 +104,17 @@ class cGuiElement:
         try:
             year = int(year)
         except:
-            logger.info('Year given for %s seems not to be a valid number' % self.getTitle())
+            logger.error('Year given for %s seems not to be a valid number' % self.getTitle())
             return False
         if len(str(year)) != 4:
-            logger.info('Year given for %s has %s digits, required 4 digits' % (self.getTitle(), len(str(year))))
+            logger.error('Year given for %s has %s digits, required 4 digits' % (self.getTitle(), len(str(year))))
             return False
         if year > 0:
             self._sYear = str(year)
             self.__aItemValues['year'] = year
             return True
         else:
-            logger.info('Year given for %s must be greater than 0' % self.getTitle())
+            logger.error('Year given for %s must be greater than 0' % self.getTitle())
             return False
 
     def setTitleSecond(self, sTitleSecond):
@@ -206,13 +206,13 @@ class cGuiElement:
         if not self._mediaType:
             self.setMediaType(mediaType)
         if not mode in ['add', 'replace']:
-            logger.info('Wrong meta set mode')
+            logger.error('Wrong meta set mode')
         if not season and self._season:
             season = self._season
         if not episode and self._episode:
             episode = self._episode
         if not self._mediaType:
-            logger.info('Could not get MetaInformations for %s, mediaType not defined' % self.getTitle())
+            logger.error('Could not get MetaInformations for %s, mediaType not defined' % self.getTitle())
             return False
         from xstream import get_metahandler
         oMetaget = get_metahandler()
