@@ -27,7 +27,7 @@ def changeWatched(params):
             episode = params.getValue('episode')
         if imdbID:
             meta.change_watched(mediaType, name, imdbID, season=season, episode=episode)
-            xbmc.executebuiltin('XBMC.Container.Refresh')
+            xbmc.executebuiltin('Container.Refresh')
     else:
         META = False
         logger.error('Could not import package metahandler')
@@ -111,7 +111,7 @@ def updateMeta(params):
             meta.update_season(name, imdbID, season)
         else:
             meta.update_meta(mediaType, name, imdbID, new_imdb_id=str(item.get('IMDB_ID', '')), new_tmdb_id=str(item['id']), year=year)
-    xbmc.executebuiltin("XBMC.Container.Refresh")
+    xbmc.executebuiltin("Container.Refresh")
     return
 
 
@@ -178,16 +178,16 @@ def parseUrl():
 
     # Test if we should run a function on a special site
     if not params.exist('site'):
-        xbmc.executebuiltin('XBMC.RunPlugin(%s?function=clearCache)' % sys.argv[0])
+        xbmc.executebuiltin('RunPlugin(%s?function=clearCache)' % sys.argv[0])
 
         # xStreamUpdate = True if cConfig().getSetting('githubUpdateXstream') == 'true' else False
         # urlResolverUpdate = True if cConfig().getSetting('githubUpdateUrlResolver') == 'true' else False
         # if xStreamUpdate and urlResolverUpdate:
-        #     xbmc.executebuiltin('XBMC.RunPlugin(%s?function=updateAll)' % sys.argv[0])
+        #     xbmc.executebuiltin('RunPlugin(%s?function=updateAll)' % sys.argv[0])
         # elif xStreamUpdate:
-        #     xbmc.executebuiltin('XBMC.RunPlugin(%s?function=updateXstream)' % sys.argv[0])
+        #     xbmc.executebuiltin('RunPlugin(%s?function=updateXstream)' % sys.argv[0])
         # elif urlResolverUpdate:
-        #     xbmc.executebuiltin('XBMC.RunPlugin(%s?function=updateUrlResolver)' % sys.argv[0])
+        #     xbmc.executebuiltin('RunPlugin(%s?function=updateUrlResolver)' % sys.argv[0])
 
         # As a default if no site was specified, we run the default starting gui with all plugins
         showMainMenu(sFunction)
@@ -401,7 +401,12 @@ def searchAlter(params):
     threads = []
     for count, pluginEntry in enumerate(aPlugins):
         dialog.update((count + 1) * 50 // numPlugins, 'Searching: ' + str(pluginEntry['name']) + '...')
-        logger.info('Searching for ' + searchTitle + pluginEntry['id'].encode('utf-8'))
+        if sys.version_info[0] == 2:
+            logger.info('Searching for ' + searchTitle + pluginEntry['id'].encode('utf-8'))
+        else:
+            logger.info('Searching for ' + searchTitle + pluginEntry['id'])
+
+        
         t = threading.Thread(target=_pluginSearch, args=(pluginEntry, searchTitle, oGui), name=pluginEntry['name'])
         threads += [t]
         t.start()
