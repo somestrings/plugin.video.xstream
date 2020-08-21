@@ -96,7 +96,7 @@ class cRequestHandler:
         try:
             cookieJar.load(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
         except Exception as e:
-            logger.info(e)
+            logger.error(e)
         if sys.version_info[0] == 2:
             sParameters = urlencode(self.__aParameters, True)
         else:
@@ -125,7 +125,7 @@ class cRequestHandler:
                 if not oResponse:
 
                     if not self.ignoreErrors:
-                        logger.error('Failed to get CF-Cookie for Url: ' + self.__sUrl)
+                        #logger.error('Failed to get CF-Cookie for Url: ' + self.__sUrl)
                         return ''
                     return ''
             elif not self.ignoreErrors:
@@ -196,7 +196,7 @@ class cRequestHandler:
         try:
             cookieJar.load(self._cookiePath, self.__bIgnoreDiscard, self.__bIgnoreExpired)
         except Exception as e:
-            logger.info(e)
+            logger.error(e)
         for entry in cookieJar:
             if entry.name == sCookieName:
                 if sDomain == '':
@@ -210,7 +210,7 @@ class cRequestHandler:
         try:
             cookieJar.load(self._cookiePath, self.__bIgnoreDiscard, self.__bIgnoreExpired)
         except Exception as e:
-            logger.info(e)
+            logger.error(e)
         cookieJar.set_cookie(oCookie)
         cookieJar.save(self._cookiePath, self.__bIgnoreDiscard, self.__bIgnoreExpired)
 
@@ -241,7 +241,7 @@ class cRequestHandler:
                 with open(cacheFile, 'r') as f:
                     content = f.read()
             except:
-                logger.info('Could not read Cache')
+                logger.error('Could not read Cache')
             if content:
                 logger.info('read html for %s from cache' % url)
                 return content
@@ -261,7 +261,7 @@ class cRequestHandler:
                 with open(cacheFile, 'wb') as f:
                     f.write(content.encode('utf8'))
         except:
-            logger.info('Could not write Cache')
+            logger.error('Could not write Cache')
 
     @staticmethod
     def getFileAge(cacheFile):
