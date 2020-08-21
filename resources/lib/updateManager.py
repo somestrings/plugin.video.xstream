@@ -1,5 +1,4 @@
-# -*- coding: UTF-8 -*-
-
+# -*- coding: utf-8 -*-
 import os, base64, sys
 import json
 import requests
@@ -141,7 +140,7 @@ def doUpdate(LocalDir, REMOTE_PATH, Title, localFileName, auth):
                 f.close()
         updateFile.close()
         os.remove(localFileName)
-        xbmc.executebuiltin("XBMC.UpdateLocalAddons()")
+        xbmc.executebuiltin("UpdateLocalAddons()")
         return True
     except:
         xbmc.log("doUpdate not possible due download error")
