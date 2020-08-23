@@ -7,9 +7,9 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'streamking'
-SITE_NAME = 'Streamking'
+SITE_NAME = 'MovieKing.cc'
 SITE_ICON = 'streamking.png'
-URL_MAIN = 'https://streamking.eu/'
+URL_MAIN = 'https://movieking.cc/'
 URL_FILME = URL_MAIN + 'movies.html'
 URL_SERIEN = URL_MAIN + 'tv-series.html'
 URL_SEARCH = URL_MAIN + 'search?q=%s'
@@ -23,7 +23,7 @@ def load():
     cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN)
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
-    params.setParam('sUrl', 'https://streamking.eu/year.html')
+    params.setParam('sUrl', 'https://movieking.cc/year.html')
     cGui().addFolder(cGuiElement('Jahr', SITE_IDENTIFIER, 'showGenre'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
