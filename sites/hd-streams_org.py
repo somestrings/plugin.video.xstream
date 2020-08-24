@@ -10,7 +10,6 @@ from resources.lib.util import cUtil
 SITE_IDENTIFIER = 'hd-streams_org'
 SITE_NAME = 'HD-Streams.org'
 SITE_ICON = 'hdstreams_org.png'
-
 URL_MAIN = 'https://hd-streams.org/'
 URL_FILME = URL_MAIN + 'movies?perPage=54'
 URL_SERIE = URL_MAIN + 'seasons?perPage=54'
@@ -37,9 +36,8 @@ def showGenre():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = "text: '([^']+)', value: '([^']+)"
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        oGui.showInfo()
         return
 
     for sName, sID in aResult:
@@ -58,9 +56,8 @@ def showEntries(entryUrl=False, sGui=False):
     pattern += "(?:url[^>]'([^']+)?).*?"
     pattern += 'filename">([^<]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if not isMatch:
-        if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        if not sGui: oGui.showInfo()
         return
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
@@ -98,9 +95,8 @@ def showEpisodes():
     sHtmlContent = oRequest.request()
     pattern = 'click="loadEpisode\S([\d]+).*?subheading">([^<]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
-        oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        oGui.showInfo()
         return
 
     isMatchDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '<div class="v-card__text">([^<]+)')
@@ -138,46 +134,6 @@ def showHosterserie():
     return hosters
 
 
-def showHosters():
-    sUrl = ParameterHandler().getValue('entryUrl')
-    sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '<v-flex>[^>]*<v-btn.*?</v-flex>'
-    isMatch, sHtmlContainer = cParser.parse(sHtmlContent, pattern)
-    pattern = '<meta name="csrf-token" content="([^"]+)">'
-    isMatch, token = cParser.parseSingleResult(sHtmlContent, pattern)
-    hosters = []
-    for a in sHtmlContainer:
-        pattern = 'x">([^<]+)</v-btn>'
-        isMatch, sQuality = cParser.parseSingleResult(a, pattern)
-        pattern = "recaptcha[^>]'([^']+)', '([^']+)', '([^']+).*?"
-        pattern += '">.*?>([^<]+)'
-        isMatch, aResult = cParser().parse(a, pattern)
-        for e, h, sLang, sName in aResult:
-            link = getLinks(sUrl, e, h, token, sLang)
-            hoster = {'link': link, 'name': sName.strip() + ' ' + sQuality.strip()}
-            hosters.append(hoster)
-    if hosters:
-        hosters.append('getHosterUrl')
-    return hosters
-
-
-def getHosterUrl(sUrl=False):
-    return [{'streamUrl': sUrl, 'resolved': False}]
-
-
-def showSearch():
-    oGui = cGui()
-    sSearchText = oGui.showKeyBoard()
-    if not sSearchText: return
-    _search(False, sSearchText)
-    oGui.setEndOfDirectory()
-
-
-def _search(oGui, sSearchText):
-    if not sSearchText: return
-    showSearchEntries(URL_SEARCH % sSearchText, oGui, sSearchText)
-
-
 def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
@@ -191,11 +147,9 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
     sHtmlContent = oRequest.request()
     pattern = 'title":"([^"]+).*?url":"([^"]+)(.*?)trailer'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if not isMatch:
-        if not sGui: oGui.showInfo('xStream', 'Es wurde kein Eintrag gefunden')
+        if not sGui: oGui.showInfo()
         return
-
 
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
@@ -223,6 +177,33 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
             oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
         oGui.setEndOfDirectory()
+
+
+def showHosters():
+    sUrl = ParameterHandler().getValue('entryUrl')
+    sHtmlContent = cRequestHandler(sUrl).request()
+    pattern = '<v-flex>[^>]*<v-btn.*?</v-flex>'
+    isMatch, sHtmlContainer = cParser.parse(sHtmlContent, pattern)
+    pattern = '<meta name="csrf-token" content="([^"]+)">'
+    isMatch, token = cParser.parseSingleResult(sHtmlContent, pattern)
+    hosters = []
+    for a in sHtmlContainer:
+        pattern = 'x">([^<]+)</v-btn>'
+        isMatch, sQuality = cParser.parseSingleResult(a, pattern)
+        pattern = "recaptcha[^>]'([^']+)', '([^']+)', '([^']+).*?"
+        pattern += '">.*?>([^<]+)'
+        isMatch, aResult = cParser().parse(a, pattern)
+        for e, h, sLang, sName in aResult:
+            link = getLinks(sUrl, e, h, token, sLang)
+            hoster = {'link': link, 'name': sName.strip() + ' ' + sQuality.strip()}
+            hosters.append(hoster)
+    if hosters:
+        hosters.append('getHosterUrl')
+    return hosters
+
+
+def getHosterUrl(sUrl=False):
+    return [{'streamUrl': sUrl, 'resolved': False}]
 
 
 def byteify(input, noneReplacement=None, baseTypesAsString=False):
@@ -276,3 +257,15 @@ def getLinks(sUrl, e, h, token, sLang=False):
         b += '0'
     tmp = cUtil.evp_decode(ciphertext, str(b), salt)
     return byteify(json.loads(tmp))
+
+
+def showSearch():
+    oGui = cGui()
+    sSearchText = oGui.showKeyBoard()
+    if not sSearchText: return
+    _search(False, sSearchText)
+    oGui.setEndOfDirectory()
+
+
+def _search(oGui, sSearchText):
+    showSearchEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
