@@ -85,7 +85,7 @@ class cRequestHandler:
         self.addHeaderEntry('Accept-Language', 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3')
         self.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
         if self.compression:
-            self.addHeaderEntry('Accept-Encoding', 'gzip')
+            self.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
 
     def __callRequest(self):
         if self.caching and self.cacheTime > 0:
@@ -96,7 +96,7 @@ class cRequestHandler:
         try:
             cookieJar.load(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
         except Exception as e:
-            logger.error(e)
+            logger.debug(e)
         if sys.version_info[0] == 2:
             sParameters = urlencode(self.__aParameters, True)
         else:
@@ -125,7 +125,7 @@ class cRequestHandler:
                 if not oResponse:
 
                     if not self.ignoreErrors:
-                        #logger.error('Failed to get CF-Cookie for Url: ' + self.__sUrl)
+                        logger.error('Failed Cloudflare aktiv Url: ' + self.__sUrl)
                         return ''
                     return ''
             elif not self.ignoreErrors:
@@ -156,12 +156,12 @@ class cRequestHandler:
             if sys.version_info[0] == 2:
                 sContent = sContent
             else:
-                sContent = sContent.decode('utf-8').encode('cp850','replace').decode('cp850')
+                sContent = sContent.decode('utf-8').encode('utf-8','replace').decode('utf-8')
         else:
             if sys.version_info[0] == 2:
                 sContent = oResponse.read()
             else:
-                sContent = (oResponse.read()).decode('utf-8').encode('cp850','replace').decode('cp850')
+                sContent = (oResponse.read()).decode('utf-8').encode('utf-8','replace').decode('utf-8')
 
 
         cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
@@ -230,6 +230,7 @@ class cRequestHandler:
         self.__cachePath = cache
 
     def readCache(self, url):
+        content = ''
         if sys.version_info[0] == 2:
             h = hashlib.md5(url).hexdigest()
         else:
@@ -238,8 +239,12 @@ class cRequestHandler:
         fileAge = self.getFileAge(cacheFile)
         if 0 < fileAge < self.cacheTime:
             try:
-                with open(cacheFile, 'r') as f:
-                    content = f.read()
+                if sys.version_info[0] == 2:
+                    with open(cacheFile, 'r') as f:
+                        content = f.read()
+                else:
+                    with open(cacheFile, 'rb') as f:
+                        content = f.read().decode('utf8')
             except:
                 logger.error('Could not read Cache')
             if content:
