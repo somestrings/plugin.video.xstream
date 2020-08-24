@@ -7,7 +7,7 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'hd-streams_to'
-SITE_NAME = 'HD-Streams'
+SITE_NAME = 'HD-Streams.to'
 SITE_ICON = 'hd-streams_to.png'
 URL_MAIN = 'https://hd-streams.to/de/'
 URL_FILME = URL_MAIN + 'movies/'
