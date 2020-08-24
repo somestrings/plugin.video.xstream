@@ -11,7 +11,7 @@ from resources.lib.parser import cParser
 SITE_IDENTIFIER = 'kinox_to'
 SITE_NAME = 'KinoX'
 SITE_ICON = 'kinox.png'
-SITE_SETTINGS = '<setting default="kinoz.to" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="kinox.am|kinoz.to|kinos.to|kinox.mobi|kinox.gratis|kinox.space|kinox.party|kinox.express|kinox.pub|kinox.direct|kinox.digital|kinox.club|kinox.click|kinox.ai|kinox.cloud|kinox.fyi|kinox.fun|kinox.wtf|kinox.lol|kinox.sh|kinox.to" />'
+SITE_SETTINGS = '<setting default="kinos.to" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="kinox.am|kinoz.to|kinos.to|kinox.mobi|kinox.gratis|kinox.space|kinox.party|kinox.express|kinox.pub|kinox.direct|kinox.digital|kinox.club|kinox.click|kinox.ai|kinox.cloud|kinox.fyi|kinox.fun|kinox.wtf|kinox.lol|kinox.sh|kinox.to" />'
 domain = cConfig().getSetting('kinox_to-domain')
 
 URL_MAIN = 'https://' + domain
