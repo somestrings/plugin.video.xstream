@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from resources.lib import logger
-from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
-from resources.lib.handler.ParameterHandler import ParameterHandler
+from resources.lib.config import cConfig
+from resources.lib.jsnprotect import cHelper
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.jsnprotect import *
+from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.parser import cParser
 
 SITE_IDENTIFIER = 'serienstream_to'
@@ -37,7 +37,6 @@ def showValue():
     sUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, '<ul[^>]*class="%s"[^>]*>(.*?)<\/ul>' % params.getValue('sCont'))
-
     if  isMatch:
         isMatch, aResult = cParser.parse(sContainer, '<li>\s*<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>\s*<\/li>')
     if not isMatch:
@@ -47,9 +46,8 @@ def showValue():
     for sUrl, sName in aResult:
         sUrl = sUrl if sUrl.startswith('http') else URL_MAIN + sUrl
         params.setParam('sUrl', sUrl)
-        cGui().addFolder(cGuiElement(sName.strip(), SITE_IDENTIFIER, 'showEntries'), params)
+        cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
-
 
 def showAllSeries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -59,7 +57,6 @@ def showAllSeries(entryUrl=False, sGui=False, sSearchText=False):
     sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
     pattern = '<a[^>]*href="(\/serie\/[^"]*)"[^>]*>(.*?)</a>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
@@ -71,11 +68,11 @@ def showAllSeries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons')
         oGuiElement.setMediaType('tvshow')
         params.setParam('sUrl', URL_MAIN + sUrl)
+        params.setParam('TVShowTitle', sName)
         oGui.addFolder(oGuiElement, params, True, total)
     if not sGui:
         oGui.setView('tvshows')
         oGui.setEndOfDirectory()
-
 
 def showEntries(entryUrl=False, sGui=False):
     oGui = sGui if sGui else cGui()
@@ -90,21 +87,19 @@ def showEntries(entryUrl=False, sGui=False):
     pattern += '<h3>(.*?)<span[^>]*class="paragraph-end">.*?'  # title
     pattern += '<\/div>'  # end element
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
 
-    cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
     for sUrl, sThumbnail, sName in aResult:
-        sThumbnail = URL_MAIN + sThumbnail + cf
+        sThumbnail = URL_MAIN + sThumbnail
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
         oGuiElement.setMediaType('tvshow')
-        oGuiElement.setTVShowTitle(sName)
         params.setParam('sUrl', URL_MAIN + sUrl)
+        params.setParam('TVShowTitle', sName)
         oGui.addFolder(oGuiElement, params, True, total)
     if not sGui:
         pattern = 'pagination">.*?<a href="([^"]+)">&gt;</a>.*?</a></div>'
@@ -114,7 +109,6 @@ def showEntries(entryUrl=False, sGui=False):
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
         oGui.setView('tvshows')
         oGui.setEndOfDirectory()
-
 
 def showSeasons():
     params = ParameterHandler()
@@ -127,7 +121,6 @@ def showSeasons():
     if isMatch:
         pattern = '<a[^>]*href="([^"]*)"[^>]*title="([^"]*)"[^>]*>(.*?)<\/a>.*?'
         isMatch, aResult = cParser.parse(sContainer, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -135,11 +128,10 @@ def showSeasons():
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '<p[^>]*data-full-description="(.*?)"[^>]*>')
     isThumbnail, sThumbnail = cParser.parseSingleResult(sHtmlContent, '<div[^>]*class="seriesCoverBox"[^>]*>.*?<img[^>]*src="([^"]*)"[^>]*>')
     if isThumbnail:
-        cf = cRequestHandler.createUrl(URL_MAIN, oRequest)
         if sThumbnail.startswith('/'):
-            sThumbnail = URL_MAIN + sThumbnail + cf
+            sThumbnail = URL_MAIN + sThumbnail
         else:
-            sThumbnail = sThumbnail + cf
+            sThumbnail = sThumbnail
 
     total = len(aResult)
     for sUrl, sName, sNr in aResult:
@@ -160,7 +152,6 @@ def showSeasons():
         cGui().addFolder(oGuiElement, params, True, total)
     cGui().setView('seasons')
     cGui().setEndOfDirectory()
-
 
 def showEpisodes():
     params = ParameterHandler()
@@ -184,7 +175,7 @@ def showEpisodes():
 
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '<p[^>]*data-full-description="(.*?)"[^>]*>')
     total = len(aResult)
-    for sID, sUrl, sNameGer, sNameEng in aResult:
+    for sID, sUrl2, sNameGer, sNameEng in aResult:
         sName = "%d - " % int(sID)
         sName += sNameGer if sNameGer else sNameEng
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
@@ -197,7 +188,8 @@ def showEpisodes():
             oGuiElement.setSeason(sSeason)
             oGuiElement.setEpisode(int(sID))
             oGuiElement.setTVShowTitle(sTVShowTitle)
-        params.setParam('sUrl', URL_MAIN + sUrl)
+        params.setParam('sUrl', URL_MAIN + sUrl2)
+        params.setParam('entryUrl', sUrl)
         cGui().addFolder(oGuiElement, params, False, total)
     cGui().setView('episodes' if not isMovieList else 'movies')
     cGui().setEndOfDirectory()
@@ -230,17 +222,17 @@ def getHosterUrl(sUrl=False):
     username = cConfig().getSetting('serienstream.user')
     password = cConfig().getSetting('serienstream.pass')
     if username == '' or password == '':
-        username = I1I1I1I1II1I1I1I1I1()[0]
-        password = I1I1I1I1II1I1I1I1I1()[1]
+        username = cHelper.UserName
+        password = cHelper.PassWord
     Handler = cRequestHandler(URL_LOGIN, caching=False)
-    Handler.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
-    Handler.addHeaderEntry('Referer', URL_MAIN + sUrl)
+    Handler.addHeaderEntry('Upgrade-Insecure-Requests', '1')
+    Handler.addHeaderEntry('Referer', ParameterHandler().getValue('entryUrl'))
     Handler.addParameters('email', username)
     Handler.addParameters('password', password)
     Handler.request()
     Request = cRequestHandler(URL_MAIN + sUrl, caching=False)
-    Request.addHeaderEntry('Referer', URL_MAIN + sUrl)
-    Request.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
+    Request.addHeaderEntry('Referer', ParameterHandler().getValue('entryUrl'))
+    Request.addHeaderEntry('Upgrade-Insecure-Requests', '1')
     Request.request()
     return [{'streamUrl': Request.getRealUrl(), 'resolved': False}]
 
