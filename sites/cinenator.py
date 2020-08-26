@@ -47,7 +47,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
-    pattern = 'poster.*?src="([^"]+).*?href="([^"]+).*?">([^<]+)(.*?)texto">([^"]+)</div>'
+    pattern = 'class="item[^>]movies">.*?src="([^"]+).*?class="data.*?href="([^"]+)">([^<]+)(.*?)class="texto">(.*?)</div>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         pattern = '<div[^>]*class="search_page_form">.*?</div></div></div>'
@@ -81,7 +81,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui and not sSearchText:
-        pattern = "class=[^>]current.*?href='([^']+)"
+        pattern = ''''class=[^>]current">\d+</span>[^>]*href='([^']+)'''
         isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, pattern)
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
