@@ -23,8 +23,8 @@ class cParser:
         s = s.replace('\\u00e9', 'é').replace('\\u2018', '‘').replace('\\u201e', '„').replace('\\u201c', '“')
         s = s.replace('\\u00c9', 'É').replace('\\u2026', '...').replace('\\u202fh', 'h').replace('\\u2019', '’')
         s = s.replace('\\u0308', '̈').replace('\\u00e8', 'è').replace('#038;', '').replace('\\u00f8', 'ø')
-        s = s.replace('／', '/').replace('\\u00e1', 'á').replace('Ã¤', 'ä').replace('Ã¼', 'ü').replace('ÃŸ', 'ß')
-        s = s.replace('Ã¶', 'ö').replace('Ã©', 'é').replace('Ã±', 'ñ').replace('&#8211;', '-')
+        s = s.replace('／', '/').replace('\\u00e1', 'á').replace('&#8211;', '-').replace('&#8220;', '“').replace('&#8222;', '„')
+        s = s.replace('&#8217;', '’').replace('&#8230;', '…')
         return s
 
 
