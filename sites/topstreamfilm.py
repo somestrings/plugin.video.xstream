@@ -5,7 +5,6 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
-import time
 
 SITE_IDENTIFIER = 'topstreamfilm'
 SITE_NAME = 'Topstreamfilm'
@@ -145,52 +144,40 @@ def showEpisodes():
 
 def showHosters():
     hosters = []
-    oRequest = cRequestHandler(ParameterHandler().getValue('entryUrl'), caching=True, ignoreErrors=True)
+    entryUrl = ParameterHandler().getValue('entryUrl')
+    oRequest = cRequestHandler(entryUrl)
     sHtmlContent = oRequest.request()
     pattern = '" src="([^"]+)" f'
-    isMatch, sUrl2 = cParser().parseSingleResult(sHtmlContent, pattern)
-
-    oRequest = cRequestHandler(sUrl2, caching=True, ignoreErrors=True)
-    oRequest.addHeaderEntry('Referer', ParameterHandler().getValue('entryUrl'))
-    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-    sHtmlContent = oRequest.request()
-    pattern = '" src="([^"]+)" f'
-    isMatch, sUrl3 = cParser().parseSingleResult(sHtmlContent, pattern)
-
-    oRequest = cRequestHandler(sUrl3, caching=False, ignoreErrors=True)
-    oRequest.addHeaderEntry('Referer', sUrl2)
-    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-    sHtmlContent = oRequest.request()
-    sUrl4 = oRequest.getRealUrl()
-
-    oRequest = cRequestHandler(sUrl4, caching=True, ignoreErrors=True)
-    oRequest.addHeaderEntry('Referer', sUrl2)
-    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-    sHtmlContent = oRequest.request()
-    pattern = "var id = trde[^>]'([^']+)"
-    isMatch, sId = cParser().parseSingleResult(sHtmlContent, pattern)
-    pattern = "iframe.src = '([^']+)"
-    isMatch, sUrl5 = cParser().parseSingleResult(sHtmlContent, pattern)
-
-    oRequest = cRequestHandler(sUrl5 + sId[::-1], caching=False, ignoreErrors=True)
-    oRequest.addHeaderEntry('Referer', sUrl4)
-    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-    sHtmlContent = oRequest.request()
-    sUrl6 = oRequest.getRealUrl()
-    isMatch, id = cParser.parseSingleResult(sUrl6, 'id=([^"]+)')
-    netloc = cParser.urlparse(sUrl6)
-    m3u8 = 'https://{0}/playlist/{1}/{2}'.format(netloc, id, int(time.time() * 1000))
-
-    oRequest = cRequestHandler(m3u8, caching=True, ignoreErrors=True)
-    oRequest.addHeaderEntry('Referer', sUrl4)
-    oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-    sHtmlContent = oRequest.request()
-    isMatch, aResult = cParser().parse(sHtmlContent, 'RESOLUTION=\d+x([\d]+)([^#]+)')
-
+    isMatch, sUrl = cParser().parseSingleResult(sHtmlContent, pattern)
+    if isMatch:
+        oRequest = cRequestHandler(sUrl)
+        sHtmlContent = oRequest.request()
+        pattern = '" src="([^"]+)" f'
+        isMatch, sUrl = cParser().parseSingleResult(sHtmlContent, pattern)
+    if isMatch:
+        oRequest = cRequestHandler(sUrl[:-1])
+        sHtmlContent = oRequest.request()
+        pattern = "var id = trde[^>]'([^']+)"
+        isMatch, sId = cParser().parseSingleResult(sHtmlContent, pattern)
+        pattern = "iframe.src = '([^']+)"
+        isMatch, sUrl = cParser().parseSingleResult(sHtmlContent, pattern)
+    if isMatch:
+        oRequest = cRequestHandler(sUrl + sId[::-1], caching=False)
+        sHtmlContent = oRequest.request()
+        sUrl = oRequest.getRealUrl()
+        isMatch, id = cParser.parseSingleResult(sUrl, 'id=([^"]+)')
+        netloc = cParser.urlparse(sUrl)
+        import time
+        m3u8 = 'https://{0}/playlist/{1}/{2}'.format(netloc, id, int(time.time() * 1000))
+    if isMatch:
+        oRequest = cRequestHandler(m3u8, caching=True, ignoreErrors=True)
+        oRequest.addHeaderEntry('Referer', sUrl)
+        oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
+        sHtmlContent = oRequest.request()
+        isMatch, aResult = cParser().parse(sHtmlContent, 'RESOLUTION=\d+x([\d]+)([^#]+)')
     for sQ, sUrl in aResult:
         hoster = {'link': 'https://{0}{1}'.format(netloc,sUrl), 'name': sQ}
         hosters.append(hoster)
-
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
