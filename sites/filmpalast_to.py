@@ -94,14 +94,17 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             sThumbnail = URL_MAIN + sThumbnail
         isYear, sYear = cParser.parseSingleResult(sDummy, 'Jahr:[^>]([\d]+)')
         isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\d]+)')
+        isRating, sRating = cParser.parseSingleResult(sDummy, 'Imdb:[^>]([^<]+)')
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
-        if isDuration:
-            oGuiElement.addItemValue('duration', sDuration)
         if isYear:
             oGuiElement.setYear(sYear)
+        if isDuration:
+            oGuiElement.addItemValue('duration', sDuration)
+        if isRating:
+            oGuiElement.addItemValue('rating', sRating.replace(',', '.'))
         if sUrl.startswith('//'):
             params.setParam('entryUrl', 'https:' + sUrl)
         else:
