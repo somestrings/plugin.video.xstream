@@ -55,6 +55,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'getHosterUrl')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
+        oGuiElement.setDescription(sDesc)
         params.setParam('url', sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
     if not sGui:
