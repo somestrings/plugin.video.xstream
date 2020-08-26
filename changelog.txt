@@ -1,4 +1,11 @@
 3.5.17~nightly
+
+- [serienstream] Kodi 19 fix
+- [cinenator] fix next-page
+- [dokus4] add description
+- [filmpalast] add rating
+- [moviestream] add rating
+- [topstreamfilm] fix hoster
 - [movieking] code cleanup
 - [hd-streams_org] hinzugefügt und code cleanup
 - [xStream] Kodi 19 Contextmenu fix usw.
