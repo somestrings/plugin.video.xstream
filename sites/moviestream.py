@@ -24,10 +24,10 @@ def load():
     params.setParam('page', (1))
     params.setParam('sUrl', URL_FILME)
     cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
-    params.setParam('Genre', URL_GENRES_FILME)
-    cGui().addFolder(cGuiElement('Film Genre', SITE_IDENTIFIER, 'showGenre'), params)
     params.setParam('sUrl', URL_SERIE)
     cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('Genre', URL_GENRES_FILME)
+    cGui().addFolder(cGuiElement('Film Genre', SITE_IDENTIFIER, 'showGenre'), params)
     params.setParam('Genre', URL_GENRES_SERIE)
     cGui().addFolder(cGuiElement('Serien Genre', SITE_IDENTIFIER, 'showGenre'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
@@ -51,14 +51,14 @@ def showEntries(entryUrl=False, sGui=False):
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     oRequest.addHeaderEntry('Referer', params.getValue('sUrl'))
     sHtmlContent = oRequest.request()
-    pattern = '"id":([\d]+).*?"name":"([^"]+).*?year":([\d]+).*?description":"([^"]+).*?poster":"([^"]+).*?backdrop":"([^"]+)","runtime":([\d]+).*?is_series":([^"]+)'
+    pattern = '"id":([\d]+).*?"name":"([^"]+).*?year":([\d]+).*?description":"([^"]+).*?poster":"([^"]+).*?backdrop":"([^"]+)","runtime":([\d]+).*?is_series":([^"]+).*?rating":"([^"]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
 
     total = len(aResult)
-    for sUrl, sName, sYear, sDesc, sThumbnail, sFanart, runtime, isserie in aResult:
+    for sUrl, sName, sYear, sDesc, sThumbnail, sFanart, runtime, isserie, sRating in aResult:
         isTvshow = True if "true" in isserie else False
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
@@ -66,6 +66,7 @@ def showEntries(entryUrl=False, sGui=False):
         oGuiElement.setYear(sYear)
         oGuiElement.setDescription(sDesc)
         oGuiElement.addItemValue('duration', int(runtime) * 60)
+        oGuiElement.addItemValue('rating', sRating)
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         params.setParam('entryUrl', URL_HOSTER % (sUrl, sUrl))
         params.setParam('sThumbnail', sThumbnail)
