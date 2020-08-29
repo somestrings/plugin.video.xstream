@@ -7,7 +7,7 @@ import xbmc, xbmcvfs
 from xbmc import translatePath, LOGERROR, LOGNOTICE
 from xbmcgui import Dialog
 from xbmcaddon import Addon as addon
-## Android K18 ZIP Fix.
+# Android K18 ZIP Fix.
 if xbmc.getCondVisibility('system.platform.android') and int(xbmc.getInfoLabel('System.BuildVersion')[:2]) >= 18:
     import fixetzipfile as zipfile
 else:
@@ -16,7 +16,8 @@ else:
 # Text/Überschrift im Dialog
 PLUGIN_NAME = addon().getAddonInfo('name')  # ist z.B. 'xstream'
 
-## URLRESOLVER
+
+# URLRESOLVER
 def urlResolverUpdate(silent=False):
     username = 'streamxstream'
     plugin_id = 'script.module.urlresolver'
@@ -51,9 +52,7 @@ def xStreamUpdate(silent=False):
 def Update(username, plugin_id, branch, token, silent):
     REMOTE_PLUGIN_COMMITS = "https://api.github.com/repos/%s/%s/commits/%s" % (username, plugin_id, branch)
     REMOTE_PLUGIN_DOWNLOADS = "https://api.github.com/repos/%s/%s/zipball/%s" % (username, plugin_id, branch)
-    
     auth = HTTPBasicAuth(username, token)
-    
     xbmc.log('%s - Search for update ' % plugin_id, LOGNOTICE)
     try:
         if sys.version_info[0] == 2:
@@ -64,7 +63,7 @@ def Update(username, plugin_id, branch, token, silent):
         LOCAL_PLUGIN_VERSION = os.path.join(ADDON_DIR, "update_sha")
         LOCAL_FILE_NAME_PLUGIN = os.path.join(ADDON_DIR, 'update-' + plugin_id + '.zip')
         if not os.path.exists(ADDON_DIR): os.mkdir(ADDON_DIR)
-#ka - Update erzwingen
+        # ka - Update erzwingen
         if addon().getSetting('enforceUpdate') == 'true':
             if xbmcvfs.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
             # if os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION) # oder so!
@@ -74,13 +73,13 @@ def Update(username, plugin_id, branch, token, silent):
         if commitXML:
             isTrue = commitUpdate(commitXML, LOCAL_PLUGIN_VERSION, REMOTE_PLUGIN_DOWNLOADS, path, plugin_id,
                                   LOCAL_FILE_NAME_PLUGIN, silent, auth)
-            if isTrue == True:
+            if isTrue is True:
                 xbmc.log('%s - Update successful.' % plugin_id, LOGNOTICE)
-                if silent == False: Dialog().ok(PLUGIN_NAME, plugin_id + " - Update erfolgreich.")
+                if silent is False: Dialog().ok(PLUGIN_NAME, plugin_id + ' - Update erfolgreich.')
                 return True
-            elif isTrue == None:
+            elif isTrue is None:
                 xbmc.log('%s - no new update ' % plugin_id, LOGNOTICE)
-                if silent == False: Dialog().ok(PLUGIN_NAME, plugin_id + " - Kein Update verfügbar.")
+                if silent is False: Dialog().ok(PLUGIN_NAME, plugin_id + ' - Kein Update verfügbar.')
                 return None
 
         xbmc.log('%s - Update error ' % plugin_id, LOGERROR)
@@ -97,7 +96,7 @@ def commitUpdate(onlineFile, offlineFile, downloadLink, LocalDir, plugin_id, loc
         if not os.path.exists(offlineFile) or open(offlineFile).read() != jsData['sha']:
             xbmc.log('%s - start update ' % plugin_id, LOGNOTICE)
             isTrue = doUpdate(LocalDir, downloadLink, plugin_id, localFileName, auth)
-            if isTrue == True:
+            if isTrue is True:
                 try:
                     open(offlineFile, 'w').write(jsData['sha'])
                     return True
@@ -107,8 +106,7 @@ def commitUpdate(onlineFile, offlineFile, downloadLink, LocalDir, plugin_id, loc
                 return False
         else:
             return None
-
-    except Exception as e:
+    except Exception:
         os.remove(offlineFile)
         xbmc.log("RateLimit reached")
         return False
@@ -172,6 +170,7 @@ def _getXmlString(xml_url, auth):
     except Exception as e:
         xbmc.log(e)
 
+
 # todo Verzeichnis packen -für zukünftige Erweiterung "Backup"
 def zipfolder(foldername, target_dir):
     zipobj = zipfile.ZipFile(foldername + '.zip', 'w', zipfile.ZIP_DEFLATED)
@@ -192,16 +191,16 @@ def devAutoUpdates(silent=False):
             status2 = urlResolverUpdate(silent)
         if status1 == status2:
             return status1
-        elif status1 == False or status2 == False:
-                return False
-        elif (status1 == True or status2 == True) and (status1 == None or status2 == None):
+        elif status1 is False or status2 is False:
+            return False
+        elif (status1 is True or status2 is True) and (status1 is None or status2 is None):
             return True
 
     except Exception as e:
         xbmc.log(e)
 
 
-def devUpdates(): # für manuelles Updates vorgesehen
+def devUpdates():  # für manuelles Updates vorgesehen
     try:
         resolverupdate = False
         pluginupdate = False
@@ -217,17 +216,17 @@ def devUpdates(): # für manuelles Updates vorgesehen
         elif result == 2:
             resolverupdate = True
 
-        if pluginupdate == True:
+        if pluginupdate is True:
             try:
                 xStreamUpdate(False)
             except:
                 pass
-        if resolverupdate == True:
+        if resolverupdate is True:
             try:
                 urlResolverUpdate(False)
             except:
                 pass
-        #ka - reset enforce Update
+        # ka - reset enforce Update
         if addon().getSetting('enforceUpdate') == 'true': addon().setSetting('enforceUpdate', 'false')
         return
     except Exception as e:
