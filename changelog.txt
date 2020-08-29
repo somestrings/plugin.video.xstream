@@ -1,4 +1,6 @@
 3.5.17~nightly
+- [general] kleiner fix für autoplay, mehrere für Kodi 19
+- [cinenator] fix hosterauswahl automatisch
 - [dokus4] fix  fix hosterauswahl automatisch
 - [hd-streams.to] fix hosterauswahl automatisch
 - [serienstream] Kodi 19 fix
