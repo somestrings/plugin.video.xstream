@@ -15,6 +15,7 @@ URL_SHOWS = URL_MAIN + 'serien'
 URL_POPULAR = URL_MAIN + 'beliebte-filme-serien'
 URL_SEARCH = URL_MAIN + '?s=%s'
 
+
 def load():
     logger.info("Load %s" % SITE_NAME)
     params = ParameterHandler()
@@ -28,12 +29,13 @@ def load():
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
 
+
 def showGenre():
     params = ParameterHandler()
     sHtmlContent = cRequestHandler(URL_MAIN).request()
     pattern = 'Kategorien.*?</aside>'
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-    if  isMatch:
+    if isMatch:
         pattern = 'href="([^"]+).*?>([^<]+)'
         isMatch, aResult = cParser.parse(sContainer, pattern)
     if not isMatch:
@@ -44,6 +46,7 @@ def showGenre():
         params.setParam('sUrl', sUrl)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
+
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -60,8 +63,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
     for sUrl, sThumbnail, sType, sName, sDummy, sDesc in aResult:
-        isDuration, sDuration = cParser.parseSingleResult(sDummy, 'time">([\d(h) \d]+)')
-        isYear, sYear = cParser.parseSingleResult(sDummy, 'date_range">([\d]+)')
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, 'time">([\\d(h) \\d]+)')
+        isYear, sYear = cParser.parseSingleResult(sDummy, 'date_range">([\\d]+)')
         sThumbnail = 'https:' + sThumbnail + cf
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
@@ -87,11 +90,12 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('tvshow' if 'Season' in sType or 'TV' in sType else 'movie')
         oGui.setEndOfDirectory()
 
+
 def showSeasons():
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    isMatch, aResult = cParser.parse(sHtmlContent, 'Season <span>([\d]+)')
+    isMatch, aResult = cParser.parse(sHtmlContent, 'Season <span>([\\d]+)')
     if not isMatch:
         cGui().showInfo()
         return
@@ -111,6 +115,7 @@ def showSeasons():
     cGui().setView('seasons')
     cGui().setEndOfDirectory()
 
+
 def showEpisodes():
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
@@ -119,7 +124,7 @@ def showEpisodes():
     pattern = 'Season <span>%s.*?></tbody>' % sSeason
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        pattern = 'Num">([\d]+).*?href="([^"]+)'
+        pattern = 'Num">([\\d]+).*?href="([^"]+)'
         isMatch, aResult = cParser.parse(sContainer, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -141,6 +146,7 @@ def showEpisodes():
         cGui().addFolder(oGuiElement, params, False, total)
     cGui().setView('episodes')
     cGui().setEndOfDirectory()
+
 
 def showHosters():
     hosters = []
@@ -174,22 +180,25 @@ def showHosters():
         oRequest.addHeaderEntry('Referer', sUrl)
         oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
         sHtmlContent = oRequest.request()
-        isMatch, aResult = cParser().parse(sHtmlContent, 'RESOLUTION=\d+x([\d]+)([^#]+)')
+        isMatch, aResult = cParser().parse(sHtmlContent, 'RESOLUTION=\\d+x([\\d]+)([^#]+)')
     for sQ, sUrl in aResult:
-        hoster = {'link': 'https://{0}{1}'.format(netloc,sUrl), 'name': sQ}
+        hoster = {'link': 'https://{0}{1}'.format(netloc, sUrl), 'name': sQ}
         hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
 
+
 def getHosterUrl(sUrl=False):
     return [{'streamUrl': sUrl, 'resolved': True}]
+
 
 def showSearch():
     sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
     cGui().setEndOfDirectory()
+
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
