@@ -161,21 +161,21 @@ def showHosters():
                 oRequest.addParameters('type', 'tv')
             else:
                 oRequest.addParameters('type', 'movie')
-            oRequest.setRequestType(1)
             sHtmlContent = oRequest.request()
             isMatch, aResult = cParser().parse(sHtmlContent, "src=[^>]([^']+)")
             for sUrl in aResult:
-                hoster = {'link': sUrl, 'name': '3434.uls.to'}
+                Request = cRequestHandler(sUrl, caching=False)
+                Request.addHeaderEntry('Referer', sUrl)
+                Request.request()
+                sUrl = Request.getRealUrl()
+                hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
                 hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
 
 def getHosterUrl(sUrl=False):
-    Request = cRequestHandler(sUrl, caching=False)
-    Request.addHeaderEntry('Referer', sUrl)
-    Request.request()
-    return [{'streamUrl': Request.getRealUrl(), 'resolved': False}]
+    return [{'streamUrl': sUrl, 'resolved': False}]
 
 def showSearch():
     sSearchText = cGui().showKeyBoard()
