@@ -16,6 +16,7 @@ URL_TOP = URL_MAIN + '/movies/top'
 URL_ENGLISH = URL_MAIN + '/search/genre/Englisch'
 URL_SEARCH = URL_MAIN + '/search/title/%s'
 
+
 def load():
     logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
@@ -25,6 +26,7 @@ def load():
     cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showSeriesMenu'))
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
+
 
 def showMovieMenu():
     params = ParameterHandler()
@@ -42,6 +44,7 @@ def showMovieMenu():
     cGui().addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showValue'), params)
     cGui().setEndOfDirectory()
 
+
 def showSeriesMenu():
     params = ParameterHandler()
     params.setParam('sUrl', URL_SHOWS)
@@ -49,6 +52,7 @@ def showSeriesMenu():
     params.setParam('value', 'movietitle')
     cGui().addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showValue'), params)
     cGui().setEndOfDirectory()
+
 
 def showValue():
     params = ParameterHandler()
@@ -67,6 +71,7 @@ def showValue():
         params.setParam('sUrl', sUrl)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
+
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -88,12 +93,12 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for sUrl, sName, sThumbnail, sDummy in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isTvshow, aResult = cParser.parse(sName, 'S\d\dE\d\d')
+        isTvshow, aResult = cParser.parse(sName, 'S\\d\\dE\\d\\d')
         sThumbnail = sThumbnail + cf
         if sThumbnail.startswith('/'):
             sThumbnail = URL_MAIN + sThumbnail
-        isYear, sYear = cParser.parseSingleResult(sDummy, 'Jahr:[^>]([\d]+)')
-        isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\d]+)')
+        isYear, sYear = cParser.parseSingleResult(sDummy, 'Jahr:[^>]([\\d]+)')
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\\d]+)')
         isRating, sRating = cParser.parseSingleResult(sDummy, 'Imdb:[^>]([^<]+)')
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
@@ -123,13 +128,14 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('tvshow' if isTvshow else 'movie')
         oGui.setEndOfDirectory()
 
+
 def showSeasons():
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue("sThumbnail")
     sName = params.getValue('sName')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '<a[^>]*class="staffTab"[^>]*data-sid="(\d+)"[^>]*>'
+    pattern = '<a[^>]*class="staffTab"[^>]*data-sid="(\\d+)"[^>]*>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -149,6 +155,7 @@ def showSeasons():
         cGui().addFolder(oGuiElement, params, True, total)
     cGui().setView('seasons')
     cGui().setEndOfDirectory()
+
 
 def showEpisodes():
     params = ParameterHandler()
@@ -184,6 +191,7 @@ def showEpisodes():
     cGui().setView('episodes')
     cGui().setEndOfDirectory()
 
+
 def showHosters():
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
@@ -198,6 +206,7 @@ def showHosters():
         hosters.append('getHosterUrl')
     return hosters
 
+
 def getHosterUrl(sUrl=False):
     if 'vivo.php' in sUrl:
         oRequest = cRequestHandler(sUrl, caching=False)
@@ -207,11 +216,13 @@ def getHosterUrl(sUrl=False):
     else:
         return [{'streamUrl': sUrl, 'resolved': False}]
 
+
 def showSearch():
     sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
     cGui().setEndOfDirectory()
+
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
