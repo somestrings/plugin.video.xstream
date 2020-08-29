@@ -35,7 +35,7 @@ class cDownload:
         self.__sTitle = self.__createDownloadFilename(sTitle)
         if showDialog:
             self.__sTitle = cGui().showKeyBoard(self.__sTitle)
-            if (self.__sTitle != False and len(self.__sTitle) > 0):
+            if (self.__sTitle is False and len(self.__sTitle) > 0):
                 sPath = cConfig().getSetting('download-folder')
                 if sPath == '':
                     dialog = xbmcgui.Dialog()
@@ -43,7 +43,7 @@ class cDownload:
                 if (sPath != ''):
                     sDownloadPath = xbmc.translatePath(sPath + '%s' % (self.__sTitle,))
                     self.__prepareDownload(url, header, sDownloadPath, downloadDialogTitle)
-        elif self.__sTitle != False:
+        elif self.__sTitle is False:
             temp_dir = os.path.join(common.profilePath)
             if not os.path.isdir(temp_dir):
                 os.makedirs(os.path.join(temp_dir))
@@ -74,7 +74,7 @@ class cDownload:
         while 1:
             iCount = iCount + 1
             data = oUrlHandler.read(chunk)
-            if not data or self.__processIsCanceled == True:
+            if not data or self.__processIsCanceled is True:
                 break
             f.write(data)
             self.__stateCallBackFunction(iCount, chunk, iTotalSize)
