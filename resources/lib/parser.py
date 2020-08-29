@@ -6,6 +6,7 @@ try:
 except ImportError:
     from urllib.parse import quote, unquote, quote_plus, unquote_plus, urlparse
 
+
 class cParser:
     @staticmethod
     def parseSingleResult(sHtmlContent, pattern):
@@ -26,8 +27,6 @@ class cParser:
         s = s.replace('／', '/').replace('\\u00e1', 'á').replace('&#8211;', '-').replace('&#8220;', '“').replace('&#8222;', '„')
         s = s.replace('&#8217;', '’').replace('&#8230;', '…')
         return s
-
-
 
     @staticmethod
     def parse(sHtmlContent, pattern, iMinFoundValue=1, ignoreCase=False):
@@ -54,7 +53,7 @@ class cParser:
 
     @staticmethod
     def getNumberFromString(sValue):
-        pattern = '\d+'
+        pattern = '\\d+'
         aMatches = re.findall(pattern, sValue)
         if len(aMatches) > 0:
             return int(aMatches[0])
