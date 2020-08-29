@@ -14,6 +14,7 @@ SITE_ICON = 'netzkino.png'
 URL_MAIN = 'http://api.netzkino.de.simplecache.net/capi-2.0a/categories/%s.json?d=www&l=de-DE&v=unknown'
 URL_SEARCH = 'http://api.netzkino.de.simplecache.net/capi-2.0a/search?q=%s&d=www&l=de-DE&v=unknown'
 
+
 def load():
     logger.info("Load %s" % SITE_NAME)
     oGui = cGui()
@@ -52,18 +53,18 @@ def load():
     oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     oGui.setEndOfDirectory()
 
+
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
     isShowAdult = showAdult()
     sJson = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
-
     if not sJson:
         if not sGui: oGui.showError('xStream', 'Fehler beim Laden der Daten.')
         return
     aJson = json.loads(sJson)
-    if not 'posts' in aJson or len(aJson['posts']) == 0:
+    if 'posts' not in aJson or len(aJson['posts']) == 0:
         if not sGui: oGui.showInfo()
         return
 
@@ -90,16 +91,19 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not sGui:
         oGui.setEndOfDirectory()
 
+
 def getHosterUrl(Streaming=False):
     if not Streaming: Streaming = ParameterHandler().getValue('Streaming')
     sUrl = 'http://netzkino_and-vh.akamaihd.net/i/%s.mp4/master.m3u8' % Streaming
     return [{'streamUrl': sUrl, 'resolved': True}]
+
 
 def showSearch():
     sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
     cGui().setEndOfDirectory()
+
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, cParser().quotePlus(sSearchText))
