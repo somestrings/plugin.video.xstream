@@ -1,20 +1,26 @@
 # -*- coding: utf-8 -*-
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
-import logger, urllib, urllib2, re
+import logger, re
+try:
+    from urllib2 import Request, urlopen
+    from urllib import urlencode
+except ImportError:
+    from urllib.request import Request, urlopen
+    from urllib.parse import urlencode
 
 
 class cJDownloader2Handler:
     def sendToJDownloader2(self, sUrl):
-        if (self.__checkConfig() == False):
+        if self.__checkConfig() is False:
             cGui().showError('JDownloader2', 'Settings ueberpruefen', 5)
             return False
 
-        if (self.__checkConnection() == False):
+        if self.__checkConnection() is False:
             cGui().showError('JDownloader2', 'Verbindung fehlgeschlagen (JD2 oder External CNL Port support aus?)', 5)
             return False
 
-        if (self.__download(sUrl) == True):
+        if self.__download(sUrl) is True:
             cGui().showInfo('JDownloader2', 'Link gesendet', 5)
             return True
         return False
@@ -26,10 +32,10 @@ class cJDownloader2Handler:
         url = 'http://{}:{}/{}'.format(sHost, sPort, path)
         if params is not None:
             headers = {'Content-Type': 'application/x-www-form-urlencoded;charset={}'.format(ENCODING), }
-            request = urllib2.Request(url, urllib.urlencode(params).encode(ENCODING), headers)
+            request = Request(url, urlencode(params).encode(ENCODING), headers)
         else:
-            request = urllib2.Request(url)
-        return urllib2.urlopen(request).read().decode(ENCODING).strip()
+            request = Request(url)
+        return urlopen(request).read().decode(ENCODING).strip()
 
     def __download(self, sFileUrl):
         logger.info('JD2 Link: ' + str(sFileUrl))
@@ -54,13 +60,11 @@ class cJDownloader2Handler:
 
     def __checkConnection(self):
         logger.info('check JD2 Connection')
-        sHost = self.__getHost()
-        sPort = self.__getPort()
         try:
             output = self.__client('jdcheck.js', None)
             pattern = re.compile(r'jdownloader\s*=\s*true', re.IGNORECASE)
-            if (pattern.search(output) != None):
+            if pattern.search(output) is None:
                 return True
-        except Exception as e:
+        except Exception:
             return False
         return False
