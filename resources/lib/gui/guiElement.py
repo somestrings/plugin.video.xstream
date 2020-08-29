@@ -5,16 +5,17 @@ from resources.lib.config import cConfig
 from resources.lib.util import cUtil
 from resources.lib import logger
 
+
 class cGuiElement:
     '''
     This class "abstracts" a xbmc listitem.
 
     Kwargs:
         sTitle    (str): title/label oft the GuiElement/listitem
-        sSite     (str): siteidentifier of the siteplugin, which is called if the GuiElement is selected 
+        sSite     (str): siteidentifier of the siteplugin, which is called if the GuiElement is selected
         sFunction (str): name of the function, which is called if the GuiElement is selected
-    
-        These arguments are mandatory. If not given on init, they have to be set by their setter-methods, before the GuiElement is added to the Gui. 
+
+        These arguments are mandatory. If not given on init, they have to be set by their setter-methods, before the GuiElement is added to the Gui.
     '''
 
     DEFAULT_FOLDER_ICON = 'DefaultFolder.png'
@@ -205,7 +206,7 @@ class cGuiElement:
             return False
         if not self._mediaType:
             self.setMediaType(mediaType)
-        if not mode in ['add', 'replace']:
+        if mode not in ['add', 'replace']:
             logger.error('Wrong meta set mode')
         if not season and self._season:
             season = self._season
