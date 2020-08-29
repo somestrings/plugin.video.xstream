@@ -56,7 +56,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
         oGuiElement.setDescription(sDesc)
-        params.setParam('url', sUrl)
+        params.setParam('sUrl', sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
     if not sGui:
         pattern = 'rel="next" href="([^"]+)'
@@ -67,7 +67,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setEndOfDirectory()
 
 def getHosterUrl(sUrl=False):
-    sHtmlContent = cRequestHandler(sUrl).request()
+    sHtmlContent = cRequestHandler(ParameterHandler().getValue('sUrl')).request()
     isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, '<p><iframe.*?src="([^"]+)"')
     if isMatch:
         import xbmc, xbmcgui
