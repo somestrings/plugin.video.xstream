@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from resources.lib import logger
+from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
@@ -153,16 +154,24 @@ def showHosters():
     if isMatch:
         for sName, sUrl, sQualy, sLang in aResult:
             if not 'filecrypt' in sName:
+                if cConfig().getSetting('hosterSelect') == 'Auto':
+                    sUrl = getlinks(sUrl)
                 hoster = {'link': sUrl, 'name': sName + ' ' + sLang + ' ' + sQualy}
                 hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
 
-def getHosterUrl(sUrl=False):
+def getlinks(sUrl):
     sHtmlContent = cRequestHandler(sUrl).request()
-    isMatch, hLink = cParser.parseSingleResult(sHtmlContent, 'id="link.*?href="([^"]+)"')
-    return [{'streamUrl': hLink, 'resolved': False}]
+    isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, 'id="link.*?href="([^"]+)"')
+    if isMatch:
+        return sUrl
+
+def getHosterUrl(sUrl=False):
+    if not cConfig().getSetting('hosterSelect') == 'Auto':
+        sUrl = getlinks(sUrl)
+    return [{'streamUrl': sUrl, 'resolved': False}]
 
 def showSearch():
     sSearchText = cGui().showKeyBoard()
