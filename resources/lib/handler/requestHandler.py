@@ -129,7 +129,7 @@ class cRequestHandler:
                         return ''
                     return ''
             elif not self.ignoreErrors:
-                xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url:', self.__sUrl, str(e))
+                xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url: {0} {1}'.format(self.__sUrl, str(e)))
                 logger.error('HTTPError ' + str(e) + ' Url: ' + self.__sUrl)
                 return ''
             else:
@@ -137,7 +137,7 @@ class cRequestHandler:
         except URLError as e:
             if not self.ignoreErrors:
                 if hasattr(e.reason, 'args') and e.reason.args[0] == 1 and sys.version_info < (2, 7, 9):
-                    xbmcgui.Dialog().ok('xStream', str(e.reason), '', 'For this request is Python v2.7.9 or higher required.')
+                    xbmcgui.Dialog().ok('xStream', '{0}For this request is Python v2.7.9 or higher required.'.format(str(e.reason)))
                 else:
                     xbmcgui.Dialog().ok('xStream', str(e.reason))
             logger.error('URLError ' + str(e.reason) + ' Url: ' + self.__sUrl)
