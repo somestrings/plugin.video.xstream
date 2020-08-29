@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from resources.lib.handler.ParameterHandler import ParameterHandler
 
+
 class cContextElement:
     def __init__(self):
         self.__sTitle = ''
