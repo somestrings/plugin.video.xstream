@@ -1,5 +1,6 @@
 3.5.17~nightly
-
+- [dokus4] fix  fix hosterauswahl automatisch
+- [hd-streams.to] fix hosterauswahl automatisch
 - [serienstream] Kodi 19 fix
 - [cinenator] fix next-page
 - [dokus4] add description
