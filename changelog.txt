@@ -1,4 +1,20 @@
 3.5.17~nightly
+- [alleserien_com] code optimiert
+- [cinenator] code optimiert
+- [dokus4] code optimiert
+- [filmpalast_to] code optimiert
+- [flimmerstube_com] code optimiert
+- [hd-streams_to] code optimiert
+- [hdfilme] code optimiert
+- [kinoger] code optimiert
+- [kkiste_co] code optimiert
+- [moviedream_ws] code optimiert
+- [movieking] code optimiert
+- [movietown_org] code optimiert
+- [netzkino_de] code optimiert
+- [pureanime] code optimiert
+- [serienstream_to] code optimiert
+- [topstreamfilm] code optimiert
 - [general] kleiner fix für autoplay, mehrere für Kodi 19
 - [cinenator] fix hosterauswahl automatisch
 - [dokus4] fix  fix hosterauswahl automatisch
