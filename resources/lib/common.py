@@ -3,7 +3,7 @@ import xbmcaddon, sys
 from xbmc import translatePath
 
 addonID = 'plugin.video.xstream'
-addon = xbmcaddon.Addon(id = addonID)
+addon = xbmcaddon.Addon(addonID)
 addonName = addon.getAddonInfo('name')
 if sys.version_info[0] == 2:
     addonPath = translatePath(addon.getAddonInfo('path')).decode('utf-8')
@@ -11,7 +11,6 @@ if sys.version_info[0] == 2:
 else:
     addonPath = translatePath(addon.getAddonInfo('path'))
     profilePath = translatePath(addon.getAddonInfo('profile'))
-
 
 IE_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko'
 FF_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0'
