@@ -2,6 +2,7 @@
 import urlresolver
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
+from resources.lib import logger
 
 
 class cHosterHandler:
@@ -12,18 +13,18 @@ class cHosterHandler:
             pattern = oHoster.getPattern()
             if type(pattern) == type(''):
                 aMediaLink = cParser().parse(sContent, oHoster.getPattern())
-                if (aMediaLink[0] == True):
+                if aMediaLink[0] is True:
                     logger.info('hosterhandler: ' + aMediaLink[1][0])
                     return True, aMediaLink[1][0]
             else:
                 for p in pattern:
                     aMediaLink = cParser().parse(sContent, p)
-                    if (aMediaLink[0] == True):
+                    if aMediaLink[0] is True:
                         logger.info('hosterhandler: ' + aMediaLink[1][0])
                         return True, aMediaLink[1][0]
         return False, ''
 
-    #checks if there is a resolver for a given hoster or url
+    # checks if there is a resolver for a given hoster or url
     def getHoster(self, sHosterFileName):
         if sHosterFileName != '':
             source = [urlresolver.HostedMediaFile(url=sHosterFileName)]
