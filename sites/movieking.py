@@ -14,6 +14,7 @@ URL_FILME = URL_MAIN + 'movies.html'
 URL_SEARCH = URL_MAIN + 'search?q=%s'
 URL_YEAR = URL_MAIN + 'year.html'
 
+
 def load():
     logger.info("Load %s" % SITE_NAME)
     params = ParameterHandler()
@@ -25,6 +26,7 @@ def load():
     cGui().addFolder(cGuiElement('Jahr', SITE_IDENTIFIER, 'showGenre'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
+
 
 def showGenre():
     params = ParameterHandler()
@@ -47,6 +49,7 @@ def showGenre():
         params.setParam('sUrl', sUrl)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
+
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -72,12 +75,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, False, total)
     if not sGui:
-        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, 'pagination.*?<a href="([^"]+)" data-ci-pagination-page="\d" rel="next">')
+        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, 'pagination.*?<a href="([^"]+)" data-ci-pagination-page="\\d" rel="next">')
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
         oGui.setView('movie')
         oGui.setEndOfDirectory()
+
 
 def showHosters():
     hosters = []
@@ -93,16 +97,19 @@ def showHosters():
         hosters.append('getHosterUrl')
     return hosters
 
+
 def getHosterUrl(sUrl=False):
     Request = cRequestHandler(sUrl, caching=False)
     Request.request()
     return [{'streamUrl': Request.getRealUrl(), 'resolved': False}]
+
 
 def showSearch():
     sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
     cGui().setEndOfDirectory()
+
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
