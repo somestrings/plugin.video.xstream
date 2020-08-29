@@ -17,6 +17,7 @@ URL_SERIES = URL_MAIN + '/serien'
 URL_POPULAR = URL_MAIN + '/beliebte-serien'
 URL_LOGIN = URL_MAIN + '/login'
 
+
 def load():
     logger.info("Load %s" % SITE_NAME)
     params = ParameterHandler()
@@ -32,13 +33,14 @@ def load():
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
 
+
 def showValue():
     params = ParameterHandler()
     sUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, '<ul[^>]*class="%s"[^>]*>(.*?)<\/ul>' % params.getValue('sCont'))
-    if  isMatch:
-        isMatch, aResult = cParser.parse(sContainer, '<li>\s*<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>\s*<\/li>')
+    isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, '<ul[^>]*class="%s"[^>]*>(.*?)<\\/ul>' % params.getValue('sCont'))
+    if isMatch:
+        isMatch, aResult = cParser.parse(sContainer, '<li>\\s*<a[^>]*href="([^"]*)"[^>]*>(.*?)<\\/a>\\s*<\\/li>')
     if not isMatch:
         cGui().showInfo()
         return
@@ -49,13 +51,14 @@ def showValue():
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
 
+
 def showAllSeries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     if not entryUrl:
         entryUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
-    pattern = '<a[^>]*href="(\/serie\/[^"]*)"[^>]*>(.*?)</a>'
+    pattern = '<a[^>]*href="(\\/serie\\/[^"]*)"[^>]*>(.*?)</a>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
@@ -74,6 +77,7 @@ def showAllSeries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('tvshows')
         oGui.setEndOfDirectory()
 
+
 def showEntries(entryUrl=False, sGui=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
@@ -85,7 +89,7 @@ def showEntries(entryUrl=False, sGui=False):
     pattern += '<a[^>]*href="([^"]*)"[^>]*>.*?'  # url
     pattern += '<img[^>]*src="([^"]*)"[^>]*>.*?'  # thumbnail
     pattern += '<h3>(.*?)<span[^>]*class="paragraph-end">.*?'  # title
-    pattern += '<\/div>'  # end element
+    pattern += '<\\/div>'  # end element
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
@@ -110,16 +114,17 @@ def showEntries(entryUrl=False, sGui=False):
         oGui.setView('tvshows')
         oGui.setEndOfDirectory()
 
+
 def showSeasons():
     params = ParameterHandler()
     sUrl = params.getValue('sUrl')
     sTVShowTitle = params.getValue('TVShowTitle')
     oRequest = cRequestHandler(sUrl)
     sHtmlContent = oRequest.request()
-    pattern = '<div[^>]*class="hosterSiteDirectNav"[^>]*>.*?<ul>(.*?)<\/ul>'
+    pattern = '<div[^>]*class="hosterSiteDirectNav"[^>]*>.*?<ul>(.*?)<\\/ul>'
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        pattern = '<a[^>]*href="([^"]*)"[^>]*title="([^"]*)"[^>]*>(.*?)<\/a>.*?'
+        pattern = '<a[^>]*href="([^"]*)"[^>]*title="([^"]*)"[^>]*>(.*?)<\\/a>.*?'
         isMatch, aResult = cParser.parse(sContainer, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -153,6 +158,7 @@ def showSeasons():
     cGui().setView('seasons')
     cGui().setEndOfDirectory()
 
+
 def showEpisodes():
     params = ParameterHandler()
     sUrl = params.getValue('sUrl')
@@ -164,10 +170,10 @@ def showEpisodes():
     isMovieList = sUrl.endswith('filme')
     oRequest = cRequestHandler(sUrl)
     sHtmlContent = oRequest.request()
-    pattern = '<table[^>]*class="seasonEpisodesList"[^>]*>(.*?)<\/table>'
+    pattern = '<table[^>]*class="seasonEpisodesList"[^>]*>(.*?)<\\/table>'
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        pattern = '<tr[^>]*data-episode-season-id="(\d+).*?<a href="([^"]+).*?(?:<strong>(.*?)</strong>.*?)?(?:<span>(.*?)</span>.*?)?<'
+        pattern = '<tr[^>]*data-episode-season-id="(\\d+).*?<a href="([^"]+).*?(?:<strong>(.*?)</strong>.*?)?(?:<span>(.*?)</span>.*?)?<'
         isMatch, aResult = cParser.parse(sContainer, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -194,6 +200,7 @@ def showEpisodes():
     cGui().setView('episodes' if not isMovieList else 'movies')
     cGui().setEndOfDirectory()
 
+
 def showHosters():
     hosters = []
     sUrl = ParameterHandler().getValue('sUrl')
@@ -202,13 +209,13 @@ def showHosters():
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if isMatch:
         for sLang, sUrl, sName, sQualy in aResult:
-            if sLang is '1':
+            if sLang == '1':
                 sLang = 'Deutsch'
-            if sLang is '2':
+            if sLang == '2':
                 sLang = 'Englisch'
-            if sLang is '3':
+            if sLang == '3':
                 sLang = 'Englisch mit Untertitel'
-            if 'HD' in sQualy:
+            if 'HD' == sQualy:
                 sQualy = 'HD'
             else:
                 sQualy = 'SD'
@@ -217,6 +224,7 @@ def showHosters():
         if hosters:
             hosters.append('getHosterUrl')
         return hosters
+
 
 def getHosterUrl(sUrl=False):
     username = cConfig().getSetting('serienstream.user')
@@ -236,11 +244,13 @@ def getHosterUrl(sUrl=False):
     Request.request()
     return [{'streamUrl': Request.getRealUrl(), 'resolved': False}]
 
+
 def showSearch():
     sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
     cGui().setEndOfDirectory()
+
 
 def _search(oGui, sSearchText):
     showAllSeries(URL_SERIES, oGui, sSearchText)
