@@ -12,7 +12,7 @@ SITE_NAME = 'Kinoger'
 SITE_ICON = 'kinoger.png'
 SITE_SETTINGS = '<setting default="kinoger.com" enable="!eq(-2,false)" id="kinoger-domain" label="30051" type="labelenum" values="kinoger.com|kinoger.to" />'
 DOMAIN = cConfig().getSetting('kinoger-domain')
-#URL_MAIN = 'https://' + DOMAIN
+''' URL_MAIN = 'https://' + DOMAIN '''
 URL_MAIN = 'https://kinoger.to'
 URL_SERIE = URL_MAIN + '/stream/serie/'
 
@@ -20,7 +20,6 @@ URL_SERIE = URL_MAIN + '/stream/serie/'
 def load():
     logger.info("Load %s" % SITE_NAME)
     params = ParameterHandler()
-    #geturl(URL_MAIN)
     params.setParam('sUrl', URL_MAIN)
     cGui().addFolder(cGuiElement('Filme & Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_SERIE)
@@ -28,6 +27,7 @@ def load():
     cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
+
 
 def showGenre():
     params = ParameterHandler()
@@ -46,7 +46,6 @@ def showGenre():
 
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
-    #geturl(URL_MAIN)
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
@@ -80,13 +79,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             continue
         sThumbnail = sThumbnail + cf
         isTvshow = True if 'staffel' in sName.lower() else False
-        isYear, sYear = cParser.parse(sName, "(.*?)\((\d*)\)")
+        isYear, sYear = cParser.parse(sName, "(.*?)\\((\\d*)\\)")
         for name, year in sYear:
             sName = name
             sYear = year
             break
         isDesc, sDesc = cParser.parseSingleResult(sDummy, '</b>([^"]+)</div>')
-        isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\d]+)')
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\\d]+)')
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
@@ -109,8 +108,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('tvshows' if 'staffel' in sName.lower() else 'movies')
         oGui.setEndOfDirectory()
 
+
 def showSeasons():
-    #geturl(URL_MAIN)
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue('sThumbnail')
@@ -120,7 +119,7 @@ def showSeasons():
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
 
     if isMatch:
-        pattern = "'([^\]]+)"
+        pattern = "'([^\\]]+)"
         isMatch, aResult = cParser.parse(sContainer, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -185,7 +184,7 @@ def showHosters():
     hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = "show[^>]\d,[^>][^>]'([^']+)"
+    pattern = "show[^>]\\d,[^>][^>]'([^']+)"
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
         for sUrl in aResult:
@@ -212,7 +211,7 @@ def showHosters():
                     hoster = {'link': sUrl, 'name': sQualy}
                     hosters.append(hoster)
             if 'cloudvideo.tv' in sUrl:
-                oRequest = cRequestHandler(sUrl.replace('emb.html?','embed-') + '.html')
+                oRequest = cRequestHandler(sUrl.replace('emb.html?', 'embed-') + '.html')
                 oRequest.addHeaderEntry('Referer', sUrl)
                 sHtmlContent = oRequest.request()
                 pattern = 'source src="([^"]+)'
@@ -221,10 +220,10 @@ def showHosters():
                 oRequest.addHeaderEntry('Referer', sUrl)
                 sHtmlContent = oRequest.request()
 
-                pattern = 'RESOLUTION=\d+x([\d]+).*?CODECS=".*?(http[^#]+)'
+                pattern = 'RESOLUTION=\\d+x([\\d]+).*?CODECS=".*?(http[^#]+)'
                 isMatch, aResult = cParser().parse(sHtmlContent, pattern)
                 for sQualy, sUrl in aResult:
-                    if not 'iframe' in sUrl:
+                    if 'iframe' not in sUrl:
                         hoster = {'link': sUrl, 'name': sQualy}
                         hosters.append(hoster)
     elif 'hdgo' in sUrl or 'sst' in sUrl:
@@ -242,6 +241,7 @@ def showHosters():
         hosters.append('getHosterUrl')
     return hosters
 
+
 def getHosterUrl(sUrl=False):
     if sUrl.startswith('//'):
         sUrl = 'https:' + sUrl
@@ -250,6 +250,7 @@ def getHosterUrl(sUrl=False):
     else:
         return [{'streamUrl': sUrl + '|Referer=' + sUrl + '&Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0', 'resolved': True}]
 
+
 def showSearch():
     oGui = cGui()
     sSearchText = oGui.showKeyBoard()
@@ -257,9 +258,10 @@ def showSearch():
     _search(False, sSearchText)
     oGui.setEndOfDirectory()
 
+
 def _search(oGui, sSearchText):
-    #geturl(URL_MAIN)
     showEntries(URL_MAIN, oGui, sSearchText)
+
 
 def Qualy2(sUrl):
     if '360p' in sUrl:
@@ -270,38 +272,3 @@ def Qualy2(sUrl):
         return '720p'
     else:
         return '1080p'
-
-def geturl(sUrl):
-    from urlparse import urlparse
-    import urllib2, cookielib, base64
-    try:
-        cj = cookielib.CookieJar()
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-        opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0')]
-        response = opener.open(sUrl)
-    except urllib2.HTTPError as e:
-        if e.code == 403:
-            data = e.fp.read()
-            if 'DDOS-GUARD' in data:
-                pattern = 'action="([^"]+)'
-                isMatch, sUrl = cParser.parseSingleResult(data, pattern)
-                url = e.geturl()
-                parsed_url = urlparse(url)
-                if  parsed_url.path == '':
-                    u = base64.b64encode('/')
-                else:
-                    u = base64.b64encode(parsed_url.path)
-                h = parsed_url.scheme + '://' + parsed_url.netloc
-                h = base64.b64encode(h)
-                oRequest = cRequestHandler('https:' + sUrl, caching=False, ignoreErrors=True)
-                oRequest.addHeaderEntry('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0')
-                oRequest.addHeaderEntry('Referer', 'https://kinoger.com/')
-                oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
-                oRequest.addHeaderEntry('Origin', 'https://kinoger.com')
-                oRequest.addParameters('u', u)
-                oRequest.addParameters('h', h)
-                oRequest.addParameters('p', '')
-                oRequest.request()
-                sUrl = oRequest.getRealUrl()
-                sHtmlContent = cRequestHandler(URL_MAIN).request()
-                return sHtmlContent
