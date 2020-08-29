@@ -13,6 +13,7 @@ URL_MAIN = 'http://flimmerstube.com'
 URL_MOVIE = URL_MAIN + '/video/vic/alle_filme'
 URL_SEARCH = URL_MAIN + '/video/shv'
 
+
 def load():
     logger.info("Load %s" % SITE_NAME)
     params = ParameterHandler()
@@ -22,13 +23,13 @@ def load():
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
 
+
 def showGenre():
     params = ParameterHandler()
     entryUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = '<a[^>]class=[^>]catName[^>][^>]href="([^"]+)"[^>]>([^"]+)</a>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -37,6 +38,7 @@ def showGenre():
         params.setParam('sUrl', URL_MAIN + sUrl)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
+
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -64,7 +66,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for sName, sThumbnail, sUrl in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isMatch, sYear = cParser.parse(sName, "(.*?)\((\d{4})\)")
+        isMatch, sYear = cParser.parse(sName, "(.*?)\\((\\d{4})\\)")
         for name, year in sYear:
             sName = name
             sYear = year
@@ -89,12 +91,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('movies')
         oGui.setEndOfDirectory()
 
+
 def showHosters():
     hosters = []
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = "src=[^>]'([^']+)'\s"
+    pattern = "src=[^>]'([^']+)'\\s"
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if not isMatch:
         pattern = 'src=[^>]"(http[^"]+)'
@@ -107,12 +110,14 @@ def showHosters():
         hosters.append('getHosterUrl')
     return hosters
 
+
 def getHosterUrl(sUrl=False):
     if 'youtube' in sUrl:
-        import xbmc, xbmcgui
+        import xbmc
         if not xbmc.getCondVisibility("System.HasAddon(%s)" % "plugin.video.youtube"):
             xbmc.executebuiltin("InstallAddon(%s)" % "plugin.video.youtube")
     return [{'streamUrl': sUrl, 'resolved': False}]
+
 
 def showSearch():
     sSearchText = cGui().showKeyBoard()
