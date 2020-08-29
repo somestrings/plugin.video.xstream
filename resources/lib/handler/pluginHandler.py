@@ -90,8 +90,8 @@ class cPluginHandler:
         index2 = []
         x = 0
         while x < len(pluginData):
-            if x < len(pluginData)/2: index1.append(sorted(pluginData)[x])
-            elif x >= len(pluginData)/2: index2.append(sorted(pluginData)[x])
+            if x < len(pluginData) // 2: index1.append(sorted(pluginData)[x])
+            elif x >= len(pluginData) // 2: index2.append(sorted(pluginData)[x])
             x = x + 1
 
         # data (dict): containing plugininformations
@@ -116,7 +116,7 @@ class cPluginHandler:
                 pluginElem.remove(elem)
                 # add plugins to settings
 
-            #for pluginID in sorted(pluginData):
+            # for pluginID in sorted(pluginData):
             for pluginID in index:
                 plugin = pluginData[pluginID]
                 subEl = ET.SubElement(pluginElem, 'setting', {'type': 'lsep', 'label': plugin['name']})
