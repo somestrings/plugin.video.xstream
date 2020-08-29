@@ -119,7 +119,7 @@ class cRequestHandler:
             oResponse = opener.open(oRequest, timeout=self.requestTimeout)
         except HTTPError as e:
             if e.code == 503 and e.headers.get('Server') == 'cloudflare':
-                #html = e.read()
+                # html = e.read()
                 oResponse = None
 
                 if not oResponse:
@@ -156,21 +156,19 @@ class cRequestHandler:
             if sys.version_info[0] == 2:
                 sContent = sContent
             else:
-                sContent = sContent.decode('utf-8').encode('utf-8','replace').decode('utf-8')
+                sContent = sContent.decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
         else:
             if sys.version_info[0] == 2:
                 sContent = oResponse.read()
             else:
-                sContent = (oResponse.read()).decode('utf-8').encode('utf-8','replace').decode('utf-8')
-
-
+                sContent = (oResponse.read()).decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
         cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
 
-        if (self.__bRemoveNewLines == True):
+        if self.__bRemoveNewLines is True:
             sContent = sContent.replace('\n', '')
             sContent = sContent.replace('\r\t', '')
 
-        if (self.__bRemoveBreakLines == True):
+        if self.__bRemoveBreakLines is True:
             sContent = sContent.replace('&nbsp;', '')
         self.__sRealUrl = oResponse.geturl()
 
