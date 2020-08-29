@@ -182,8 +182,6 @@ class cHosterGui:
                 ranking = sorted(ranking, key=lambda hoster: int('quality' in hoster[1] and hoster[1]['quality']) == int(pref_quli), reverse=True)
             else:
                 ranking = sorted(ranking, key=lambda hoster: 'quality' in hoster[1] and int(hoster[1]['quality']), reverse=True)
-        else:
-            ranking.sort()
         hosterQueue = []
         for i, hoster in ranking:
             hosterQueue.append(hoster)
