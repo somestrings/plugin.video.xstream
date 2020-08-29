@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import re, hashlib,sys
+import re, hashlib, sys
 from resources.lib import pyaes
 try:
     from htmlentitydefs import name2codepoint
 except ImportError:
     from html.entities import name2codepoint
+
 
 class cUtil:
     @staticmethod
@@ -55,7 +56,7 @@ class cUtil:
                     text = text.decode('utf-8', 'ignore')
                 except:
                     pass
-        return re.sub("&(\w+;|#x?\d+;?)", fixup, text.strip())
+        return re.sub("&(\\w+;|#x?\\d+;?)", fixup, text.strip())
 
     @staticmethod
     def cleanse_text(text):
