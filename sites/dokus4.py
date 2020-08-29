@@ -13,6 +13,7 @@ SITE_GLOBAL_SEARCH = False
 URL_MAIN = 'http://www.dokus4.me/'
 URL_SEARCH = URL_MAIN + '?s=%s'
 
+
 def load():
     logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
@@ -21,6 +22,7 @@ def load():
     cGui().addFolder(cGuiElement('Kategorien', SITE_IDENTIFIER, 'showGenre'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
+
 
 def showGenre():
     params = ParameterHandler()
@@ -36,6 +38,7 @@ def showGenre():
         params.setParam('sUrl', sUrl)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
+
 
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
@@ -66,20 +69,23 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
         oGui.setEndOfDirectory()
 
+
 def getHosterUrl(sUrl=False):
     sHtmlContent = cRequestHandler(ParameterHandler().getValue('sUrl')).request()
     isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, '<p><iframe.*?src="([^"]+)"')
     if isMatch:
-        import xbmc, xbmcgui
+        import xbmc
         if not xbmc.getCondVisibility("System.HasAddon(%s)" % "plugin.video.youtube"):
             xbmc.executebuiltin("InstallAddon(%s)" % "plugin.video.youtube")
         return [{'streamUrl': sUrl, 'resolved': False}]
+
 
 def showSearch():
     sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
     cGui().setEndOfDirectory()
+
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
