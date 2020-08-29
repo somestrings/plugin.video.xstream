@@ -17,7 +17,6 @@ URL_SEARCH = URL_MAIN + '?s=%s'
 
 def load():
     logger.info('Load %s' % SITE_NAME)
-    oGui = cGui()
     params = ParameterHandler()
     params.setParam('sUrl', URL_FILME)
     cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
@@ -54,10 +53,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '<article id="post-\d.*?src="([^"]+).*?href="([^"]+)">([^<]+).*?span>([\d]+).*?texto">([^<]+)'
+    pattern = '<article id="post-\\d.*?src="([^"]+).*?href="([^"]+)">([^<]+).*?span>([\\d]+).*?texto">([^<]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
-        pattern = '<article>.*?<img src="([^"]+).*?href="([^"]+)">([^<]+).*?year">([\d]+).*?contenido">([^"]+)</div>'
+        pattern = '<article>.*?<img src="([^"]+).*?href="([^"]+)">([^<]+).*?year">([\\d]+).*?contenido">([^"]+)</div>'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
@@ -77,6 +76,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setYear(sYear)
         oGuiElement.setDescription(sDesc)
         params.setParam('entryUrl', sUrl)
+        params.setParam('sName', sName)
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
@@ -87,13 +87,14 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('tvshows' if 'tvshow' in sUrl else 'movies')
         oGui.setEndOfDirectory()
 
+
 def showSeasons():
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue('sThumbnail')
     sTVShowTitle = params.getValue('sName')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = "<span[^>]class='title'>.*?([\d]+)"
+    pattern = "<span[^>]class='title'>.*?([\\d]+)"
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -105,6 +106,7 @@ def showSeasons():
         oGuiElement = cGuiElement("Staffel " + sSeasonNr, SITE_IDENTIFIER, 'showEpisodes')
         oGuiElement.setMediaType('season')
         oGuiElement.setSeason(sSeasonNr)
+        oGuiElement.setTVShowTitle(sTVShowTitle)
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
         if isDesc:
@@ -113,6 +115,7 @@ def showSeasons():
         cGui().addFolder(oGuiElement, params, True, total)
     cGui().setView('seasons')
     cGui().setEndOfDirectory()
+
 
 def showEpisodes():
     params = ParameterHandler()
@@ -123,7 +126,7 @@ def showEpisodes():
     pattern = "title'>Season[^>]%s[^<]<i>.*?<span class='date'" % sSeasonNr
     isMatch, sContainer = cParser.parse(sHtmlContent, pattern)
     if isMatch:
-        pattern = "numerando'>[^-]*-\s*(\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
+        pattern = "numerando'>[^-]*-\\s*(\\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
         isMatch, aResult = cParser.parse(sContainer[0], pattern)
     if not isMatch:
         cGui().showInfo()
@@ -145,10 +148,11 @@ def showEpisodes():
     cGui().setView('episodes')
     cGui().setEndOfDirectory()
 
+
 def showHosters():
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = "</span><a data-id='([\d]+)' "
+    pattern = "</span><a data-id='([\\d]+)'"
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     hosters = []
     if isMatch:
@@ -174,14 +178,17 @@ def showHosters():
         hosters.append('getHosterUrl')
     return hosters
 
+
 def getHosterUrl(sUrl=False):
     return [{'streamUrl': sUrl, 'resolved': False}]
+
 
 def showSearch():
     sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
     cGui().setEndOfDirectory()
+
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
