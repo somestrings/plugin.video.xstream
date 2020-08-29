@@ -62,12 +62,10 @@ class cGui:
         xbmcplugin.addDirectoryItem(self.pluginHandle, sUrl, listitem, bIsFolder, iTotal)
 
     def addNextPage(self, site, function, params=''):
-        # inserts a standard "next page" button into a listing 
         guiElement = cGuiElement('>>>', site, function)
         self.addFolder(guiElement, params)
 
     def createListItem(self, oGuiElement):
-        # creates a standard xbmcgui.listitem from the GuiElement
         itemValues = oGuiElement.getItemValues()
         itemTitle = oGuiElement.getTitle()
         infoString = ''
@@ -82,10 +80,11 @@ class cGui:
         if infoString:
             infoString = '[I]%s[/I]' % infoString
         itemValues['title'] = itemTitle + infoString
+        '''
         # kodi 19 funktioniert nicht
-        #listitem = xbmcgui.ListItem(itemTitle + infoString, oGuiElement.getTitleSecond(), oGuiElement.getIcon(), oGuiElement.getThumbnail())
+        listitem = xbmcgui.ListItem(itemTitle + infoString, oGuiElement.getTitleSecond(), oGuiElement.getIcon(), oGuiElement.getThumbnail())
+        '''
         listitem = xbmcgui.ListItem(itemTitle + infoString, oGuiElement.getIcon(), oGuiElement.getThumbnail())
-        
         listitem.setInfo(oGuiElement.getType(), itemValues)
         listitem.setProperty('fanart_image', oGuiElement.getFanart())
         listitem.setArt({'poster': oGuiElement.getThumbnail()})
@@ -126,8 +125,7 @@ class cGui:
             if 'season' in itemValues and itemValues['season'] and int(itemValues['season']) > 0:
                 metaParams['season'] = itemValues['season']
                 metaParams['mediaType'] = 'season'
-            if ('episode' in itemValues and itemValues['episode'] and int(itemValues['episode']) > 0
-                    and 'season' in itemValues and itemValues['season'] and int(itemValues['season'])):
+            if ('episode' in itemValues and itemValues['episode'] and int(itemValues['episode']) > 0 and 'season' in itemValues and itemValues['season'] and int(itemValues['season'])):
                 metaParams['episode'] = itemValues['episode']
                 metaParams['mediaType'] = 'episode'
             # if an imdb id is available we can mark this element as seen/unseen in the metahandler
@@ -170,7 +168,7 @@ class cGui:
         if not self._isViewSet:
             self.setView('files')
         xbmcplugin.setPluginCategory(self.pluginHandle, "")
-        # add some sort methods, these will be available in all views         
+        # add some sort methods, these will be available in all views
         xbmcplugin.addSortMethod(self.pluginHandle, xbmcplugin.SORT_METHOD_UNSORTED)
         xbmcplugin.addSortMethod(self.pluginHandle, xbmcplugin.SORT_METHOD_VIDEO_RATING)
         xbmcplugin.addSortMethod(self.pluginHandle, xbmcplugin.SORT_METHOD_LABEL)
@@ -263,8 +261,7 @@ class cGui:
             iSeconds = 1000
         else:
             iSeconds = iSeconds * 1000
-        xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % (
-        cConfig().getLocalizedString(30308), (cConfig().getLocalizedString(30309) % str(sTitle)), iSeconds, common.addon.getAddonInfo('icon')))
+        xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % (cConfig().getLocalizedString(30308), (cConfig().getLocalizedString(30309) % str(sTitle)), iSeconds, common.addon.getAddonInfo('icon')))
 
     @staticmethod
     def showError(sTitle, sDescription, iSeconds=0):
