@@ -17,6 +17,7 @@ URL_SERIES = URL_MAIN + 'anime-serien/'
 URL_TRENDING = URL_MAIN + 'trending/'
 URL_SEARCH = URL_MAIN + '?s=%s'
 
+
 def login():
     from resources.lib.config import cConfig
     username = cConfig().getSetting('pureanime.user')
@@ -83,13 +84,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setView('tvshows' if isTvshow else 'movies')
         oGui.setEndOfDirectory()
 
+
 def showSeasons():
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = "class='title'>Season[^>]([\d]+)"
+    pattern = "class='title'>Season[^>]([\\d]+)"
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -108,6 +109,7 @@ def showSeasons():
     cGui().setView('seasons')
     cGui().setEndOfDirectory()
 
+
 def showEpisodes():
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
@@ -115,9 +117,8 @@ def showEpisodes():
     sHtmlContent = cRequestHandler(entryUrl).request()
     pattern = "class='title'>Season[^>]%s.*?</li></ul>" % sSeasonNr
     isMatch, sContainer = cParser.parse(sHtmlContent, pattern)
-
     if isMatch:
-        pattern = "numerando'>[^-]*-\s*(\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
+        pattern = "numerando'>[^-]*-\\s*(\\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
         isMatch, aResult = cParser.parse(sContainer[0], pattern)
     if not isMatch:
         cGui().showInfo()
@@ -137,6 +138,7 @@ def showEpisodes():
         cGui().addFolder(oGuiElement, params, False, total)
     cGui().setView('episodes')
     cGui().setEndOfDirectory()
+
 
 def showHosters():
     hosters = []
@@ -162,7 +164,7 @@ def showHosters():
                     isMatch, sUrl = cParser.parse(sHtmlContent, 'JuicyCodes.Run[^>]"(.*?)"[^>];')
                 if isMatch:
                     sHtmlContent = cParser.B64decode(sUrl[0].replace('"+"', ''))
-                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\(function\(p,a,c,k,e,d\).+)\s+?')
+                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\\(function\\(p,a,c,k,e,d\\).+)\\s+?')
                 if isMatch:
                     sHtmlContent = jsunpacker.unpack(sUrl[0])
                     isMatch, aResult = cParser.parse(sHtmlContent, 'file":"([^"]+).*?label":"([^"]+)')
@@ -175,7 +177,7 @@ def showHosters():
                 isMatch, sUrl = cParser.parse(sHtmlContent, 'JuicyCodes.Run[^>]"(.*?)"[^>];')
                 if isMatch:
                     sHtmlContent = cParser.B64decode(sUrl[0].replace('"+"', ''))
-                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\(function\(p,a,c,k,e,d\).+)\s+?')
+                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\\(function\\(p,a,c,k,e,d\\).+)\\s+?')
                 if isMatch:
                     sHtmlContent = jsunpacker.unpack(sUrl[0])
                     isMatch, aResult = cParser.parse(sHtmlContent, 'file":"([^"]+).*?label":"([^"]+)')
@@ -188,6 +190,7 @@ def showHosters():
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
+
 
 def Language(sLang):
     if 'gersub' in sLang:
@@ -205,17 +208,20 @@ def Language(sLang):
     else:
         return ' '
 
+
 def getHosterUrl(sUrl=False):
     if 'cloudplayer' in sUrl or 'uniquestream' in sUrl:
         return [{'streamUrl': sUrl, 'resolved': True}]
     else:
         return [{'streamUrl': sUrl, 'resolved': False}]
 
+
 def showSearch():
     sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
     cGui().setEndOfDirectory()
+
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
