@@ -87,7 +87,7 @@ def showHosters():
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
         for sUrl in aResult:
-            hoster = {'link': sUrl, 'name': sUrl}
+            hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
             hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
