@@ -22,6 +22,13 @@
    <platform>all</platform>
    <news>
 3.5.17~nightly
+- [dokus4] fix setView
+- [filmpalast] fix setView
+- [movieking] fix setView
+- [moviestream] fix setView
+- [movietown] fix setView
+- [netzkino] fix setView
+- [topstreamfilm] fix setView
 - [general] code optimiert
 - [alleserien_com] code optimiert
 - [cinenator] code optimiert
