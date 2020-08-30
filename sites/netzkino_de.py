@@ -89,6 +89,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         except:
             pass
     if not sGui:
+        oGui.setView('movies')
         oGui.setEndOfDirectory()
 
 
