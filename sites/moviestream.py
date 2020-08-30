@@ -78,7 +78,7 @@ def showEntries(entryUrl=False, sGui=False):
             if float(int(strPage)) > iPage:
                 params.setParam('page', (iPage + 1))
                 oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
-        oGui.setView('tvshows' if 'true' in isserie else 'movies')
+        oGui.setView('tvshows' if isTvshow else 'movies')
         oGui.setEndOfDirectory()
 
 def showSeasons():
@@ -165,7 +165,7 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
             if float(int(strPage)) > iPage:
                 params.setParam('page', (iPage + 1))
                 oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
-        oGui.setView('tvshows' if 'true' in isserie else 'movies')
+        oGui.setView('tvshows' if isTvshow else 'movies')
         oGui.setEndOfDirectory()
 
 def showHosters():
