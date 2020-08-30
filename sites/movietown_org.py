@@ -75,7 +75,7 @@ def showEntries(entryUrl=False, sGui=False):
         if isMatchNextPage:
             params.setParam('page', (iPage + 1))
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
-        oGui.setView('tvshows' if isTvshow else 'movie')
+        oGui.setView('tvshows' if isTvshow else 'movies')
         oGui.setEndOfDirectory()
 
 
@@ -86,7 +86,6 @@ def showSeasons():
     sHtmlContent = cRequestHandler(sUrl).request()
     pattern = 'number":([\\d]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if not isMatch:
         cGui().showInfo()
         return
@@ -184,7 +183,7 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
-        oGui.setView('tvshows' if isTvshow else 'movie')
+        oGui.setView('tvshows' if isTvshow else 'movies')
         oGui.setEndOfDirectory()
 
 
