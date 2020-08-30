@@ -125,7 +125,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
                 sNextUrl = URL_MAIN + sNextUrl
             params.setParam('sUrl', sNextUrl.replace("'", "").replace('"', ''))
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
-        oGui.setView('tvshow' if isTvshow else 'movie')
+        oGui.setView('tvshows' if isTvshow else 'movies')
         oGui.setEndOfDirectory()
 
 
