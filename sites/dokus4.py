@@ -67,6 +67,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
+        oGui.setView('movies')
         oGui.setEndOfDirectory()
 
 
