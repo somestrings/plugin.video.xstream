@@ -8,7 +8,7 @@ from xbmc import translatePath, LOGERROR, LOGNOTICE
 from xbmcgui import Dialog
 from xbmcaddon import Addon as addon
 # Android K18 ZIP Fix.
-if xbmc.getCondVisibility('system.platform.android') and int(xbmc.getInfoLabel('System.BuildVersion')[:2]) >= 18:
+if xbmc.getCondVisibility('system.platform.android') and int(xbmc.getInfoLabel('System.BuildVersion')[:2]) == 18:
     import fixetzipfile as zipfile
 else:
     import zipfile
