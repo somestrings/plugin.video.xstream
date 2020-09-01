@@ -1,4 +1,5 @@
 3.5.17~nightly
+- [stream.to] seite hinzugefügt
 - [dokus4] fix setView
 - [filmpalast] fix setView
 - [movieking] fix setView
