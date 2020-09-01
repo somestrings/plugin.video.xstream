@@ -63,7 +63,7 @@ class cJDownloader2Handler:
         try:
             output = self.__client('jdcheck.js', None)
             pattern = re.compile(r'jdownloader\s*=\s*true', re.IGNORECASE)
-            if pattern.search(output) is None:
+            if pattern.search(output) != None:
                 return True
         except Exception:
             return False
