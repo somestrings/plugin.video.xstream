@@ -161,14 +161,14 @@ class cRequestHandler:
             if sys.version_info[0] == 2:
                 sContent = oResponse.read()
             else:
-                sContent = (oResponse.read()).decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+                sContent = oResponse.read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
         cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
 
-        if self.__bRemoveNewLines is True:
+        if self.__bRemoveNewLines == True:
             sContent = sContent.replace('\n', '')
             sContent = sContent.replace('\r\t', '')
 
-        if self.__bRemoveBreakLines is True:
+        if self.__bRemoveBreakLines == True:
             sContent = sContent.replace('&nbsp;', '')
         self.__sRealUrl = oResponse.geturl()
 
