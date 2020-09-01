@@ -92,7 +92,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
-        oGui.setView('tvshows' if isTvshow else 'movies')
+        oGui.setView('tvshows' if 'series' in sUrl else 'movies')
         oGui.setEndOfDirectory()
 
 
