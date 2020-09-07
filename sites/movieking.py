@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.parser import cParser
-from resources.lib.gui.guiElement import cGuiElement
-from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.handler.ParameterHandler import ParameterHandler
+from resources.lib.handler.requestHandler import cRequestHandler
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'movieking'
 SITE_NAME = 'MovieKing.cc'
@@ -16,7 +15,7 @@ URL_YEAR = URL_MAIN + 'year.html'
 
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('sUrl', URL_FILME)
     cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
@@ -68,11 +67,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
-        oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
+        oGuiElement.setThumbnail(sThumbnail.replace('https', 'http'))
+        oGuiElement.setFanart(sThumbnail.replace('https', 'http'))
         oGuiElement.setMediaType('movie')
         params.setParam('entryUrl', sUrl)
-        params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, False, total)
     if not sGui:
         isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, 'pagination.*?<a href="([^"]+)" data-ci-pagination-page="\\d" rel="next">')
@@ -87,8 +85,7 @@ def showHosters():
     hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = 'embed-item".*?src="(http[^"]+)'
-    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+    isMatch, aResult = cParser().parse(sHtmlContent, 'embed-item".*?src="(http[^"]+)')
     if isMatch:
         for sUrl in aResult:
             hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
