@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-import json, os
-from resources.lib import common, logger
 from resources.lib.config import cConfig
+from resources.lib.tools import logger
+from resources.lib import common
+import json, os
 
 
 class cPluginHandler:
@@ -129,7 +130,7 @@ class cPluginHandler:
                 attrib = {'default': str(plugin['globalsearch']).lower(), 'type': 'bool'}
                 attrib['id'] = 'global_search_%s' % pluginID
                 attrib['label'] = '30052'
-                attrib['enable'] = "!eq(-1,false)"
+                attrib['enable'] = '!eq(-1,false)'
                 subEl = ET.SubElement(pluginElem, 'setting', attrib)
                 subEl.tail = '\n    '
 
@@ -167,7 +168,7 @@ class cPluginHandler:
             plugin = __import__(fileName, globals(), locals())
             pluginData['name'] = plugin.SITE_NAME
         except Exception as e:
-            logger.error("Can't import plugin: %s :%s" % (fileName, e))
+            logger.error("Can't import plugin: %s :%s" % fileName, e)
             return False
         try:
             pluginData['icon'] = plugin.SITE_ICON

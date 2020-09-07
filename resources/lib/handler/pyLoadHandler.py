@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
-from resources.lib import logger
+from resources.lib.tools import logger
 from string import maketrans
 import sys
 try:
@@ -19,7 +19,7 @@ class cPyLoadHandler:
 
     def sendToPyLoad(self, sPackage, sUrl):
         logger.info('PyLoad package: ' + str(sPackage) + ', ' + str(sUrl))
-        if self.__sendLinkToCore(sPackage, sUrl) == True:
+        if self.__sendLinkToCore(sPackage, sUrl):
             cGui().showInfo('PyLoad', 'Link gesendet', 5)
         else:
             cGui().showInfo('PyLoad', 'Fehler beim Senden des Links!', 5)

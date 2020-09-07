@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import urlresolver
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
-from resources.lib import logger
+from resources.lib.tools import logger, cParser
 
 
 class cHosterHandler:

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import socket, os, sys, hashlib
-import io, gzip, time, xbmcgui, re
-from resources.lib import logger, common
 from resources.lib.config import cConfig
+from resources.lib.tools import logger
+from resources.lib import common
+import io, gzip, time, xbmcgui, re
+import socket, os, sys, hashlib
 try:
     from urlparse import urlparse
     from urllib import quote, urlencode
@@ -22,7 +23,6 @@ class cRequestHandler:
         self.__sUrl = sUrl
         self.__sRealUrl = ''
         self.__USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0'
-        self.__cType = 0
         self.__aParameters = {}
         self.__aResponses = {}
         self.__headerEntries = {}
@@ -49,9 +49,6 @@ class cRequestHandler:
 
     def removeBreakLines(self, bRemoveBreakLines):
         self.__bRemoveBreakLines = bRemoveBreakLines
-
-    def setRequestType(self, cType):
-        self.__cType = cType
 
     def addHeaderEntry(self, sHeaderKey, sHeaderValue):
         self.__headerEntries[sHeaderKey] = sHeaderValue
@@ -131,9 +128,9 @@ class cRequestHandler:
                     opener.addheaders = [('Referer', self.__sUrl)]
                     response = opener.open('https://check.ddos-guard.net/check.js')
                     if sys.version_info[0] == 2:
-                        content=response.read()
+                        content = response.read()
                     else:
-                        content=response.read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+                        content = response.read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
                     url2 = re.findall("Image.*?'([^']+)'; new", content)
                     url3 = urlparse(self.__sUrl)
                     url3 = '%s://%s/%s' % (url3.scheme, url3.netloc, url2[0])
@@ -141,7 +138,7 @@ class cRequestHandler:
                     opener.addheaders = [('User-Agent', self.__USER_AGENT)]
                     opener.addheaders = [('Referer', self.__sUrl)]
                     response = opener.open(url3)
-                    content=response.read()
+                    content = response.read()
                     time.sleep(2)
                     opener = build_opener(HTTPCookieProcessor(cookieJar))
                     opener.addheaders = [('User-Agent', self.__USER_AGENT)]
