@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import socket, os, sys, hashlib, time, xbmcgui
+import socket, os, sys, hashlib
+import io, gzip, time, xbmcgui, re
 from resources.lib import logger, common
 from resources.lib.config import cConfig
 try:
@@ -20,6 +21,7 @@ class cRequestHandler:
     def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True):
         self.__sUrl = sUrl
         self.__sRealUrl = ''
+        self.__USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0'
         self.__cType = 0
         self.__aParameters = {}
         self.__aResponses = {}
@@ -58,8 +60,8 @@ class cRequestHandler:
         if sHeaderKey in self.__headerEntries:
             return self.__headerEntries[sHeaderKey]
 
-    def addParameters(self, key, value, quote2=False):
-        if not quote2:
+    def addParameters(self, key, value, Quote=False):
+        if not Quote:
             self.__aParameters[key] = value
         else:
             self.__aParameters[key] = quote(str(value))
@@ -81,7 +83,7 @@ class cRequestHandler:
         return self.__sUrl + '?' + urlencode(self.__aParameters)
 
     def __setDefaultHeader(self):
-        self.addHeaderEntry('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0')
+        self.addHeaderEntry('User-Agent', self.__USER_AGENT)
         self.addHeaderEntry('Accept-Language', 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3')
         self.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
         if self.compression:
@@ -114,20 +116,43 @@ class cRequestHandler:
         for key, value in self.__headerEntries.items():
             oRequest.add_header(key, value)
         cookieJar.add_cookie_header(oRequest)
-
         try:
             oResponse = opener.open(oRequest, timeout=self.requestTimeout)
         except HTTPError as e:
-            if e.code == 503 and e.headers.get('Server') == 'cloudflare':
-                # html = e.read()
+            if e.code == 503:
                 oResponse = None
-
                 if not oResponse:
+                    logger.error('Failed Cloudflare aktiv Url: ' + self.__sUrl)
+            if e.code == 403:
+                data = e.fp.read()
+                if 'DDOS-GUARD' in str(data):
+                    opener = build_opener(HTTPCookieProcessor(cookieJar))
+                    opener.addheaders = [('User-Agent', self.__USER_AGENT)]
+                    opener.addheaders = [('Referer', self.__sUrl)]
+                    response = opener.open('https://check.ddos-guard.net/check.js')
+                    if sys.version_info[0] == 2:
+                        content=response.read()
+                    else:
+                        content=response.read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+                    url2 = re.findall("Image.*?'([^']+)'; new", content)
+                    url3 = urlparse(self.__sUrl)
+                    url3 = '%s://%s/%s' % (url3.scheme, url3.netloc, url2[0])
+                    opener = build_opener(HTTPCookieProcessor(cookieJar))
+                    opener.addheaders = [('User-Agent', self.__USER_AGENT)]
+                    opener.addheaders = [('Referer', self.__sUrl)]
+                    response = opener.open(url3)
+                    content=response.read()
+                    time.sleep(2)
+                    opener = build_opener(HTTPCookieProcessor(cookieJar))
+                    opener.addheaders = [('User-Agent', self.__USER_AGENT)]
+                    opener.addheaders = [('Referer', self.__sUrl)]
+                    oResponse = opener.open(self.__sUrl)
 
-                    if not self.ignoreErrors:
-                        logger.error('Failed Cloudflare aktiv Url: ' + self.__sUrl)
-                        return ''
-                    return ''
+                    if not oResponse:
+                        if not self.ignoreErrors:
+                            logger.error('Failed DDOS-GUARD Url: ' + self.__sUrl)
+                            return ''
+
             elif not self.ignoreErrors:
                 xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url: {0} {1}'.format(self.__sUrl, str(e)))
                 logger.error('HTTPError ' + str(e) + ' Url: ' + self.__sUrl)
@@ -149,9 +174,7 @@ class cRequestHandler:
             return ''
 
         self.__sResponseHeader = oResponse.info()
-
         if self.__sResponseHeader.get('Content-Encoding') == 'gzip':
-            import io, gzip
             sContent = gzip.GzipFile(fileobj=io.BytesIO(oResponse.read())).read()
             if sys.version_info[0] == 2:
                 sContent = sContent
@@ -163,15 +186,12 @@ class cRequestHandler:
             else:
                 sContent = oResponse.read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
         cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
-
-        if self.__bRemoveNewLines == True:
+        if self.__bRemoveNewLines:
             sContent = sContent.replace('\n', '')
             sContent = sContent.replace('\r\t', '')
-
-        if self.__bRemoveBreakLines == True:
+        if self.__bRemoveBreakLines:
             sContent = sContent.replace('&nbsp;', '')
         self.__sRealUrl = oResponse.geturl()
-
         oResponse.close()
         if self.caching and self.cacheTime > 0:
             self.writeCache(self.getRequestUri(), sContent)
@@ -222,7 +242,6 @@ class cRequestHandler:
         if not cache:
             profilePath = common.profilePath
             cache = os.path.join(profilePath, 'htmlcache')
-
         if not os.path.exists(cache):
             os.makedirs(cache)
         self.__cachePath = cache
@@ -243,7 +262,7 @@ class cRequestHandler:
                 else:
                     with open(cacheFile, 'rb') as f:
                         content = f.read().decode('utf8')
-            except:
+            except Exception:
                 logger.error('Could not read Cache')
             if content:
                 logger.info('read html for %s from cache' % url)
@@ -263,14 +282,14 @@ class cRequestHandler:
             else:
                 with open(cacheFile, 'wb') as f:
                     f.write(content.encode('utf8'))
-        except:
+        except Exception:
             logger.error('Could not write Cache')
 
     @staticmethod
     def getFileAge(cacheFile):
         try:
             fileAge = time.time() - os.stat(cacheFile).st_mtime
-        except:
+        except Exception:
             return 0
         return fileAge
 
