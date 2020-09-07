@@ -1,6 +1,10 @@
 3.5.17~nightly
+- [movieking] fix coverl
+- [kinoger] code optimiert
+- [hd-streams_org] neu geschrieben
 - [kinoger] fix serien und hoster
 - [stream.to] seite hinzugefügt
+- [general] code optimiert
 - [dokus4] fix setView
 - [filmpalast] fix setView
 - [movieking] fix setView
@@ -8,23 +12,6 @@
 - [movietown] fix setView
 - [netzkino] fix setView
 - [topstreamfilm] fix setView
-- [general] code optimiert
-- [alleserien_com] code optimiert
-- [cinenator] code optimiert
-- [dokus4] code optimiert
-- [filmpalast_to] code optimiert
-- [flimmerstube_com] code optimiert
-- [hd-streams_to] code optimiert
-- [hdfilme] code optimiert
-- [kinoger] code optimiert
-- [kkiste_co] code optimiert
-- [moviedream_ws] code optimiert
-- [movieking] code optimiert
-- [movietown_org] code optimiert
-- [netzkino_de] code optimiert
-- [pureanime] code optimiert
-- [serienstream_to] code optimiert
-- [topstreamfilm] code optimiert
 - [general] kleiner fix für autoplay, mehrere für Kodi 19
 - [cinenator] fix hosterauswahl automatisch
 - [dokus4] fix  fix hosterauswahl automatisch
