@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import sys, xbmc, xbmcgui
-from resources.lib import logger
-from resources.lib.config import cConfig
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
+from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.handler.pluginHandler import cPluginHandler
+from resources.lib.tools import logger
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
+from resources.lib.config import cConfig
+import sys, xbmc, xbmcgui
 
 
 def run():
@@ -134,7 +135,6 @@ def parseUrl():
         if sFunction == 'spacer':
             return True
         elif sFunction == 'clearCache':
-            from resources.lib.handler.requestHandler import cRequestHandler
             cRequestHandler('dummy').clearCache()
             return
         elif sFunction == 'changeWatched':
@@ -146,21 +146,10 @@ def parseUrl():
         elif sFunction == 'searchAlter':
             searchAlter(params)
             return
-        ##ka  edit
         elif sFunction == 'devUpdates':
             from resources.lib import updateManager
             updateManager.devUpdates()
             return
-        ##ka  remove
-        # elif sFunction == 'updateUrlResolver':
-        #     from resources.lib import updateManager
-        #     updateManager.urlResolverUpdate()
-        #     return
-        # elif sFunction == 'updateAll':
-        #     from resources.lib import updateManager
-        #     updateManager.xStreamUpdate()
-        #     updateManager.urlResolverUpdate()
-        #     return
     elif params.exist('remoteplayurl'):
         try:
             import urlresolver
@@ -179,16 +168,6 @@ def parseUrl():
     # Test if we should run a function on a special site
     if not params.exist('site'):
         xbmc.executebuiltin('RunPlugin(%s?function=clearCache)' % sys.argv[0])
-
-        # xStreamUpdate = True if cConfig().getSetting('githubUpdateXstream') == 'true' else False
-        # urlResolverUpdate = True if cConfig().getSetting('githubUpdateUrlResolver') == 'true' else False
-        # if xStreamUpdate and urlResolverUpdate:
-        #     xbmc.executebuiltin('RunPlugin(%s?function=updateAll)' % sys.argv[0])
-        # elif xStreamUpdate:
-        #     xbmc.executebuiltin('RunPlugin(%s?function=updateXstream)' % sys.argv[0])
-        # elif urlResolverUpdate:
-        #     xbmc.executebuiltin('RunPlugin(%s?function=updateUrlResolver)' % sys.argv[0])
-
         # As a default if no site was specified, we run the default starting gui with all plugins
         showMainMenu(sFunction)
         return
@@ -215,12 +194,6 @@ def parseUrl():
         if params.exist('searchterm'):
             searchterm = params.getValue('searchterm')
         searchGlobal(searchterm)
-
-    ##ka - remove - not exist
-    # elif sSiteName == 'favGui':
-    #     showFavGui(sFunction)
-
-    # If addon settings are called
     elif sSiteName == 'xStream':
         oGui = cGui()
         oGui.openSettings()
@@ -283,7 +256,7 @@ def showMainMenu(sFunction):
     else:
         for folder in settingsGuiElements():
             oGui.addFolder(folder)
-    ##ka add - Create a gui element for updateManager
+    # ka add - Create a gui element for updateManager
     if cConfig().getSetting('DevUpdateAuto') == 'false':
         oGuiElement = cGuiElement()
         oGuiElement.setTitle('Nightly Update')
@@ -405,8 +378,6 @@ def searchAlter(params):
             logger.info('Searching for ' + searchTitle + pluginEntry['id'].encode('utf-8'))
         else:
             logger.info('Searching for ' + searchTitle + pluginEntry['id'])
-
-        
         t = threading.Thread(target=_pluginSearch, args=(pluginEntry, searchTitle, oGui), name=pluginEntry['name'])
         threads += [t]
         t.start()
@@ -419,7 +390,8 @@ def searchAlter(params):
     for result in oGui.searchResults:
         guiElement = result['guiElement']
         logger.info('Site: %s Titel: %s' % (guiElement.getSiteName(), guiElement.getTitle()))
-        if not searchTitle in guiElement.getTitle(): continue
+        if searchTitle not in guiElement.getTitle():
+            continue
         if guiElement._sYear and searchYear and guiElement._sYear != searchYear: continue
         if searchImdbId and guiElement.getItemProperties().get('imdbID', False) and guiElement.getItemProperties().get('imdbID', False) != searchImdbId: continue
         filteredResults.append(result)
