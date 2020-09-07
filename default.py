@@ -3,7 +3,7 @@ from os.path import join
 from sys import path
 import platform
 from resources.lib import common
-from resources.lib import logger
+from resources.lib.tools import logger
 
 _addonPath_ = common.addonPath
 path.append(join(_addonPath_, "resources", "lib"))
