@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'alleserien_com'
 SITE_NAME = 'Alleserien'
@@ -47,8 +46,7 @@ def showGenre():
     pattern = 'divider.*?<div[^>]class'
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        pattern = '#">(.*?)<'
-        isMatch, aResult = cParser.parse(sContainer, pattern)
+        isMatch, aResult = cParser.parse(sContainer, '#">(.*?)<')
     if not isMatch:
         cGui().showInfo()
         return
@@ -82,7 +80,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oRequest.addParameters('page', page)
     oRequest.addParameters('rating', 0)
     oRequest.addParameters('sortBy', sortBy)
-    oRequest.addParameters('to', time.strftime("%Y", time.localtime()))
+    oRequest.addParameters('to', time.strftime('%Y', time.localtime()))
     oRequest.addParameters('type', type)
     sHtmlContent = oRequest.request()
     pattern = '<a title=[^>]"(.*?)" href=[^>]"([^"]+).*?src=[^>]"([^"]+)'
@@ -91,13 +89,11 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if not sGui: oGui.showInfo()
         return
 
-    cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
     for sName, sUrl, sThumbnail in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         isTvshow = True if 'folge' in sUrl else False
-        sThumbnail = sThumbnail + cf
         oGuiElement = cGuiElement(sName[:-1], SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail[:-1])
         oGuiElement.setFanart(sThumbnail[:-1])
@@ -107,7 +103,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('entryUrl', sUrl[:-1])
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
-        pattern = 'Next.*?data-p=[^>]"([\\d]+).*?d-flex'
+        pattern = 'Next.*?data-p=[^>]"([\d]+).*?d-flex'
         isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, pattern)
         if isMatch:
             params.setParam('page', sUrl)
@@ -122,7 +118,7 @@ def showSeasons():
     sThumbnail = params.getValue('sThumbnail')
     sTVShowTitle = params.getValue('sName')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '<div[^>]class="collapse[^>]m.*?id="s([\\d]+)">'
+    pattern = '<div[^>]class="collapse[^>]m.*?id="s([\d]+)">'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '<p>([^<]+)')
     if not isMatch:
@@ -154,7 +150,7 @@ def showEpisodes():
     pattern = 'id="s%s">.*?</table>' % sSeasonNr
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        isMatch, aResult = cParser.parse(sContainer, "href = '([^']+).*?episodeNumber.*?>([\\d]+)")
+        isMatch, aResult = cParser.parse(sContainer, "href = '([^']+).*?episodeNumber.*?>([\d]+)")
         isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '<p>([^<]+)')
     if not isMatch:
         cGui().showInfo()
@@ -179,11 +175,10 @@ def showHosters():
     hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl, ignoreErrors=True).request()
-    pattern = '<iframe[^>]src="([^"]+)'
-    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+    isMatch, aResult = cParser().parse(sHtmlContent, '<iframe[^>]src="([^"]+)')
     if not isMatch:
-        pattern = '"partItem" data-id="([\\d]+).*?data-controlid="([\\d]+).*?e/([^"]+).png'
-        isMatch2, aResult = cParser().parse(sHtmlContent, pattern)
+        pattern = '"partItem" data-id="([\d]+).*?data-controlid="([\d]+).*?e/([^"]+).png'
+        isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
         if 'alleserien' in aResult[0]:
             result, hash = cParser().parseSingleResult(sHtmlContent, 'o/([^"]+)')
@@ -202,7 +197,7 @@ def showHosters():
                     hoster = {'link': sUrl, 'name': sName}
                     hosters.append(hoster)
     else:
-        if isMatch2:
+        if isMatch:
             result, token = cParser().parseSingleResult(sHtmlContent, "_token':'([^']+)")
             for ID, controlid, sName in aResult:
                 oRequest = cRequestHandler('https://alleserien.com/getpart')

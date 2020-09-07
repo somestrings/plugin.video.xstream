@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'flimmerstube_com'
 SITE_NAME = 'Flimmerstube'
@@ -15,7 +14,7 @@ URL_SEARCH = URL_MAIN + '/video/shv'
 
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('sUrl', URL_MOVIE)
     cGui().addFolder(cGuiElement('Deutsche Horrorfilme', SITE_IDENTIFIER, 'showEntries'), params)
@@ -53,7 +52,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             oRequest.addParameters('c', '70')
         else:
             oRequest.addParameters('c', '')
-        oRequest.setRequestType(1)
     sHtmlContent = oRequest.request()
     pattern = 've-screen.*?title="([^"]+).*?url[^>]([^")]+).*?href="([^">]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
@@ -66,7 +64,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for sName, sThumbnail, sUrl in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isMatch, sYear = cParser.parse(sName, "(.*?)\\((\\d{4})\\)")
+        isMatch, sYear = cParser.parse(sName, "(.*?)\((\d{4})\)")
         for name, year in sYear:
             sName = name
             sYear = year
@@ -97,11 +95,9 @@ def showHosters():
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = "src=[^>]'([^']+)'\\s"
-    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+    isMatch, aResult = cParser().parse(sHtmlContent, "src=[^>]'([^']+)'\s")
     if not isMatch:
-        pattern = 'src=[^>]"(http[^"]+)'
-        isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+        isMatch, aResult = cParser().parse(sHtmlContent, 'src=[^>]"(http[^"]+)')
     if isMatch:
         for sUrl in aResult:
             hoster = {'link': sUrl, 'name': sUrl}
@@ -114,8 +110,8 @@ def showHosters():
 def getHosterUrl(sUrl=False):
     if 'youtube' in sUrl:
         import xbmc
-        if not xbmc.getCondVisibility("System.HasAddon(%s)" % "plugin.video.youtube"):
-            xbmc.executebuiltin("InstallAddon(%s)" % "plugin.video.youtube")
+        if not xbmc.getCondVisibility('System.HasAddon(%s)' % 'plugin.video.youtube'):
+            xbmc.executebuiltin('InstallAddon(%s)' % 'plugin.video.youtube')
     return [{'streamUrl': sUrl, 'resolved': False}]
 
 

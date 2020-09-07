@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'hd-streams_to'
 SITE_NAME = 'HD-Streams.to'
@@ -53,21 +52,19 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '<article id="post-\\d.*?src="([^"]+).*?href="([^"]+)">([^<]+).*?span>([\\d]+).*?texto">([^<]+)'
+    pattern = '<article id="post-\d.*?src="([^"]+).*?href="([^"]+)">([^<]+).*?span>([\d]+).*?texto">([^<]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
-        pattern = '<article>.*?<img src="([^"]+).*?href="([^"]+)">([^<]+).*?year">([\\d]+).*?contenido">([^"]+)</div>'
+        pattern = '<article>.*?<img src="([^"]+).*?href="([^"]+)">([^<]+).*?year">([\d]+).*?contenido">([^"]+)</div>'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
 
-    cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
     for sThumbnail, sUrl, sName, sYear, sDesc in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        sThumbnail = sThumbnail + cf
         isTvshow = True if 'tvshow' in sUrl else False
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
@@ -94,7 +91,7 @@ def showSeasons():
     sThumbnail = params.getValue('sThumbnail')
     sTVShowTitle = params.getValue('sName')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = "<span[^>]class='title'>.*?([\\d]+)"
+    pattern = "<span[^>]class='title'>.*?([\d]+)"
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -103,7 +100,7 @@ def showSeasons():
     isDesc, sDesc = cParser.parse(sHtmlContent, 'class="wp-content">([^"]+)<div')
     total = len(aResult)
     for sSeasonNr in aResult:
-        oGuiElement = cGuiElement("Staffel " + sSeasonNr, SITE_IDENTIFIER, 'showEpisodes')
+        oGuiElement = cGuiElement('Staffel ' + sSeasonNr, SITE_IDENTIFIER, 'showEpisodes')
         oGuiElement.setMediaType('season')
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setTVShowTitle(sTVShowTitle)
@@ -126,7 +123,7 @@ def showEpisodes():
     pattern = "title'>Season[^>]%s[^<]<i>.*?<span class='date'" % sSeasonNr
     isMatch, sContainer = cParser.parse(sHtmlContent, pattern)
     if isMatch:
-        pattern = "numerando'>[^-]*-\\s*(\\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
+        pattern = "numerando'>[^-]*-\s*(\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
         isMatch, aResult = cParser.parse(sContainer[0], pattern)
     if not isMatch:
         cGui().showInfo()
@@ -150,11 +147,10 @@ def showEpisodes():
 
 
 def showHosters():
+    hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = "</span><a data-id='([\\d]+)'"
-    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-    hosters = []
+    isMatch, aResult = cParser().parse(sHtmlContent, "</span><a data-id='([\d]+)'")
     if isMatch:
         for post in aResult:
             oRequest = cRequestHandler(URL_MAIN + 'wp-admin/admin-ajax.php')

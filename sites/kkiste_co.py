@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'kkiste_co'
 SITE_NAME = 'KKiste.co'
@@ -53,9 +52,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oRequest.addParameters('do', 'search')
         oRequest.addParameters('subaction', 'search')
         oRequest.addParameters('story', sSearchText)
-        oRequest.setRequestType(1)
     sHtmlContent = oRequest.request()
-    pattern = 'class="short">.*?href="([^"]+)">([^<]+).*?img src="([^"]+).*?desc">([^<]+).*?Jahr.*?([\\d]+).*?s-red">([\\d]+)'
+    pattern = 'class="short">.*?href="([^"]+)">([^<]+).*?img src="([^"]+).*?desc">([^<]+).*?Jahr.*?([\d]+).*?s-red">([\d]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
@@ -90,8 +88,7 @@ def showEpisodes():
     entryUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue('sThumbnail')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = '"><a href="#">([^<]+)'
-    isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+    isMatch, aResult = cParser.parse(sHtmlContent, '"><a href="#">([^<]+)')
     if not isMatch:
         cGui().showInfo()
         return

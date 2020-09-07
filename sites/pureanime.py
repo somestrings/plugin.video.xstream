@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'pureanime'
 SITE_NAME = 'Pureanime'
@@ -89,7 +88,7 @@ def showSeasons():
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = "class='title'>Season[^>]([\\d]+)"
+    pattern = "class='title'>Season[^>]([\d]+)"
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -98,7 +97,7 @@ def showSeasons():
     isThumbnail, sThumbnail = cParser.parseSingleResult(sHtmlContent, 'poster.*?src="([^"]+)')
     total = len(aResult)
     for sSeasonNr in aResult:
-        oGuiElement = cGuiElement("Staffel " + sSeasonNr, SITE_IDENTIFIER, 'showEpisodes')
+        oGuiElement = cGuiElement('Staffel ' + sSeasonNr, SITE_IDENTIFIER, 'showEpisodes')
         if isThumbnail:
             oGuiElement.setThumbnail(sThumbnail)
             oGuiElement.setFanart(sThumbnail)
@@ -118,7 +117,7 @@ def showEpisodes():
     pattern = "class='title'>Season[^>]%s.*?</li></ul>" % sSeasonNr
     isMatch, sContainer = cParser.parse(sHtmlContent, pattern)
     if isMatch:
-        pattern = "numerando'>[^-]*-\\s*(\\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
+        pattern = "numerando'>[^-]*-\s*(\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
         isMatch, aResult = cParser.parse(sContainer[0], pattern)
     if not isMatch:
         cGui().showInfo()
@@ -152,7 +151,6 @@ def showHosters():
             oRequest.addParameters('post', sPost)
             oRequest.addParameters('nume', sNume)
             oRequest.addParameters('type', sType)
-            oRequest.setRequestType(1)
             sHtmlContent = oRequest.request()
             isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, '(http[^"]+)')
             if 'cloudplayer' in sUrl:
@@ -164,7 +162,7 @@ def showHosters():
                     isMatch, sUrl = cParser.parse(sHtmlContent, 'JuicyCodes.Run[^>]"(.*?)"[^>];')
                 if isMatch:
                     sHtmlContent = cParser.B64decode(sUrl[0].replace('"+"', ''))
-                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\\(function\\(p,a,c,k,e,d\\).+)\\s+?')
+                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\\(function\\(p,a,c,k,e,d\\).+)\s+?')
                 if isMatch:
                     sHtmlContent = jsunpacker.unpack(sUrl[0])
                     isMatch, aResult = cParser.parse(sHtmlContent, 'file":"([^"]+).*?label":"([^"]+)')
@@ -177,7 +175,7 @@ def showHosters():
                 isMatch, sUrl = cParser.parse(sHtmlContent, 'JuicyCodes.Run[^>]"(.*?)"[^>];')
                 if isMatch:
                     sHtmlContent = cParser.B64decode(sUrl[0].replace('"+"', ''))
-                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\\(function\\(p,a,c,k,e,d\\).+)\\s+?')
+                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\\(function\\(p,a,c,k,e,d\\).+)\s+?')
                 if isMatch:
                     sHtmlContent = jsunpacker.unpack(sUrl[0])
                     isMatch, aResult = cParser.parse(sHtmlContent, 'file":"([^"]+).*?label":"([^"]+)')

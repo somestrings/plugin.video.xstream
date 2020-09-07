@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'filmpalast_to'
 SITE_NAME = 'FilmPalast'
@@ -61,8 +60,7 @@ def showValue():
     pattern = '<section[^>]id="%s">(.*?)</section>' % value
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        pattern = 'href="([^"]+)">([^<]+)'
-        isMatch, aResult = cParser.parse(sContainer, pattern)
+        isMatch, aResult = cParser.parse(sContainer, 'href="([^"]+)">([^<]+)')
     if not isMatch:
         cGui().showInfo()
         return
@@ -88,17 +86,15 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if not sGui: oGui.showInfo()
         return
 
-    cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
     for sUrl, sName, sThumbnail, sDummy in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isTvshow, aResult = cParser.parse(sName, 'S\\d\\dE\\d\\d')
-        sThumbnail = sThumbnail + cf
+        isTvshow, aResult = cParser.parse(sName, 'S\d\dE\d\d')
         if sThumbnail.startswith('/'):
             sThumbnail = URL_MAIN + sThumbnail
-        isYear, sYear = cParser.parseSingleResult(sDummy, 'Jahr:[^>]([\\d]+)')
-        isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\\d]+)')
+        isYear, sYear = cParser.parseSingleResult(sDummy, 'Jahr:[^>]([\d]+)')
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\d]+)')
         isRating, sRating = cParser.parseSingleResult(sDummy, 'Imdb:[^>]([^<]+)')
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
@@ -135,7 +131,7 @@ def showSeasons():
     sThumbnail = params.getValue("sThumbnail")
     sName = params.getValue('sName')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '<a[^>]*class="staffTab"[^>]*data-sid="(\\d+)"[^>]*>'
+    pattern = '<a[^>]*class="staffTab"[^>]*data-sid="(\d+)"[^>]*>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -144,7 +140,7 @@ def showSeasons():
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '"description">([^<]+)')
     total = len(aResult)
     for sSeason in aResult:
-        oGuiElement = cGuiElement("Staffel " + str(sSeason), SITE_IDENTIFIER, 'showEpisodes')
+        oGuiElement = cGuiElement('Staffel ' + str(sSeason), SITE_IDENTIFIER, 'showEpisodes')
         oGuiElement.setTVShowTitle(sName)
         oGuiElement.setSeason(sSeason)
         oGuiElement.setMediaType('season')
@@ -175,7 +171,7 @@ def showEpisodes():
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '"description">([^<]+)')
     total = len(aResult)
     for sEpisodeUrl, sName in aResult:
-        oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, "showHosters")
+        oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
         oGuiElement.setTVShowTitle(sShowName)

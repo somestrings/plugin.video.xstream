@@ -51,8 +51,7 @@ def showGenre():
     params = ParameterHandler()
     sUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = "text: '([^']+)', value: '(\d+)"
-    isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+    isMatch, aResult = cParser.parse(sHtmlContent, "text: '([^']+)', value: '(\d+)")
     if not isMatch:
         cGui().showInfo()
         return

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from json import loads
-from resources.lib import logger
-from resources.lib.config import cConfig
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
+from resources.lib.config import cConfig
+from json import loads
 
 SITE_IDENTIFIER = 'kinox_to'
 SITE_NAME = 'KinoX'
@@ -37,8 +36,6 @@ def load():
     logger.info('Load %s' % SITE_NAME)
     parms = ParameterHandler()
     oGui = cGui()
-    oRequest = cRequestHandler(URL_MAIN)
-    sHtmlContent = oRequest.request()
     parms.setParam('sUrl', URL_NEWS)
     parms.setParam('page', 1)
     parms.setParam('mediaType', 'news')
@@ -113,7 +110,7 @@ def __createLanguage(sLangID):
 
 
 def __checkSubLanguage(sTitle):
-    if not ' subbed*' in sTitle:
+    if ' subbed*' not in sTitle:
         return [sTitle, '']
     temp = sTitle.split(' *')
     subLang = temp[-1].split('subbed*')[0].strip()
@@ -124,7 +121,7 @@ def __checkSubLanguage(sTitle):
 def __getHtmlContent(sUrl=None, ignoreErrors=False):
     parms = ParameterHandler()
     if sUrl is None and not parms.exist('sUrl'):
-        logger.error("There is no url we can request.")
+        logger.error('There is no url we can request.')
         return False
     elif sUrl is None:
         sUrl = parms.getValue('sUrl')
@@ -153,10 +150,9 @@ def __displayItems(sGui, sHtmlContent):
     parms = ParameterHandler()
     pattern = '<td class="Icon"><img width="16" height="11" src="/gr/sys/lng/(\d+).png" alt="language"></td>' + \
               '.*?title="([^\"]+)".*?<td class="Title">.*?<a href="([^\"]+)" onclick="return false;">([^<]+)</a> <span class="Year">([0-9]+)</span>'
-
     aResult = cParser().parse(sHtmlContent, pattern)
     if not aResult[0]:
-        logger.error("Could not find an item")
+        logger.error('Could not find an item')
         return
     total = len(aResult[1])
     for aEntry in aResult[1]:
@@ -200,14 +196,13 @@ def showNews():
               '</h1></div>\s*<div class="Opt rightOpt Hint">Insgesamt: (.*?)</div>'
     sHtmlContent = __getHtmlContent(sUrl)
     aResult = cParser().parse(sHtmlContent, pattern)
-    oGui = cGui()
     if aResult[0]:
         for aEntry in aResult[1]:
             sTitle = str(aEntry[0]) + ' (' + str(aEntry[1]) + ')'
             oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER, 'parseNews')
             parms.addParams({'sUrl': URL_NEWS, 'page': 1, 'mediaType': 'news', 'sNewsTitle': aEntry[0]})
-            oGui.addFolder(oGuiElement, parms)
-    oGui.setEndOfDirectory()
+            cGui().addFolder(oGuiElement, parms)
+    cGui().setEndOfDirectory()
 
 
 def parseNews():
@@ -247,7 +242,7 @@ def parseNews():
             sTitle = sTitle[:-1]
         sTitle, subLang = __checkSubLanguage(sTitle)
         sUrl = aEntry[2]
-        aUrl = sUrl.split(",")
+        aUrl = sUrl.split(',')
         if len(aUrl) > 0:
             sUrl = aUrl[0]
             oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
@@ -297,9 +292,7 @@ def showGenres():
     if aResult[0]:
         for aEntry in aResult[1]:
             iGenreId = aEntry[2]
-            __createMenuEntry(oGui, 'showCharacters', aEntry[1],
-                              {'page': 1, 'mediaType': 'fGenre', 'mediaTypePageId': iGenreId,
-                               'sUrl': URL_MOVIE_PAGE})
+            __createMenuEntry(oGui, 'showCharacters', aEntry[1], {'page': 1, 'mediaType': 'fGenre', 'mediaTypePageId': iGenreId, 'sUrl': URL_MOVIE_PAGE})
     oGui.setEndOfDirectory()
 
 
@@ -417,7 +410,7 @@ def parseSerieEpisodes(sHtmlContent, seasonNum):
     aResult = cParser().parse(sHtmlContent, pattern)
     logger.info(aResult[1])
     if aResult[0]:
-        aSeriesIds = aResult[1][0].split(",")
+        aSeriesIds = aResult[1][0].split(',')
         for iSeriesIds in aSeriesIds:
             aSeries = {}
             iEpisodeNum = iSeriesIds
@@ -590,9 +583,9 @@ def showHosters():
                 mirrors = int(aResult[1][0])
             for i in range(1, mirrors + 1):
                 sUrl = URL_MIRROR + cParser().unquotePlus(aEntry[0])
-                mirrorName = ""
+                mirrorName = ''
                 if mirrors > 1:
-                    mirrorName = "  Mirror " + str(i)
+                    mirrorName = ' Mirror ' + str(i)
                     sUrl = cParser().replace(r'Mirror=[0-9]+', 'Mirror=' + str(i), sUrl)
                 hoster = {'name': sHoster, 'link': sUrl, 'displayedName': sHoster + mirrorName}
                 hosters.append(hoster)
@@ -634,12 +627,12 @@ def getHosterUrl(sUrl=False):
             results.append({'streamUrl': sStreamUrl, 'resolved': False})
     return results
 
+
 def showSearch():
-    oGui = cGui()
-    sSearchText = oGui.showKeyBoard()
+    sSearchText = cGui().showKeyBoard()
     if not sSearchText: return
     _search(False, sSearchText)
-    oGui.setEndOfDirectory()
+    cGui().setEndOfDirectory()
 
 
 def _search(oGui, sSearchText):

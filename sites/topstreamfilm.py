@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'topstreamfilm'
 SITE_NAME = 'Topstreamfilm'
@@ -17,7 +16,7 @@ URL_SEARCH = URL_MAIN + '?s=%s'
 
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('sUrl', URL_MOVIES)
     cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
@@ -33,11 +32,10 @@ def load():
 def showGenre():
     params = ParameterHandler()
     sHtmlContent = cRequestHandler(URL_MAIN).request()
-    pattern = 'Kategorien.*?</aside>'
-    isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
+
+    isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, 'Kategorien.*?</aside>')
     if isMatch:
-        pattern = 'href="([^"]+).*?>([^<]+)'
-        isMatch, aResult = cParser.parse(sContainer, pattern)
+        isMatch, aResult = cParser.parse(sContainer, 'href="([^"]+).*?>([^<]+)')
     if not isMatch:
         cGui().showInfo()
         return
@@ -60,12 +58,11 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if not sGui: oGui.showInfo()
         return
 
-    cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
     for sUrl, sThumbnail, sType, sName, sDummy, sDesc in aResult:
-        isDuration, sDuration = cParser.parseSingleResult(sDummy, 'time">([\\d(h) \\d]+)')
-        isYear, sYear = cParser.parseSingleResult(sDummy, 'date_range">([\\d]+)')
-        sThumbnail = 'https:' + sThumbnail + cf
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, 'time">([\d(h) \d]+)')
+        isYear, sYear = cParser.parseSingleResult(sDummy, 'date_range">([\d]+)')
+        sThumbnail = 'https:' + sThumbnail
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         isTvshow = True if 'Season' in sType or 'TV' in sType else False
@@ -95,7 +92,7 @@ def showSeasons():
     params = ParameterHandler()
     entryUrl = params.getValue('entryUrl')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    isMatch, aResult = cParser.parse(sHtmlContent, 'Season <span>([\\d]+)')
+    isMatch, aResult = cParser.parse(sHtmlContent, 'Season <span>([\d]+)')
     if not isMatch:
         cGui().showInfo()
         return
@@ -124,7 +121,7 @@ def showEpisodes():
     pattern = 'Season <span>%s.*?></tbody>' % sSeason
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        pattern = 'Num">([\\d]+).*?href="([^"]+)'
+        pattern = 'Num">([\d]+).*?href="([^"]+)'
         isMatch, aResult = cParser.parse(sContainer, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -153,20 +150,16 @@ def showHosters():
     entryUrl = ParameterHandler().getValue('entryUrl')
     oRequest = cRequestHandler(entryUrl)
     sHtmlContent = oRequest.request()
-    pattern = '" src="([^"]+)" f'
-    isMatch, sUrl = cParser().parseSingleResult(sHtmlContent, pattern)
+    isMatch, sUrl = cParser().parseSingleResult(sHtmlContent, '" src="([^"]+)" f')
     if isMatch:
         oRequest = cRequestHandler(sUrl)
         sHtmlContent = oRequest.request()
-        pattern = '" src="([^"]+)" f'
-        isMatch, sUrl = cParser().parseSingleResult(sHtmlContent, pattern)
+        isMatch, sUrl = cParser().parseSingleResult(sHtmlContent, '" src="([^"]+)" f')
     if isMatch:
         oRequest = cRequestHandler(sUrl[:-1])
         sHtmlContent = oRequest.request()
-        pattern = "var id = trde[^>]'([^']+)"
-        isMatch, sId = cParser().parseSingleResult(sHtmlContent, pattern)
-        pattern = "iframe.src = '([^']+)"
-        isMatch, sUrl = cParser().parseSingleResult(sHtmlContent, pattern)
+        isMatch, sId = cParser().parseSingleResult(sHtmlContent, "var id = trde[^>]'([^']+)")
+        isMatch, sUrl = cParser().parseSingleResult(sHtmlContent, "iframe.src = '([^']+)")
     if isMatch:
         oRequest = cRequestHandler(sUrl + sId[::-1], caching=False)
         sHtmlContent = oRequest.request()
@@ -180,7 +173,7 @@ def showHosters():
         oRequest.addHeaderEntry('Referer', sUrl)
         oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
         sHtmlContent = oRequest.request()
-        isMatch, aResult = cParser().parse(sHtmlContent, 'RESOLUTION=\\d+x([\\d]+)([^#]+)')
+        isMatch, aResult = cParser().parse(sHtmlContent, 'RESOLUTION=\d+x([\d]+)([^#]+)')
     for sQ, sUrl in aResult:
         hoster = {'link': 'https://{0}{1}'.format(netloc, sUrl), 'name': sQ}
         hosters.append(hoster)

@@ -188,8 +188,8 @@ def showEpisodes():
     L22 = []
     if params.exist('L22'):
         L22 = params.getValue('L22')
-        isMatch2, L22 = cParser.parse(L22, "(http[^']+)")
-        if isMatch2:
+        isMatch, L22 = cParser.parse(L22, "(http[^']+)")
+        if isMatch:
             L22 = L22
     L33 = []
     if params.exist('L33'):
@@ -239,8 +239,7 @@ def showHosters():
                 oRequest = cRequestHandler(sUrl)
                 oRequest.addHeaderEntry('Referer', URL_MAIN)
                 sHtmlContent = oRequest.request()
-                pattern = '(\d+p)[^>](http[^ ]+)'
-                isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+                isMatch, aResult = cParser.parse(sHtmlContent, '(\d+p)[^>](http[^ ]+)')
                 for sQualy, sUrl in aResult:
                     hoster = {'link': sUrl, 'name': sQualy + ' ProtonVideo'}
                     hosters.append(hoster)
@@ -249,8 +248,7 @@ def showHosters():
                 oRequest.addHeaderEntry('Referer', sUrl)
                 sHtmlContent = oRequest.request()
                 isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, 'file:"(.*?)"')
-                pattern = '(\d+p)[^>](http[^,]+)'
-                isMatch, aResult = cParser().parse(sContainer[0], pattern)
+                isMatch, aResult = cParser().parse(sContainer[0], '(\d+p)[^>](http[^,]+)')
                 for sQualy, sUrl in aResult:
                     hoster = {'link': sUrl, 'name': sQualy + ' Fsst.Online'}
                     hosters.append(hoster)

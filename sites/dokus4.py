@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'dokus4'
 SITE_NAME = 'Dokus4'
@@ -62,8 +61,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sUrl', sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
     if not sGui:
-        pattern = 'rel="next" href="([^"]+)'
-        isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, pattern)
+        isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, 'rel="next" href="([^"]+)')
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
@@ -76,8 +74,8 @@ def getHosterUrl(sUrl=False):
     isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, '<p><iframe.*?src="([^"]+)"')
     if isMatch:
         import xbmc
-        if not xbmc.getCondVisibility("System.HasAddon(%s)" % "plugin.video.youtube"):
-            xbmc.executebuiltin("InstallAddon(%s)" % "plugin.video.youtube")
+        if not xbmc.getCondVisibility('System.HasAddon(%s)' % 'plugin.video.youtube'):
+            xbmc.executebuiltin('InstallAddon(%s)' % 'plugin.video.youtube')
         return [{'streamUrl': sUrl, 'resolved': False}]
 
 

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
-from resources.lib.config import cConfig
-from resources.lib.jsnprotect import cHelper
-from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.parser import cParser
+from resources.lib.handler.requestHandler import cRequestHandler
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
+from resources.lib.jsnprotect import cHelper
+from resources.lib.config import cConfig
 
 SITE_IDENTIFIER = 'serienstream_to'
 SITE_NAME = 'SerienStream'
@@ -19,7 +18,7 @@ URL_LOGIN = URL_MAIN + '/login'
 
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('sUrl', URL_SERIES)
     cGui().addFolder(cGuiElement('Alle Serien', SITE_IDENTIFIER, 'showAllSeries'), params)
@@ -40,7 +39,7 @@ def showValue():
     sHtmlContent = cRequestHandler(sUrl).request()
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, '<ul[^>]*class="%s"[^>]*>(.*?)<\\/ul>' % params.getValue('sCont'))
     if isMatch:
-        isMatch, aResult = cParser.parse(sContainer, '<li>\\s*<a[^>]*href="([^"]*)"[^>]*>(.*?)<\\/a>\\s*<\\/li>')
+        isMatch, aResult = cParser.parse(sContainer, '<li>\s*<a[^>]*href="([^"]*)"[^>]*>(.*?)<\\/a>\s*<\\/li>')
     if not isMatch:
         cGui().showInfo()
         return
@@ -55,8 +54,7 @@ def showValue():
 def showAllSeries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
-    if not entryUrl:
-        entryUrl = params.getValue('sUrl')
+    if not entryUrl: entryUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
     pattern = '<a[^>]*href="(\\/serie\\/[^"]*)"[^>]*>(.*?)</a>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
@@ -166,14 +164,14 @@ def showEpisodes():
     sSeason = params.getValue('sSeason')
     sThumbnail = params.getValue('sThumbnail')
     if not sSeason:
-        sSeason = "0"
+        sSeason = '0'
     isMovieList = sUrl.endswith('filme')
     oRequest = cRequestHandler(sUrl)
     sHtmlContent = oRequest.request()
     pattern = '<table[^>]*class="seasonEpisodesList"[^>]*>(.*?)<\\/table>'
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        pattern = '<tr[^>]*data-episode-season-id="(\\d+).*?<a href="([^"]+).*?(?:<strong>(.*?)</strong>.*?)?(?:<span>(.*?)</span>.*?)?<'
+        pattern = '<tr[^>]*data-episode-season-id="(\d+).*?<a href="([^"]+).*?(?:<strong>(.*?)</strong>.*?)?(?:<span>(.*?)</span>.*?)?<'
         isMatch, aResult = cParser.parse(sContainer, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -182,7 +180,7 @@ def showEpisodes():
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '<p[^>]*data-full-description="(.*?)"[^>]*>')
     total = len(aResult)
     for sID, sUrl2, sNameGer, sNameEng in aResult:
-        sName = "%d - " % int(sID)
+        sName = '%d - ' % int(sID)
         sName += sNameGer if sNameGer else sNameEng
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setMediaType('episode' if not isMovieList else 'movie')

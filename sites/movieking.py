@@ -6,7 +6,7 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'movieking'
-SITE_NAME = 'MovieKing.cc'
+SITE_NAME = 'MovieKing'
 SITE_ICON = 'movieking.png'
 URL_MAIN = 'https://movieking.cc/'
 URL_FILME = URL_MAIN + 'movies.html'
@@ -67,13 +67,14 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
-        oGuiElement.setThumbnail(sThumbnail.replace('https', 'http'))
-        oGuiElement.setFanart(sThumbnail.replace('https', 'http'))
+        oGuiElement.setThumbnail(sThumbnail)
+        oGuiElement.setFanart(sThumbnail)
         oGuiElement.setMediaType('movie')
         params.setParam('entryUrl', sUrl)
+        params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, False, total)
     if not sGui:
-        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, 'pagination.*?<a href="([^"]+)" data-ci-pagination-page="\\d" rel="next">')
+        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, 'pagination.*?<a href="([^"]+)" data-ci-pagination-page="\d" rel="next">')
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
@@ -85,7 +86,8 @@ def showHosters():
     hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    isMatch, aResult = cParser().parse(sHtmlContent, 'embed-item".*?src="(http[^"]+)')
+    pattern = 'embed-item".*?src="(http[^"]+)'
+    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
         for sUrl in aResult:
             hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}

@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.config import cConfig
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
+from resources.lib.config import cConfig
 
 SITE_IDENTIFIER = 'cinenator'
 SITE_NAME = 'Cinenator'
@@ -16,7 +15,7 @@ URL_SEARCH = URL_MAIN + '?s=%s'
 
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('sUrl', URL_FILME)
     cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
@@ -67,14 +66,14 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for sThumbnail, sUrl, sName, sValue, sDesc in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        sThumbnail = cParser.replace('-\\d+x\\d+\\.', '.', sThumbnail)
+        sThumbnail = cParser.replace('-\d+x\d+\.', '.', sThumbnail)
         isTvshow = True if "tvshow" in sUrl else False
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
-        isYear, sYear = cParser.parse(sValue, '>([\\d]+)<')
-        isDuration, sDuration = cParser.parse(sValue, '<span>([\\d]+)[^>]min')
+        isYear, sYear = cParser.parse(sValue, '>([\d]+)<')
+        isDuration, sDuration = cParser.parse(sValue, '<span>([\d]+)[^>]min')
         if isYear:
             oGuiElement.setYear(sYear[0])
         if isDuration:
@@ -85,7 +84,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui and not sSearchText:
-        pattern = ''''class=[^>]current">\\d+</span>[^>]*href='([^']+)'''
+        pattern = ''''class=[^>]current">\d+</span>[^>]*href='([^']+)'''
         isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, pattern)
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
@@ -100,7 +99,7 @@ def showSeasons():
     sThumbnail = params.getValue('sThumbnail')
     sTVShowTitle = params.getValue('sName')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = '<span[^>]class="title">.*?([\\d]+)'
+    pattern = '<span[^>]class="title">.*?([\d]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -108,7 +107,7 @@ def showSeasons():
 
     total = len(aResult)
     for sSeasonNr in aResult:
-        oGuiElement = cGuiElement("Staffel " + sSeasonNr, SITE_IDENTIFIER, 'showEpisodes')
+        oGuiElement = cGuiElement('Staffel ' + sSeasonNr, SITE_IDENTIFIER, 'showEpisodes')
         oGuiElement.setMediaType('season')
         oGuiElement.setTVShowTitle(sTVShowTitle)
         oGuiElement.setSeason(sSeasonNr)
@@ -129,7 +128,7 @@ def showEpisodes():
     pattern = '<span[^>]*class="se-t[^"]*">%s</span>.*?<ul[^>]*class="episodios"[^>]*>(.*?)</ul>' % sSeasonNr
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        pattern = '<a[^>]*href="([^"]+)"[^>]*>\\s*(?:<img[^>]*src="([^"]+)?).*?<div[^>]*class="numerando">[^-]*-\\s*(\\d+)\\s*?</div>.*?<a[^>]*>([^<]*)</a>'
+        pattern = '<a[^>]*href="([^"]+)"[^>]*>\s*(?:<img[^>]*src="([^"]+)?).*?<div[^>]*class="numerando">[^-]*-\s*(\d+)\s*?</div>.*?<a[^>]*>([^<]*)</a>'
         isMatch, aResult = cParser.parse(sContainer, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -141,7 +140,7 @@ def showEpisodes():
         oGuiElement.setTVShowTitle(sTVShowTitle)
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setEpisode(sEpisodeNr)
-        sThumbnail = cParser.replace('-\\d+x\\d+\\.', '.', sThumbnail)
+        sThumbnail = cParser.replace('-\d+x\d+\\.', '.', sThumbnail)
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
         oGuiElement.setMediaType('episode')

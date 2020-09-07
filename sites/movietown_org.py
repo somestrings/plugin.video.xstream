@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'movietown_org'
 SITE_NAME = 'MovieTown'
@@ -17,7 +16,7 @@ URL_GENRES_LIST = {'Abenteuer', 'Action', 'Animation', 'Anime', 'Biographie', 'B
 
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
     params.setParam('sUrl', URL_LIST)
     params.setParam('type', 'movie')
@@ -51,7 +50,7 @@ def showEntries(entryUrl=False, sGui=False):
     sUrl = URL_LIST % (type, str(iPage), genre)
     oRequest = cRequestHandler(sUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '"id":([\\d]+),"name":"([^"]+).*?year":([\\d]+),"description":"([^"]+).*?poster":"([^"]+)","backdrop":"([^"]+)","runtime":([\\d]+).*?is_series":([^,]+)'
+    pattern = '"id":([\d]+),"name":"([^"]+).*?year":([\d]+),"description":"([^"]+).*?poster":"([^"]+)","backdrop":"([^"]+)","runtime":([\d]+).*?is_series":([^,]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
@@ -71,7 +70,7 @@ def showEntries(entryUrl=False, sGui=False):
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
-        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, 'next_page_url":".*?page=([\\d]+)')
+        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, 'next_page_url":".*?page=([\d]+)')
         if isMatchNextPage:
             params.setParam('page', (iPage + 1))
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
@@ -84,8 +83,7 @@ def showSeasons():
     sUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue('sThumbnail')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = 'number":([\\d]+)'
-    isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+    isMatch, aResult = cParser().parse(sHtmlContent, 'number":([\d]+)')
     if not isMatch:
         cGui().showInfo()
         return
@@ -114,9 +112,8 @@ def showEpisodes():
     sThumbnail = params.getValue('sThumbnail')
     sUrl = sUrl + '&seasonNumber=%s' % sSeasonNr
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = 'name":"([^"]+)".*?season_id":\\d+,"season_number":%s,"episode_number":([\\d]+)' % sSeasonNr
+    pattern = 'name":"([^"]+)".*?season_id":\d+,"season_number":%s,"episode_number":([\d]+)' % sSeasonNr
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
-
     if not isMatch:
         oGui.showInfo()
         return
@@ -162,7 +159,7 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '"id":([\\d]+),"name":"([^"]+).*?year":([\\d]+),"description":"([^"]+).*?poster":"([^"]+).*?is_series":([^,]+)'
+    pattern = '"id":([\d]+),"name":"([^"]+).*?year":([\d]+),"description":"([^"]+).*?poster":"([^"]+).*?is_series":([^,]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-import json
-from resources.lib import logger
-from resources.lib.config import cConfig
-from resources.lib.gui.gui import cGui
-from resources.lib.parser import cParser
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
+from resources.lib.config import cConfig
+import json
 
 SITE_IDENTIFIER = 'netzkino_de'
 SITE_NAME = 'NetzKino'
@@ -16,7 +15,7 @@ URL_SEARCH = 'http://api.netzkino.de.simplecache.net/capi-2.0a/search?q=%s&d=www
 
 
 def load():
-    logger.info("Load %s" % SITE_NAME)
+    logger.info('Load %s' % SITE_NAME)
     oGui = cGui()
     params = ParameterHandler()
     params.setParam('sUrl', URL_MAIN % 'neu')

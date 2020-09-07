@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from resources.lib import logger
-from resources.lib.gui.gui import cGui
-from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.parser import cParser
+from resources.lib.tools import logger, cParser
+from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'moviedream_ws'
 SITE_NAME = 'MovieDream'
@@ -47,7 +46,7 @@ def top10(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     sHtmlContent = cRequestHandler(URL_MAIN).request()
-    pattern = 'class="carouselbox">.*?src="([^"]+).*?">([^<]+).*?</b>([\\d]+).*?">([^<]+).*?href="([^"]+)'
+    pattern = 'class="carouselbox">.*?src="([^"]+).*?">([^<]+).*?</b>([\d]+).*?">([^<]+).*?href="([^"]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         cGui().showInfo()
@@ -62,9 +61,10 @@ def top10(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setDescription(sDesc)
         oGuiElement.addItemValue('duration', int(sDauer) * 60)
         params.setParam('entryUrl', URL_MAIN + sUrl.replace('../..', ''))
-        oGuiElement.setMediaType("movie")
+        oGuiElement.setMediaType('movie')
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, False, total)
+    oGui.setView('movies')
     cGui().setEndOfDirectory()
 
 
@@ -101,12 +101,11 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if not sGui: oGui.showInfo()
         return
 
-    cf = cRequestHandler.createUrl(entryUrl, oRequest)
     total = len(aResult)
     for sUrl, sThumbnail, sName in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        sThumbnail = URL_MAIN + sThumbnail + cf
+        sThumbnail = URL_MAIN + sThumbnail
         isTvshow = True if 'serie' in sUrl else False
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
@@ -123,8 +122,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             sPageNr = 2
         else:
             sPageNr += 1
-        pattern = 'seiterr"[^>]href=".*?([\\d]+)'
-        isMatch, Lastpage = cParser.parseSingleResult(sHtmlContent, pattern)
+        isMatch, Lastpage = cParser.parseSingleResult(sHtmlContent, 'seiterr"[^>]href=".*?([\d]+)')
         if isMatch:
             if int(sPageNr) <= int(Lastpage):
                 params.setParam('page', int(sPageNr))
@@ -160,7 +158,7 @@ def showEpisodes():
     entryUrl = params.getValue('entryUrl')
     sTVShowTitle = params.getValue('Name')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = 'href="([^"]+)" class="episodebutton" id="episodebutton\\d+">#([\\d]+)'
+    pattern = 'href="([^"]+)" class="episodebutton" id="episodebutton\d+">#([\d]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         cGui().showInfo()
