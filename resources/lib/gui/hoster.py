@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.config import cConfig
-from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.gui.gui import cGui
+from resources.lib.config import cConfig
 from resources.lib.player import cPlayer
-from resources.lib import logger
+from resources.lib.tools import logger
 import xbmc, xbmcgui, xbmcplugin
 
 
@@ -14,6 +14,7 @@ class cHosterGui:
     def __init__(self):
         self.maxHoster = int(cConfig().getSetting('maxHoster', 100))
         self.dialog = False
+    
     # TODO: unify parts of play, download etc.
     def _getInfoAndResolve(self, siteResult):
         oGui = cGui()

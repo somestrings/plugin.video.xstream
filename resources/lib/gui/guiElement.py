@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from os import path
-from resources.lib.common import addon
 from resources.lib.config import cConfig
-from resources.lib.util import cUtil
-from resources.lib import logger
-
+from resources.lib.common import addon
+from resources.lib.tools import logger, cUtil
+from os import path
 
 class cGuiElement:
     '''
@@ -17,7 +15,6 @@ class cGuiElement:
 
         These arguments are mandatory. If not given on init, they have to be set by their setter-methods, before the GuiElement is added to the Gui.
     '''
-
     DEFAULT_FOLDER_ICON = 'DefaultFolder.png'
     DEFAULT_FANART = path.join(addon.getAddonInfo('path'), 'fanart.jpg')
     MEDIA_TYPES = ['movie', 'tvshow', 'season', 'episode']
