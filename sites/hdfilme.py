@@ -155,13 +155,13 @@ def showHosters():
         oRequest.addHeaderEntry('Origin', URL_MAIN)
         oRequest.addHeaderEntry('Referer', sUrl)
         sHtmlContent = oRequest.request()
-        pattern = 'data-movie-id="(.*?)"[\s\s]*?data-episode-id="(.*?)"'
+        pattern = 'data-movie-id="(\d+).*?data-episode-id="(\d+)"'
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
         if isMatch:
             sID = aResult[0][0]
             eID = aResult[0][1]
 
-    oRequest = cRequestHandler(URL_MAIN + 'movie/load-stream/' + sID + '/' + eID + '?server=0')
+    oRequest = cRequestHandler(URL_MAIN + 'movie/load-stream/' + sID + '/' + eID + '?')
     oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
     oRequest.addHeaderEntry('Referer', rUrl)
     sHtmlContentBase = oRequest.request()
