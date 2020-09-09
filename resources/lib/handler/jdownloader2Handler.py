@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
-import logger, re
+from resources.lib.tools import logger
+import re
 try:
     from urllib2 import Request, urlopen
     from urllib import urlencode
