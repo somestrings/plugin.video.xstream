@@ -248,9 +248,9 @@ def showHosters():
                 oRequest.addHeaderEntry('Referer', sUrl)
                 sHtmlContent = oRequest.request()
                 isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, 'file:"(.*?)"')
-                isMatch, aResult = cParser().parse(sContainer[0], '(\d+p)[^>](http[^,]+)')
-                for sQualy, sUrl in aResult:
-                    hoster = {'link': sUrl, 'name': sQualy + ' Fsst.Online'}
+                isMatch, aResult = cParser().parse(sContainer[0], '(http[^",]+)')
+                for sUrl in aResult:
+                    hoster = {'link': sUrl, 'name': Qualy(sUrl) + ' Fsst.Online'}
                     hosters.append(hoster)
             if 'kinoger.re' in sUrl:
                 oRequest = cRequestHandler(sUrl.replace('/v/', '/api/source/'))
@@ -267,6 +267,15 @@ def showHosters():
             hosters.append('getHosterUrl')
         return hosters
 
+def Qualy(sUrl):
+    if '360p' in sUrl:
+        return '360p'
+    elif '480p' in sUrl:
+        return '480p'
+    elif '720p' in sUrl:
+        return '720p'
+    else:
+        return '1080p'
 
 def getHosterUrl(sUrl=False):
     return [{'streamUrl': sUrl, 'resolved': True}]
