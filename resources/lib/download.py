@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import os, sys, time, xbmc, xbmcgui, logger
+import os, sys, time, xbmc, xbmcgui
 from resources.lib import common
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
+from resources.lib.tools import logger
 try:
     from urllib2 import Request, urlopen
 except ImportError:
