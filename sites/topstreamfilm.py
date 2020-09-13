@@ -23,7 +23,6 @@ def load():
     params.setParam('sUrl', URL_SHOWS)
     cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_POPULAR)
-    cGui().addFolder(cGuiElement('Beliebte', SITE_IDENTIFIER, 'showEntries'), params)
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
@@ -31,9 +30,8 @@ def load():
 
 def showGenre():
     params = ParameterHandler()
-    sHtmlContent = cRequestHandler(URL_MAIN).request()
-
-    isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, 'Kategorien.*?</aside>')
+    sHtmlContent = cRequestHandler(URL_MOVIES).request()
+    isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, 'KATEGORIEN.*?</ul>')
     if isMatch:
         isMatch, aResult = cParser.parse(sContainer, 'href="([^"]+).*?>([^<]+)')
     if not isMatch:
@@ -52,29 +50,35 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl)
     sHtmlContent = oRequest.request()
-    pattern = 'TPost C">.*?href="([^"]+).*?img[^>]src="([^"]+)(.*?)Title">([^<]+)(.*?)Description">([^"]+)</p>'
+    pattern = 'TPost C.*?href="([^"]+).*?src="([^"]+)(.*?)</article>'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
 
     total = len(aResult)
-    for sUrl, sThumbnail, sType, sName, sDummy, sDesc in aResult:
-        isDuration, sDuration = cParser.parseSingleResult(sDummy, 'time">([\d(h) \d]+)')
-        isYear, sYear = cParser.parseSingleResult(sDummy, 'date_range">([\d]+)')
+    for sUrl, sThumbnail, sDummy in aResult:
+        isName, sName = cParser.parse(sDummy, 'Title">([^<]+)')
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, 'time">(.*?)<')
+        isYear, sYear = cParser.parseSingleResult(sDummy, 'date_range">(\d{4})')
+        isDesc, sDesc = cParser.parseSingleResult(sDummy, 'Description">([^"]+)</p>')
+        isRating, sRating = cParser.parseSingleResult(sDummy, 'star">([^<]+)')
         sThumbnail = 'https:' + sThumbnail
-        if sSearchText and not cParser().search(sSearchText, sName):
+        if sSearchText and not cParser().search(sSearchText, sName[0]):
             continue
-        isTvshow = True if 'Season' in sType or 'TV' in sType else False
-        oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
+        isTvshow = True if 'Season' in sDummy or 'TV' in sDummy else False
+        oGuiElement = cGuiElement(sName[0], SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
+        if isDesc:
+            oGuiElement.setDescription(sDesc)
         if isDuration:
-            oGuiElement.addItemValue('duration', int(sDuration.replace('h ', '')) - 40)
+            oGuiElement.addItemValue('duration', FormatTime(sDuration))
         if isYear:
             oGuiElement.setYear(sYear)
-        oGuiElement.setDescription(sDesc)
+        if isRating:
+            oGuiElement.addItemValue('rating', sRating)
         params.setParam('entryUrl', sUrl)
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
@@ -84,7 +88,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
-        oGui.setView('tvshows' if 'Season' in sType or 'TV' in sType else 'movies')
+        oGui.setView('tvshows' if 'Season' in sDummy or 'TV' in sDummy else 'movies')
         oGui.setEndOfDirectory()
 
 
@@ -131,7 +135,6 @@ def showEpisodes():
     total = len(aResult)
     for sEpisode, sUrl in aResult:
         oGuiElement = cGuiElement('Folge ' + sEpisode, SITE_IDENTIFIER, 'showHosters')
-        oGuiElement.setMediaType('season')
         oGuiElement.setSeason(sSeason)
         oGuiElement.setEpisode(sEpisode)
         oGuiElement.setMediaType('episode')
@@ -195,3 +198,21 @@ def showSearch():
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
+
+
+def FormatTime(dig):
+    import re
+    if dig:
+        t = re.findall('(\d+)h[^>](\d+)m', dig)
+        if t:
+            if t[0][0] >= '1':
+                h = int(t[0][0]) * 60
+                return h + int(t[0][1])
+            else:
+                return int(t[0][1])
+        else:
+            t = re.findall('(\d+)', dig)
+            if t:
+                return int(t[0])
+    if not dig:
+        return 0
