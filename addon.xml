@@ -22,7 +22,11 @@
    <platform>all</platform>
    <news>
 3.5.17~nightly
-- [movieking] fix coverl
+- [filmpalast] serien überarbeitet
+- [topstreamfilm] add rating fix duration
+- [kinoger] fix hoster (c|f)sst
+- [general] code optimiert
+- [movieking] fix cover
 - [kinoger] code optimiert
 - [hd-streams_org] neu geschrieben
 - [kinoger] fix serien und hoster
