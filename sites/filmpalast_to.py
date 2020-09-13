@@ -88,9 +88,12 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     total = len(aResult)
     for sUrl, sName, sThumbnail, sDummy in aResult:
+        isTvshow, aResult = cParser.parse(sName, 'S\d\dE\d\d')
+        isShow, name = cParser.parseSingleResult(sName, '(.*?)S\d\dE\d\d')
+        if isShow:
+            sName = name
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isTvshow, aResult = cParser.parse(sName, 'S\d\dE\d\d')
         if sThumbnail.startswith('/'):
             sThumbnail = URL_MAIN + sThumbnail
         isYear, sYear = cParser.parseSingleResult(sDummy, 'Jahr:[^>]([\d]+)')
@@ -166,21 +169,23 @@ def showEpisodes():
         cGui().showInfo()
         return
 
-    pattern = '<a[^>]*href="([^"]*)"[^>]*class="getStaffelStream"[^>]*>.*?<small>([^>]*?)</small>'
+    pattern = 'href="([^"]+).*?staffStreams_(\d+)'
     isMatch, aResult = cParser.parse(sContainer, pattern)
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '"description">([^<]+)')
     total = len(aResult)
-    for sEpisodeUrl, sName in aResult:
-        oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
+    for sUrl, sName in aResult:
+        sName = int(sName) + 1
+        oGuiElement = cGuiElement('Folge ' + str(sName), SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
         oGuiElement.setTVShowTitle(sShowName)
         oGuiElement.setSeason(sSeason)
+        oGuiElement.setEpisode(sName)
         oGuiElement.setMediaType('episode')
-        if sEpisodeUrl.startswith('//'):
-            params.setParam('entryUrl', 'https:' + sEpisodeUrl)
+        if sUrl.startswith('//'):
+            params.setParam('entryUrl', 'https:' + sUrl)
         else:
-            params.setParam('entryUrl', sEpisodeUrl)
+            params.setParam('entryUrl', sUrl)
         if isDesc:
             oGuiElement.setDescription(sDesc)
         cGui().addFolder(oGuiElement, params, False, total)
