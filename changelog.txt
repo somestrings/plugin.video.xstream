@@ -1,4 +1,5 @@
-3.5.17~nightly
+3.5.17
+  20.09.2020
 - [filmpalast] serien überarbeitet
 - [topstreamfilm] add rating fix duration
 - [kinoger] fix hoster (c|f)sst
