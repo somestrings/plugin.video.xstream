@@ -97,7 +97,10 @@ class cParser:
 class logger:
     @staticmethod
     def info(sInfo):
-        logger.__writeLog(sInfo, cLogLevel=xbmc.LOGNOTICE)
+        if sys.version_info[0] == 2:
+            logger.__writeLog(sInfo, cLogLevel=xbmc.LOGNOTICE)
+        else:
+            logger.__writeLog(sInfo, cLogLevel=xbmc.LOGINFO)
 
     @staticmethod
     def debug(sInfo):
