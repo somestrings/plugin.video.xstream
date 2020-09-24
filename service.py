@@ -1,11 +1,14 @@
-# -*- coding: UTF-8 -*-
-import sys, os, xbmc, xbmcaddon, xbmcgui
+# -*- coding: utf-8 -*-
+import sys, os, xbmcaddon, xbmcgui
 
 AddonName = xbmcaddon.Addon().getAddonInfo('name')
 if sys.version_info[0] == 2:
-    NIGHTLY_VERSION_CONTROL = os.path.join(xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile')).decode('utf-8'), "update_sha")
+    from xbmc import translatePath
+    NIGHTLY_VERSION_CONTROL = os.path.join(translatePath(xbmcaddon.Addon().getAddonInfo('profile')).decode('utf-8'), "update_sha")
 else:
-    NIGHTLY_VERSION_CONTROL = os.path.join(xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile')), "update_sha")
+    from xbmcvfs import translatePath
+    NIGHTLY_VERSION_CONTROL = os.path.join(translatePath(xbmcaddon.Addon().getAddonInfo('profile')), "update_sha")
+
 
 def infoDialog(message, heading=AddonName, icon='', time=5000, sound=False):
     if icon == '': icon = xbmcaddon.Addon().getAddonInfo('icon')
@@ -14,12 +17,13 @@ def infoDialog(message, heading=AddonName, icon='', time=5000, sound=False):
     elif icon == 'ERROR': icon = xbmcgui.NOTIFICATION_ERROR
     xbmcgui.Dialog().notification(heading, message, icon, time, sound=sound)
 
-if os.path.isfile(NIGHTLY_VERSION_CONTROL)== False or xbmcaddon.Addon().getSetting('DevUpdateAuto') == 'true' or xbmcaddon.Addon().getSetting('enforceUpdate') == 'true':
+
+if os.path.isfile(NIGHTLY_VERSION_CONTROL) == False or xbmcaddon.Addon().getSetting('DevUpdateAuto') == 'true' or xbmcaddon.Addon().getSetting('enforceUpdate') == 'true':
     from resources.lib import updateManager
     status = updateManager.devAutoUpdates(True)
     if status == True: infoDialog("Auto Update abgeschlossen", sound=False, icon='INFO', time=3000)
     if status == False: infoDialog("Auto Update mit Fehler beendet", sound=True, icon='ERROR')
-    #if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon='INFO', time=3000)
+    # if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon='INFO', time=3000)
     if xbmcaddon.Addon().getSetting('enforceUpdate') == 'true': xbmcaddon.Addon().setSetting('enforceUpdate', 'false')
 
 # "setting.xml" wenn notwendig Indexseiten aktualisieren
@@ -29,9 +33,3 @@ try:
         cPluginHandler().getAvailablePlugins()
 except:
     pass
-
-##ka - remove parent directory (..) in lists
-#if not 'false' in xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue", "params":{"setting":"filelists.showparentdiritems"}}'):
-#    xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"filelists.showparentdiritems","value":false}}')
-#    xbmc.executebuiltin("ReloadSkin()")
-#exit(0)
