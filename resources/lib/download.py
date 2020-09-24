@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-import os, sys, time, xbmc, xbmcgui
+import os, time, xbmcgui
 from resources.lib import common
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.tools import logger
 try:
+    from xbmc import translatePath
     from urllib2 import Request, urlopen
 except ImportError:
+    from xbmcvfs import translatePath
     from urllib.request import Request, urlopen
 
 
@@ -17,8 +19,6 @@ class cDownload:
         self.__oDialog = oDialog
 
     def __createDownloadFilename(self, filename):
-        # valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
-        # filename = ''.join(c for c in sTitle if c in valid_chars)
         filename = filename.replace(' ', '_')
         return filename
 
@@ -42,7 +42,7 @@ class cDownload:
                     dialog = xbmcgui.Dialog()
                     sPath = dialog.browse(3, 'Downloadfolder', 'files', '')
                 if (sPath != ''):
-                    sDownloadPath = xbmc.translatePath(sPath + '%s' % (self.__sTitle,))
+                    sDownloadPath = translatePath(sPath + '%s' % (self.__sTitle,))
                     self.__prepareDownload(url, header, sDownloadPath, downloadDialogTitle)
         elif self.__sTitle != False:
             temp_dir = os.path.join(common.profilePath)
@@ -55,7 +55,7 @@ class cDownload:
             logger.info('download file: ' + str(url) + ' to ' + str(sDownloadPath))
             self.__createProcessDialog(downloadDialogTitle)
             request = Request(url, headers=header)
-            self.__download(urlopen(request, timeout=60), sDownloadPath)
+            self.__download(urlopen(request, timeout=240), sDownloadPath)
         except Exception as e:
             logger.error(e)
         self.__oDialog.close()
@@ -66,10 +66,7 @@ class cDownload:
         if 'content-length' in headers:
             iTotalSize = (headers['Content-Length'])
         chunk = 4096
-        if sys.platform.startswith('win'):
-            f = open(r'%s' % fpath, 'wb')
-        else:
-            f = open(r'%s' % fpath, 'wb')
+        f = open(r'%s' % fpath, 'wb')
         iCount = 0
         self._startTime = time.time()
         while 1:
