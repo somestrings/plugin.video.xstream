@@ -224,12 +224,11 @@ def getLinks(sUrl, e, h, sLang, sQuality, sToken):
     oRequest.addParameters('grecaptcha', '')
     sHtmlContent = oRequest.request()
     Data = json.loads(sHtmlContent)
-    tmp = Data.get('d', '') + Data.get('c', '') + Data.get('iv', '') + Data.get('f', '') + Data.get(
-        'h', '') + Data.get('b', '')
+    tmp = Data.get('d', '') + Data.get('c', '') + Data.get('iv', '') + Data.get('f', '') + Data.get('h', '') + Data.get('b', '')
     tmp = json.loads(base64.b64decode(tmp))
     salt = binascii.unhexlify(tmp['s'])
     ciphertext = base64.b64decode(tmp['ct'][::-1])
-    b = base64.b64encode(sToken[::-1])
+    b = base64.b64encode(sToken[::-1].encode('utf-8'))
     tmp = cUtil.evp_decode(ciphertext, b, salt)
     tmp = json.loads(base64.b64decode(tmp))
     ciphertext = base64.b64decode(tmp['ct'][::-1])
@@ -242,7 +241,7 @@ def getLinks(sUrl, e, h, sLang, sQuality, sToken):
         b += '1'
     else:
         b += '0'
-    tmp = cUtil.evp_decode(ciphertext, str(b), salt)
+    tmp = cUtil.evp_decode(ciphertext, b.encode('utf-8'), salt)
     return json.loads(tmp)
 
 
