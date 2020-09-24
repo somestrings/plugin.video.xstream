@@ -3,16 +3,18 @@ import os, base64, sys
 import json
 import requests
 from requests.auth import HTTPBasicAuth
-import xbmc, xbmcvfs
-from xbmc import translatePath, LOGERROR, LOGNOTICE
 from xbmcgui import Dialog
 from xbmcaddon import Addon as addon
+if sys.version_info[0] == 2:
+    from xbmc import translatePath, LOGNOTICE, LOGERROR, log, executebuiltin, getCondVisibility, getInfoLabel
+else:
+    from xbmc import LOGINFO as LOGNOTICE, LOGERROR, log, executebuiltin, getCondVisibility, getInfoLabel
+    from xbmcvfs import translatePath
 # Android K18 ZIP Fix.
-if xbmc.getCondVisibility('system.platform.android') and int(xbmc.getInfoLabel('System.BuildVersion')[:2]) == 18:
+if getCondVisibility('system.platform.android') and int(getInfoLabel('System.BuildVersion')[:2]) == 18:
     import fixetzipfile as zipfile
 else:
     import zipfile
-
 # Text/Überschrift im Dialog
 PLUGIN_NAME = addon().getAddonInfo('name')  # ist z.B. 'xstream'
 
@@ -26,9 +28,8 @@ def urlResolverUpdate(silent=False):
     token = base64.b64decode(token)
     try:
         return Update(username, plugin_id, branch, token, silent)
-
     except Exception as e:
-        xbmc.log('Exception Raised: %s' % str(e), xbmc.LOGERROR)
+        log('Exception Raised: %s' % str(e), LOGERROR)
         Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
         return
 
@@ -38,12 +39,10 @@ def xStreamUpdate(silent=False):
     plugin_id = 'plugin.video.xstream'
     branch = 'nightly'
     token = ''
-
     try:
         return Update(username, plugin_id, branch, token, silent)
-
     except Exception as e:
-        xbmc.log('Exception Raised: %s' % str(e), LOGERROR)
+        log('Exception Raised: %s' % str(e), LOGERROR)
         Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
         return False
 
@@ -53,7 +52,7 @@ def Update(username, plugin_id, branch, token, silent):
     REMOTE_PLUGIN_COMMITS = "https://api.github.com/repos/%s/%s/commits/%s" % (username, plugin_id, branch)
     REMOTE_PLUGIN_DOWNLOADS = "https://api.github.com/repos/%s/%s/zipball/%s" % (username, plugin_id, branch)
     auth = HTTPBasicAuth(username, token)
-    xbmc.log('%s - Search for update ' % plugin_id, LOGNOTICE)
+    log('%s - Search for update ' % plugin_id, LOGNOTICE)
     try:
         if sys.version_info[0] == 2:
             ADDON_DIR = translatePath(addon(plugin_id).getAddonInfo('profile')).decode('utf-8')
@@ -65,8 +64,7 @@ def Update(username, plugin_id, branch, token, silent):
         if not os.path.exists(ADDON_DIR): os.mkdir(ADDON_DIR)
         # ka - Update erzwingen
         if addon().getSetting('enforceUpdate') == 'true':
-            if xbmcvfs.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
-            # if os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION) # oder so!
+            if os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
 
         path = addon(plugin_id).getAddonInfo('Path')
         commitXML = _getXmlString(REMOTE_PLUGIN_COMMITS, auth)
@@ -74,19 +72,19 @@ def Update(username, plugin_id, branch, token, silent):
             isTrue = commitUpdate(commitXML, LOCAL_PLUGIN_VERSION, REMOTE_PLUGIN_DOWNLOADS, path, plugin_id,
                                   LOCAL_FILE_NAME_PLUGIN, silent, auth)
             if isTrue is True:
-                xbmc.log('%s - Update successful.' % plugin_id, LOGNOTICE)
+                log('%s - Update successful.' % plugin_id, LOGNOTICE)
                 if silent is False: Dialog().ok(PLUGIN_NAME, plugin_id + ' - Update erfolgreich.')
                 return True
             elif isTrue is None:
-                xbmc.log('%s - no new update ' % plugin_id, LOGNOTICE)
+                log('%s - no new update ' % plugin_id, LOGNOTICE)
                 if silent is False: Dialog().ok(PLUGIN_NAME, plugin_id + ' - Kein Update verfügbar.')
                 return None
 
-        xbmc.log('%s - Update error ' % plugin_id, LOGERROR)
+        log('%s - Update error ' % plugin_id, LOGERROR)
         Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
         return False
     except:
-        xbmc.log('%s - Update error ' % plugin_id, LOGERROR)
+        log('%s - Update error ' % plugin_id, LOGERROR)
         Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
 
 
@@ -94,7 +92,7 @@ def commitUpdate(onlineFile, offlineFile, downloadLink, LocalDir, plugin_id, loc
     try:
         jsData = json.loads(onlineFile)
         if not os.path.exists(offlineFile) or open(offlineFile).read() != jsData['sha']:
-            xbmc.log('%s - start update ' % plugin_id, LOGNOTICE)
+            log('%s - start update ' % plugin_id, LOGNOTICE)
             isTrue = doUpdate(LocalDir, downloadLink, plugin_id, localFileName, auth)
             if isTrue is True:
                 try:
@@ -108,16 +106,13 @@ def commitUpdate(onlineFile, offlineFile, downloadLink, LocalDir, plugin_id, loc
             return None
     except Exception:
         os.remove(offlineFile)
-        xbmc.log("RateLimit reached")
+        log("RateLimit reached")
         return False
 
 
 def doUpdate(LocalDir, REMOTE_PATH, Title, localFileName, auth):
     try:
         response = requests.get(REMOTE_PATH, auth=auth)  # verify=False,
-        # Open our local file for writing
-        # with open(localFileName,"wb") as local_file:
-        # local_file.write(f.read())
         if response.status_code == 200:
             open(localFileName, "wb").write(response.content)
         else:
@@ -138,10 +133,10 @@ def doUpdate(LocalDir, REMOTE_PATH, Title, localFileName, auth):
                 f.close()
         updateFile.close()
         os.remove(localFileName)
-        xbmc.executebuiltin("UpdateLocalAddons()")
+        executebuiltin("UpdateLocalAddons()")
         return True
     except:
-        xbmc.log("doUpdate not possible due download error")
+        log("doUpdate not possible due download error")
         return False
 
 
@@ -166,9 +161,9 @@ def _getXmlString(xml_url, auth):
         if "sha" in json.loads(xmlString):
             return xmlString
         else:
-            xbmc.log("Update-URL incorrect or bad credentials")
+            log("Update-URL incorrect or bad credentials")
     except Exception as e:
-        xbmc.log(e)
+        log(e)
 
 
 # todo Verzeichnis packen -für zukünftige Erweiterung "Backup"
@@ -195,9 +190,8 @@ def devAutoUpdates(silent=False):
             return False
         elif (status1 is True or status2 is True) and (status1 is None or status2 is None):
             return True
-
     except Exception as e:
-        xbmc.log(e)
+        log(e)
 
 
 def devUpdates():  # für manuelles Updates vorgesehen
@@ -230,4 +224,4 @@ def devUpdates():  # für manuelles Updates vorgesehen
         if addon().getSetting('enforceUpdate') == 'true': addon().setSetting('enforceUpdate', 'false')
         return
     except Exception as e:
-        xbmc.log(e)
+        log(e)
