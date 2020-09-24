@@ -30,7 +30,7 @@ class cParser:
         s = s.replace('\\u00c9', 'É').replace('\\u2026', '...').replace('\\u202fh', 'h').replace('\\u2019', '’')
         s = s.replace('\\u0308', '̈').replace('\\u00e8', 'è').replace('#038;', '').replace('\\u00f8', 'ø')
         s = s.replace('／', '/').replace('\\u00e1', 'á').replace('&#8211;', '-').replace('&#8220;', '“').replace('&#8222;', '„')
-        s = s.replace('&#8217;', '’').replace('&#8230;', '…')
+        s = s.replace('&#8217;', '’').replace('&#8230;', '…').replace('&#39;', "'")
         return s
 
     @staticmethod
@@ -183,30 +183,21 @@ class cUtil:
         if not salt:
             salt = cipher_text[8:16]
             cipher_text = cipher_text[16:]
-        data = cUtil.evpKDF(passphrase, salt)
-        decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(data['key'], data['iv']))
+        key, iv = cUtil.evpKDF(passphrase, salt)
+        decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(key, iv))
         plain_text = decrypter.feed(cipher_text)
         plain_text += decrypter.feed()
-        return plain_text
+        return plain_text.decode("utf-8")
 
     @staticmethod
-    def evpKDF(passwd, salt, key_size=8, iv_size=4):
-        target_key_size = key_size + iv_size
-        derived_bytes = ''
-        number_of_derived_words = 0
-        block = None
-        hasher = hashlib.new('md5')
-        while number_of_derived_words < target_key_size:
-            if block is not None:
-                hasher.update(block)
-            hasher.update(passwd)
-            hasher.update(salt)
-            block = hasher.digest()
-            hasher = hashlib.new('md5')
-            for _i in range(1, 1):
-                hasher.update(block)
-                block = hasher.digest()
-                hasher = hashlib.new('md5')
-            derived_bytes += block[0: min(len(block), (target_key_size - number_of_derived_words) * 4)]
-            number_of_derived_words += len(block) / 4
-        return {'key': derived_bytes[0: key_size * 4], 'iv': derived_bytes[key_size * 4:]}
+    def evpKDF(pwd, salt, key_size=32, iv_size=16):
+        temp = b''
+        fd = temp
+        while len(fd) < key_size + iv_size:
+            h = hashlib.md5()
+            h.update(temp + pwd + salt)
+            temp = h.digest()
+            fd += temp
+        key = fd[0:key_size]
+        iv = fd[key_size:key_size + iv_size]
+        return key, iv
