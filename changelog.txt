@@ -1,4 +1,5 @@
 3.5.18~nightly
+- [streamkiste] Seite hinzugefügt
 - [hd-streams.org] fix für Kodi 19
 - [movie4k.space] Seite hinzugefügt
 - [general] fix für Kodi 19 Alpha2
