@@ -1,4 +1,5 @@
 3.5.18~nightly
+- [flimmerstube] fix hoster
 - [streamkiste] Seite hinzugefügt
 - [hd-streams.org] fix für Kodi 19
 - [movie4k.space] Seite hinzugefügt
