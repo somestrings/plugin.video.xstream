@@ -67,8 +67,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
-        oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
+        oGuiElement.setThumbnail(sThumbnail.replace('https', 'http'))
+        oGuiElement.setFanart(sThumbnail.replace('https', 'http'))
         oGuiElement.setMediaType('movie')
         params.setParam('entryUrl', sUrl)
         params.setParam('sThumbnail', sThumbnail)
