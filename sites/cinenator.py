@@ -84,7 +84,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui and not sSearchText:
-        pattern = ''''class=[^>]current">\d+</span>[^>]*href='([^']+)'''
+        pattern = "current[^>]>\d+</span>[^>]*href='([^']+)"
         isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, pattern)
         if isMatchNextPage:
             params.setParam('sUrl', sNextUrl)
