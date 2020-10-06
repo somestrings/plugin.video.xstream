@@ -1,4 +1,5 @@
-3.5.18~nightly
+3.5.18 
+  06.10.2020
 - [flimmerstube] fix hoster
 - [streamkiste] Seite hinzugefügt
 - [hd-streams.org] fix für Kodi 19
