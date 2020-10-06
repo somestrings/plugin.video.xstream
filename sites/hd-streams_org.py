@@ -96,7 +96,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     else:
         oRequest = cRequestHandler(entryUrl)
         sHtmlContent = oRequest.request()
-        pattern = 'data-id.*?href="([^"]+).*?src="([^"]+).*?filename">([^<]+)'
+        pattern = 'href="([^"]+)"[^>]class="card.*?src="(?:([^"]+)?).*?card__title">([^<]+)'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
         if not isMatch:
             pattern = 'href="([^"]+)"><div.*?src="([^"]+).*?0">([^<]+)'
