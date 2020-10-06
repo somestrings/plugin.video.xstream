@@ -1,4 +1,7 @@
-3.5.18 
+3.5.19~nightly
+- [cinenator] fix nextpage
+
+3.5.18
   06.10.2020
 - [flimmerstube] fix hoster
 - [streamkiste] Seite hinzugefügt
