@@ -14,7 +14,7 @@ class cHosterGui:
     def __init__(self):
         self.maxHoster = int(cConfig().getSetting('maxHoster', 100))
         self.dialog = False
-    
+
     # TODO: unify parts of play, download etc.
     def _getInfoAndResolve(self, siteResult):
         oGui = cGui()
@@ -235,10 +235,9 @@ class cHosterGui:
                 return
             if len(siteResult) > 1:
                 # choose hoster
-                if cConfig().getSetting('hosterSelect') == 'Dialog':
-                    siteResult = self._chooseHoster(siteResult)
-            if not siteResult:
-                return
+                siteResult = self._chooseHoster(siteResult)
+                if not siteResult:
+                    return
             else:
                 siteResult = siteResult[0]
             # get stream links
