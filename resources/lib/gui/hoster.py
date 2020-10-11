@@ -230,14 +230,15 @@ class cHosterGui:
             # self.dialog.close()
             if len(siteResult) > self.maxHoster:
                 siteResult = siteResult[:self.maxHoster - 1]
+            if cConfig().getSetting('hosterSelect') == 'List':
+                self.showHosterFolder(siteResult, siteName, functionName)
+                return
             if len(siteResult) > 1:
                 # choose hoster
-                if cConfig().getSetting('hosterSelect') == 'List':
-                    self.showHosterFolder(siteResult, siteName, functionName)
-                    return
-                siteResult = self._chooseHoster(siteResult)
-                if not siteResult:
-                    return
+                if cConfig().getSetting('hosterSelect') == 'Dialog':
+                    siteResult = self._chooseHoster(siteResult)
+            if not siteResult:
+                return
             else:
                 siteResult = siteResult[0]
             # get stream links
