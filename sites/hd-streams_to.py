@@ -55,14 +55,15 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     pattern = '<article id="post-\d.*?src="([^"]+).*?href="([^"]+)">([^<]+).*?span>([\d]+).*?texto">([^<]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
-        pattern = '<article>.*?<img src="([^"]+).*?href="([^"]+)">([^<]+).*?year">([\d]+).*?contenido">([^"]+)</div>'
+        pattern = '<article>.*?<img src="([^"]+).*?href="([^"]+)">([^<]+)(.*?)contenido">([^"]+)</div>'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
 
     total = len(aResult)
-    for sThumbnail, sUrl, sName, sYear, sDesc in aResult:
+    for sThumbnail, sUrl, sName, sDummy, sDesc in aResult:
+        isYear, sYear = cParser.parseSingleResult(sDummy, '(\d{4})')
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         isTvshow = True if 'tvshow' in sUrl else False
@@ -70,7 +71,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
-        oGuiElement.setYear(sYear)
+        if isYear:
+            oGuiElement.setYear(sYear)
         oGuiElement.setDescription(sDesc)
         params.setParam('entryUrl', sUrl)
         params.setParam('sName', sName)
