@@ -207,6 +207,9 @@ def showHosters():
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if isMatch:
         for sLang, sUrl, sName, sQualy in aResult:
+            sLanguage = cConfig().getSetting('prefLanguage')
+            if sLang is not '1' and sLanguage == '0':
+                continue
             if sLang == '1':
                 sLang = 'Deutsch'
             if sLang == '2':
