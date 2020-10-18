@@ -5,10 +5,10 @@ from resources.lib.tools import logger, cParser
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
 
-SITE_IDENTIFIER = 'kkiste_co'
-SITE_NAME = 'KKiste.co'
-SITE_ICON = 'kkiste_co.png'
-URL_MAIN = 'https://kkiste.co/'
+SITE_IDENTIFIER = 'kkiste'
+SITE_NAME = 'KKiste'
+SITE_ICON = 'kkiste.png'
+URL_MAIN = 'https://kkiste.green/'
 
 
 def load():
