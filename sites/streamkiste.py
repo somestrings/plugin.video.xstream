@@ -142,10 +142,11 @@ def showSeasons():
         oGuiElement.setThumbnail(sThumbnail)
         if isFanart:
             oGuiElement.setFanart('https:' + sFanart)
+            params.setParam('sFanart', 'https:' + sFanart)
         if isDesc:
             oGuiElement.setDescription(sDesc)
         params.setParam('season', sSeasonNr)
-        params.setParam('sFanart', 'https:' + sFanart)
+        
         cGui().addFolder(oGuiElement, params, True, total)
     cGui().setView('seasons')
     cGui().setEndOfDirectory()
