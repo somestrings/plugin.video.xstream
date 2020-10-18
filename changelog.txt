@@ -1,4 +1,7 @@
 3.5.19~nightly
+- [streamkiste] fix Serien
+- entfernt alleserien, moviedream, movie4k
+- [hd-streams.to] fix site
 - fix hosterSelect List
 - [HD-Streams.org] fix site
 - [cinenator] fix nextpage
