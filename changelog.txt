@@ -1,4 +1,5 @@
 3.5.19~nightly
+- [kkiste] fix suche
 - [requestHandler] use socket.setdefaulttimeout
 - [streamkiste] fix Serien
 - entfernt alleserien, moviedream, movie4k
