@@ -34,15 +34,14 @@ class cRequestHandler:
         self.ignoreErrors = ignoreErrors
         self.compression = compression
         self.cacheTime = int(cConfig().getSetting('cacheTime', 600))
-        self.requestTimeout = int(cConfig().getSetting('requestTimeout', 60))
+        self.requestTimeout = int(cConfig().getSetting('requestTimeout', 10))
         self.removeBreakLines(True)
         self.removeNewLines(True)
         self.__setDefaultHeader()
         self.setCachePath()
         self.__setCookiePath()
         self.__sResponseHeader = ''
-        if self.requestTimeout >= 60 or self.requestTimeout <= 10:
-            self.requestTimeout = 60
+        socket.setdefaulttimeout(self.requestTimeout)
 
     def removeNewLines(self, bRemoveNewLines):
         self.__bRemoveNewLines = bRemoveNewLines
@@ -114,7 +113,7 @@ class cRequestHandler:
             oRequest.add_header(key, value)
         cookieJar.add_cookie_header(oRequest)
         try:
-            oResponse = opener.open(oRequest, timeout=self.requestTimeout)
+            oResponse = opener.open(oRequest)
         except HTTPError as e:
             if e.code == 503:
                 oResponse = None
@@ -297,21 +296,6 @@ class cRequestHandler:
             fileAge = self.getFileAge(cacheFile)
             if fileAge > self.cacheTime:
                 os.remove(cacheFile)
-
-    @staticmethod
-    def createUrl(Url, oRequest):
-        parsed_url = urlparse(Url)
-        netloc = parsed_url.netloc[4:] if parsed_url.netloc.startswith('www.') else parsed_url.netloc
-        cfId = oRequest.getCookie('__cfduid', '.' + netloc)
-        cfClear = oRequest.getCookie('cf_clearance', '.' + netloc)
-        sUrl = ''
-        if cfId and cfClear and 'Cookie=Cookie:' not in sUrl:
-            delimiter = '&' if '|' in sUrl else '|'
-            sUrl = delimiter + 'Cookie=Cookie: __cfduid=' + cfId.value + '; cf_clearance=' + cfClear.value
-        if 'User-Agent=' not in sUrl:
-            delimiter = '&' if '|' in sUrl else '|'
-            sUrl += delimiter + 'User-Agent=' + oRequest.getHeaderEntry('User-Agent')
-        return sUrl
 
 
 # python 2.7.9 and 2.7.10 certificate workaround
