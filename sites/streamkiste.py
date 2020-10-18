@@ -158,7 +158,7 @@ def showEpisodes():
     sFanart = params.getValue('sFanart')
     sSeason = params.getValue('season')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = "Staffel:[^>]%s.*?</span></div></a></div>" % sSeason
+    pattern = "Staffel:[^>]%s.*?section-header" % sSeason
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
         pattern = "href='([^']+).*?>#(\d+)<"
@@ -198,7 +198,7 @@ def showHosters():
                 oRequest = cRequestHandler(sUrl, caching=False)
                 oRequest.request()
                 sUrl = oRequest.getRealUrl()
-            if 'vidsrc' in sUrl or 'cdn.' in sUrl:
+            if 'imdb' in sUrl or 'youtube' in sUrl:
                 continue
             hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl) + ' ' + sLang}
             hosters.append(hoster)
