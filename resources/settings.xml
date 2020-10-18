@@ -27,13 +27,9 @@
     <setting type="sep" />
     <setting label="30035" type="lsep" />
     <setting default="600" id="cacheTime" label="30006" option="int" range="0,60,1800" type="slider" />
-    <setting default="30" id="requestTimeout" label="30014" option="int" range="10,5,60" type="slider" />
+    <setting default="10" id="requestTimeout" label="30014" option="int" range="1,1,60" type="slider" />
   </category> 
   <category label="Indexseiten 1">
-    <setting label="Alleserien" type="lsep" />
-    <setting default="true" id="plugin_alleserien_com" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_alleserien_com" label="30052" type="bool" />
-    <setting type="sep" />
     <setting label="Cinenator" type="lsep" />
     <setting default="true" id="plugin_cinenator" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_cinenator" label="30052" type="bool" />
@@ -72,22 +68,17 @@
     <setting default="true" enable="!eq(-1,false)" id="global_search_kinox_to" label="30052" type="bool" />
     <setting default="kinos.to" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="kinox.am|kinoz.to|kinos.to|kinox.mobi|kinox.gratis|kinox.space|kinox.party|kinox.express|kinox.pub|kinox.direct|kinox.digital|kinox.club|kinox.click|kinox.ai|kinox.cloud|kinox.fyi|kinox.fun|kinox.wtf|kinox.lol|kinox.sh|kinox.to" />
     <setting type="sep" />
-</category> 
-  <category label="Indexseiten 2">
     <setting label="KKiste.co" type="lsep" />
     <setting default="true" id="plugin_kkiste_co" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_kkiste_co" label="30052" type="bool" />
     <setting type="sep" />
-    <setting label="Movie4k" type="lsep" />
-    <setting default="true" id="plugin_movie4k_to" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_movie4k_to" label="30052" type="bool" />
-    <setting default="movie4k.to" enable="!eq(-2,false)" id="movie4k_to-domain" label="30051" type="labelenum" values="movie4k.to|movie4k.lol|movie.to|movie4k.me|movie4k.org|movie4k.pe|movie4k.am" />
+</category> 
+  <category label="Indexseiten 2">
+    <setting label="Movie4k Space" type="lsep" />
+    <setting default="true" id="plugin_movie4k_space" label="30050" type="bool" />
+    <setting default="false" enable="!eq(-1,false)" id="global_search_movie4k_space" label="30052" type="bool" />
     <setting type="sep" />
-    <setting label="MovieDream" type="lsep" />
-    <setting default="true" id="plugin_moviedream_ws" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_moviedream_ws" label="30052" type="bool" />
-    <setting type="sep" />
-    <setting label="MovieKing.cc" type="lsep" />
+    <setting label="MovieKing" type="lsep" />
     <setting default="true" id="plugin_movieking" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_movieking" label="30052" type="bool" />
     <setting type="sep" />
@@ -118,6 +109,10 @@
     <setting label="Stream.to" type="lsep" />
     <setting default="true" id="plugin_stream_to" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_stream_to" label="30052" type="bool" />
+    <setting type="sep" />
+    <setting label="StreamKiste" type="lsep" />
+    <setting default="true" id="plugin_streamkiste" label="30050" type="bool" />
+    <setting default="true" enable="!eq(-1,false)" id="global_search_streamkiste" label="30052" type="bool" />
     <setting type="sep" />
     <setting label="Topstreamfilm" type="lsep" />
     <setting default="true" id="plugin_topstreamfilm" label="30050" type="bool" />
