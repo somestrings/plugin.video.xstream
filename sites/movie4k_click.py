@@ -144,7 +144,7 @@ def showHosters():
                 continue
             if sUrl.startswith('/'):
                 sUrl = 'https:' + sUrl
-            hoster = {'link': sUrl, 'name': sUrl}
+            hoster = {'link': sUrl, 'name': sName}
             hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
