@@ -198,7 +198,7 @@ def Language(sLang):
     elif 'espsub' in sLang:
         return ' (Spanische Untertitel) '
     elif 'trsub' in sLang:
-        return ' (Tuerkische Untertitel) '
+        return ' (Türkische Untertitel) '
     elif 'de.png' in sLang:
         return ' (Deutsch) '
     elif 'en.png' in sLang:
