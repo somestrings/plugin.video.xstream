@@ -10,7 +10,7 @@ from json import loads
 SITE_IDENTIFIER = 'kinox_to'
 SITE_NAME = 'KinoX'
 SITE_ICON = 'kinox.png'
-SITE_SETTINGS = '<setting default="kinos.to" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="kinox.am|kinoz.to|kinos.to|kinox.mobi|kinox.gratis|kinox.space|kinox.party|kinox.express|kinox.pub|kinox.direct|kinox.digital|kinox.club|kinox.click|kinox.ai|kinox.cloud|kinox.fyi|kinox.fun|kinox.wtf|kinox.lol|kinox.sh|kinox.to" />'
+SITE_SETTINGS = '<setting default="kinos.to" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="kinos.to|kinox.ai|kinox.am|kinox.bz|kinox.click|kinox.cloud|kinox.club|kinox.digital|kinox.direct|kinox.express|kinox.fun|kinox.fyi|kinox.gratis|kinox.io|kinox.lol|kinox.me|kinox.mobi|kinox.nu|kinox.party|kinox.pub|kinox.sg|kinox.sh|kinox.space|kinox.sx|kinox.to|kinox.tube|kinox.tv|kinox.wtf|kinoz.to" />'
 domain = cConfig().getSetting('kinox_to-domain')
 
 URL_MAIN = 'https://' + domain
