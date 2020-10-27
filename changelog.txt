@@ -1,4 +1,5 @@
 3.5.19~nightly
+- [kinox] update domains
 - entfernt moviestream
 - [Movie4k Click] add site
 - [kkiste] fix suche
