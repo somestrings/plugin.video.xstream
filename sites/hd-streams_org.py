@@ -33,7 +33,7 @@ def showMenu():
     params = ParameterHandler()
     sUrl = params.getValue('sUrl')
     params.setParam('sUrl', sUrl + '&orderBy=date&order=desc')
-    cGui().addFolder(cGuiElement('Hinzugefuegt', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Hinzugefügt', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', sUrl + '&orderBy=vote_average&order=desc')
     cGui().addFolder(cGuiElement('Bewertung', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', sUrl + '&orderBy=release_date&order=desc')
