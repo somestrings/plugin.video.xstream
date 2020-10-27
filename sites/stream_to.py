@@ -34,7 +34,7 @@ def showMenu():
     params.setParam('sUrl', sUrl + 'view')
     cGui().addFolder(cGuiElement('Am meisten gesehn', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', sUrl + 'latest')
-    cGui().addFolder(cGuiElement('Zuletzt hinzugefuegt', SITE_IDENTIFIER, 'showEntries'), params)
+    cGui().addFolder(cGuiElement('Zuletzt hinzugefügt', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', sUrl + 'favorite')
     cGui().addFolder(cGuiElement('Am meisten favorisiert', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', sUrl + 'rating')
