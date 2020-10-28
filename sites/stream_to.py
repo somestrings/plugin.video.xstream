@@ -170,7 +170,21 @@ def showHosters():
 
 
 def getHosterUrl(sUrl=False):
-    return [{'streamUrl': sUrl, 'resolved': False}]
+    if 'thevideos.ga' in sUrl:
+        from resources.lib import jsunpacker
+        oRequest = cRequestHandler(sUrl, caching=False)
+        oRequest.addHeaderEntry('Referer', 'https://stream.to/')
+        sHtmlContent = oRequest.request()
+        isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\s*\(function.*?)</script>')
+        if isMatch:
+            sHtmlContent = jsunpacker.unpack(sUrl[0])
+            isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, ",src.*?'([^']+)")
+            if isMatch:
+                oRequest = cRequestHandler('https://thevideos.ga/' + sUrl, caching=False)
+                sUrl = _redirectHoster('https://thevideos.ga/' + sUrl)
+                return [{'streamUrl': sUrl, 'resolved': True}]
+    else:
+        return [{'streamUrl': sUrl, 'resolved': False}]
 
 
 def showSearch():
@@ -182,3 +196,24 @@ def showSearch():
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % cParser.quotePlus(sSearchText), oGui, sSearchText)
+
+
+def _redirectHoster(url):
+    try:
+        from urllib2 import build_opener, HTTPError
+    except ImportError:
+        from urllib.error import HTTPError
+        from urllib.request import build_opener
+    opener = build_opener()
+    opener.addheaders = [('Referer', url)]
+    try:
+        resp = opener.open(url)
+        if url != resp.geturl():
+            return resp.geturl()
+        else:
+            return url
+    except HTTPError as e:
+        if e.code == 403:
+            if url != e.geturl():
+                return e.geturl()
+        raise
