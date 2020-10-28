@@ -122,7 +122,7 @@ def showEpisodes():
     entryUrl = params.getValue('entryUrl')
     sSeasonNr = params.getValue('sSeasonNr')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = "title'>Season[^>]%s[^<]<i>.*?<span class='date'" % sSeasonNr
+    pattern = "title'>Season[^>]%s[^<]<i>.*?[^<]<i>.*?></li></ul>" % sSeasonNr
     isMatch, sContainer = cParser.parse(sHtmlContent, pattern)
     if isMatch:
         pattern = "numerando'>[^-]*-\s*(\d+)<.*?<a[^>]*href='([^']+)'>([^<]+)"
