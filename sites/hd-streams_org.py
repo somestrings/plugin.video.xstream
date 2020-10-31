@@ -128,7 +128,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if sThumbnail.startswith('/'):
             sThumbnail = URL_MAIN + sThumbnail
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         if sYear:
             oGuiElement.setYear(sYear)
         params.setParam('entryUrl', sUrl)
