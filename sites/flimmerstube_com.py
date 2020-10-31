@@ -76,7 +76,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         if sYear:
             oGuiElement.setYear(sYear)
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         params.setParam('entryUrl', URL_MAIN + sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
     if not sGui:
