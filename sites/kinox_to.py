@@ -249,7 +249,6 @@ def parseNews():
             oGuiElement.setLanguage(sLang)
             oGuiElement.setSubLanguage(subLang)
             oGuiElement.setThumbnail(URL_MAIN + str(aEntry[1]))
-            oGuiElement.setFanart(URL_MAIN + str(aEntry[1]))
             parms.setParam('sUrl', URL_MAIN + sUrl)
             parms.setParam('mediaType', mediaType)
             if mediaType == 'series':
@@ -323,7 +322,6 @@ def _cinema(oGui):
         oGuiElement.setDescription(aEntry[3])
         oGuiElement.setMediaType('movie')
         oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]))
-        oGuiElement.setFanart(URL_MAIN + str(aEntry[2]))
         oGuiElement.addItemValue('rating', rating)
         parms.setParam('sUrl', URL_MAIN + str(aEntry[1]))
         oGui.addFolder(oGuiElement, parms, False, total)
