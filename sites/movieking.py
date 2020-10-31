@@ -68,7 +68,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             continue
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setThumbnail(sThumbnail.replace('https', 'http'))
-        oGuiElement.setFanart(sThumbnail.replace('https', 'http'))
         oGuiElement.setMediaType('movie')
         params.setParam('entryUrl', sUrl)
         params.setParam('sThumbnail', sThumbnail)
