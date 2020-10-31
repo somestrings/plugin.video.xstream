@@ -103,7 +103,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         isTvshow = True if 'staffel' in sName.lower() or 'season' in sName.lower() else False
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail('https:' + sThumbnail)
-        oGuiElement.setFanart('https:' + sThumbnail)
         if isYear:
             oGuiElement.setYear(sYear)
         if isDesc:
