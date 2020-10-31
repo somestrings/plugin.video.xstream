@@ -80,7 +80,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         isTvshow = True if 'series' in sUrl else False
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         params.setParam('sID', AJAX + sID)
         params.setParam('entryUrl', URL_MAIN + sUrl)
@@ -111,7 +110,6 @@ def showSeasons():
         oGuiElement.setMediaType('season')
         oGuiElement.setSeason(sSeason)
         oGuiElement.setThumbnail(params.getValue('sThumbnail'))
-        oGuiElement.setFanart(params.getValue('sThumbnail'))
         if isDesc:
             oGuiElement.setDescription(sDesc)
         params.setParam('Season', sSeason)
@@ -143,7 +141,6 @@ def showEpisodes():
         oGuiElement.setEpisode(sEpisode)
         oGuiElement.setMediaType('episode')
         oGuiElement.setThumbnail(params.getValue('sThumbnail'))
-        oGuiElement.setFanart(params.getValue('sThumbnail'))
         if isDesc:
             oGuiElement.setDescription(sDesc)
         params.setParam('sID', AJAX + sID)
