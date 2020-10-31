@@ -170,7 +170,6 @@ def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         oGuiElement.setYear(sYear)
         oGuiElement.setDescription(sDesc)
         params.setParam('entryUrl', URL_GET % (sId, sId))
