@@ -17,6 +17,7 @@
     <string id="30013">Bevorzugte Qualität bei Auto-Play Funktion</string>
     <string id="30014">Timeout für HTTP-Anfragen in Sekunden</string>
     <string id="30015">Auto-Update für URLResolver</string>
+    <string id="30019">Benutze Cover als Fanart</string>
 
     <!-- settingtabs begin by 30020 - 30029 -->
     <string id="30020">Allgemein</string>
