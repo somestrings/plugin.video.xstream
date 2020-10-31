@@ -44,7 +44,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             continue
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         oGuiElement.setMediaType('movie')
         params.setParam('entryUrl', URL_MAIN + sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
