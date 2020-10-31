@@ -68,6 +68,10 @@ msgctxt "#30015"
 msgid "Auto-Update for URLResolver"
 msgstr ""
 
+msgctxt "#30019"
+msgid ""
+msgstr "use Cover as Fanart"
+
 msgctxt "#30020"
 msgid "General"
 msgstr ""
