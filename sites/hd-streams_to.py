@@ -70,7 +70,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         if isYear:
             oGuiElement.setYear(sYear)
         oGuiElement.setDescription(sDesc)
@@ -107,7 +106,6 @@ def showSeasons():
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setTVShowTitle(sTVShowTitle)
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         if isDesc:
             oGuiElement.setDescription(sDesc[0])
         params.setParam('sSeasonNr', int(sSeasonNr))
@@ -138,7 +136,6 @@ def showEpisodes():
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setEpisode(sEpisodeNr)
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         if isDesc:
             oGuiElement.setDescription(sDesc[0])
         oGuiElement.setMediaType('episode')
