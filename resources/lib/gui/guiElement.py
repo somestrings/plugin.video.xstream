@@ -134,6 +134,8 @@ class cGuiElement:
 
     def setThumbnail(self, sThumbnail):
         self.__sThumbnail = sThumbnail
+        if cConfig().getSetting('replacefanart') == 'true':
+            self.__sFanart = sThumbnail
 
     def getThumbnail(self):
         return self.__sThumbnail
