@@ -134,7 +134,7 @@ class cGuiElement:
 
     def setThumbnail(self, sThumbnail):
         self.__sThumbnail = sThumbnail
-        if cConfig().getSetting('replacefanart') == 'true':
+        if cConfig().getSetting('replacefanart') == 'true' and sThumbnail.startswith('http'):
             self.__sFanart = sThumbnail
 
     def getThumbnail(self):
