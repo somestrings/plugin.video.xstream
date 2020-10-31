@@ -70,7 +70,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setDescription(sDesc)
         oGuiElement.addItemValue('duration', sDuration)
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         params.setParam('entryUrl', sUrl)
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
@@ -98,7 +97,6 @@ def showEpisodes():
     for sName in aResult:
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         if isDesc:
             oGuiElement.setDescription(sDesc)
         oGuiElement.setMediaType('episode')
