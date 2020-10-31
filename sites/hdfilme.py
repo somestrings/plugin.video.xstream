@@ -100,7 +100,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showEpisodes' if isTvshow else 'showHosters')
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         if sYear:
             oGuiElement.setYear(sYear)
         params.setParam('entryUrl', sUrl)
@@ -136,7 +135,6 @@ def showEpisodes():
     for eID, eNr in aResult:
         oGuiElement = cGuiElement('Folge ' + eNr, SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         params.setParam('eID', eID)
         params.setParam('sID', sID[0])
         cGui().addFolder(oGuiElement, params, False, total)
