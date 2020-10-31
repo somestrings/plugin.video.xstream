@@ -100,7 +100,6 @@ def showSeasons():
         oGuiElement = cGuiElement('Staffel ' + sSeasonNr, SITE_IDENTIFIER, 'showEpisodes')
         if isThumbnail:
             oGuiElement.setThumbnail(sThumbnail)
-            oGuiElement.setFanart(sThumbnail)
         oGuiElement.setMediaType('season')
         oGuiElement.setSeason(sSeasonNr)
         params.setParam('sSeasonNr', int(sSeasonNr))
@@ -131,7 +130,6 @@ def showEpisodes():
         oGuiElement.setEpisode(sEpisodeNr)
         if isThumbnail:
             oGuiElement.setThumbnail(sThumbnail)
-            oGuiElement.setFanart(sThumbnail)
         oGuiElement.setMediaType('episode')
         params.setParam('entryUrl', sUrl)
         cGui().addFolder(oGuiElement, params, False, total)
