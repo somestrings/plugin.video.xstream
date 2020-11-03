@@ -238,7 +238,6 @@ def showMainMenu(sFunction):
         for aPlugin in sorted(aPlugins, key=lambda k: k['id']):
             oGuiElement = cGuiElement()
             oGuiElement.setTitle(aPlugin['name'])
-            oGuiElement.setDescription(aPlugin['name']) #ka
             oGuiElement.setSiteName(aPlugin['id'])
             oGuiElement.setFunction(sFunction)
             if 'icon' in aPlugin and aPlugin['icon']:
@@ -301,7 +300,6 @@ def globalSearchGuiElement():
     # Create a gui element for global search
     oGuiElement = cGuiElement()
     oGuiElement.setTitle(cConfig().getLocalizedString(30040))
-    oGuiElement.setDescription(cConfig().getLocalizedString(30040))  #ka
     oGuiElement.setSiteName('globalSearch')
     oGuiElement.setFunction('globalSearch')
     oGuiElement.setThumbnail('DefaultAddonWebSkin.png')
