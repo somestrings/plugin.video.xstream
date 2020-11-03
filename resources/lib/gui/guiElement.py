@@ -7,17 +7,14 @@ from os import path
 class cGuiElement:
     '''
     This class "abstracts" a xbmc listitem.
-
     Kwargs:
         sTitle    (str): title/label oft the GuiElement/listitem
         sSite     (str): siteidentifier of the siteplugin, which is called if the GuiElement is selected
         sFunction (str): name of the function, which is called if the GuiElement is selected
-
         These arguments are mandatory. If not given on init, they have to be set by their setter-methods, before the GuiElement is added to the Gui.
     '''
     DEFAULT_FOLDER_ICON = 'DefaultFolder.png'
     DEFAULT_FANART = path.join(addon.getAddonInfo('path'), 'fanart.jpg')
-    DEFAULT_BANNER = path.join(addon.getAddonInfo('path'), 'resources', 'art', 'banner.png')
     MEDIA_TYPES = ['movie', 'tvshow', 'season', 'episode']
 
     def __init__(self, sTitle='', sSite=None, sFunction=None):
@@ -32,7 +29,6 @@ class cGuiElement:
         self.__aProperties = {}
         self.__aContextElements = []
         self.__sFanart = self.DEFAULT_FANART
-        self.__sBanner = self.DEFAULT_BANNER
         self.__sSiteName = sSite
         self.__sFunctionName = sFunction
         self._sLanguage = ''
@@ -79,7 +75,6 @@ class cGuiElement:
     def setMediaType(self, mediaType):
         '''
         Set mediatype for GuiElement
-
         Args:
             mediaType(str): 'movie'/'tvshow'/'season'/'episode'
         '''
@@ -154,13 +149,6 @@ class cGuiElement:
     def getFanart(self):
         return self.__sFanart
 
-#ka
-    def setBanner(self, sBanner):
-        self.__sBanner = sBanner
-
-    def getBanner(self):
-        return self.__sBanner
-
     def addItemValue(self, sItemKey, sItemValue):
         self.__aItemValues[sItemKey] = sItemValue
 
@@ -204,7 +192,6 @@ class cGuiElement:
         Fetch metainformations for GuiElement.
         Args:
             mediaType(str): 'movie'/'tvshow'/'season'/'episode'
-
         Kwargs:
             imdbID (str)        :
             TVShowTitle (str)   :
