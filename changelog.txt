@@ -1,4 +1,5 @@
 3.5.19~nightly
+- [general] add erkennung von jahr in title
 - [general] add einstellung Benutze Cover als Fanart
 - [hd-streams.to] fix episode
 - [kinox] update domains
