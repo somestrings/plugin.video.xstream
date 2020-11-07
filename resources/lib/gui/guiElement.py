@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+from resources.lib.tools import logger, cParser, cUtil
 from resources.lib.config import cConfig
 from resources.lib.common import addon
-from resources.lib.tools import logger, cUtil
 from os import path
 
 class cGuiElement:
@@ -70,7 +70,22 @@ class cGuiElement:
         self.__sTitle = cUtil.cleanse_text(sTitle)
 
     def getTitle(self):
-        return self.__sTitle
+        if ' (19' in self.__sTitle or ' (20' in self.__sTitle:
+            isMatch, aYear = cParser.parse(self.__sTitle, '(.*?)\((\d{4})\)')
+            if isMatch:
+                self.__sTitle = aYear[0][0]
+                self.setYear(aYear[0][1])
+        if '*19' in self.__sTitle or '*20' in self.__sTitle:
+            isMatch, aYear = cParser.parse(self.__sTitle, '(.*?)\*(\d{4})\*')
+            if isMatch:
+                self.__sTitle = aYear[0][0]
+                self.setYear(aYear[0][1])
+        if '*ENGLISH*' in self.__sTitle:
+            isMatch, aLang = cParser.parse(self.__sTitle, '(.*?)\*(.*?)\*')
+            if isMatch:
+                self.__sTitle = aLang[0][0]
+                self.setLanguage('Englisch')
+        return self.__sTitle.strip()
 
     def setMediaType(self, mediaType):
         '''
