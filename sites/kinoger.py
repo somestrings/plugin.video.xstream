@@ -236,7 +236,7 @@ def showHosters():
                 oRequest = cRequestHandler(sUrl)
                 oRequest.addHeaderEntry('Referer', URL_MAIN)
                 sHtmlContent = oRequest.request()
-                isMatch, aResult = cParser.parse(sHtmlContent, '(\d+p)[^>](http[^ ]+)')
+                isMatch, aResult = cParser.parse(sHtmlContent, '(\d+p)[^>](http[^ "]+)')
                 for sQualy, sUrl in aResult:
                     hoster = {'link': sUrl, 'name': sQualy + ' ProtonVideo'}
                     hosters.append(hoster)
