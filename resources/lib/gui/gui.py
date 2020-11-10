@@ -106,7 +106,7 @@ class cGui:
         contextitem = cContextElement()
 
         if oGuiElement._mediaType == 'movie' or oGuiElement._mediaType == 'tvshow':
-            contextitem.setTitle("Erweiterte Info(IMDB)")
+            contextitem.setTitle("Erweiterte Info (TMDB)")
             searchParams = {'searchTitle': oGuiElement.getTitle(), 'sMeta': oGuiElement._mediaType, 'sYear': oGuiElement._sYear}
             contextmenus += [(contextitem.getTitle(), "RunPlugin(%s?function=viewInfo&%s)" % (self.pluginPath, urlencode(searchParams),),)]
         # contextitem.setTitle("Info")
