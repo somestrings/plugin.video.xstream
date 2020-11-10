@@ -13,6 +13,15 @@ def run():
     parseUrl()
 
 
+def viewInfo(params):
+    from resources.lib.tmdbinfo import WindowsBoxes
+    parms = ParameterHandler()
+    sCleanTitle = params.getValue('searchTitle')
+    sMeta = parms.getValue('sMeta')
+    sYear = parms.getValue('sYear')
+    WindowsBoxes(sCleanTitle, sCleanTitle, sMeta, sYear)
+
+
 def changeWatched(params):
     if not cConfig().getSetting('metahandler') == 'true': return
     meta = get_metahandler()
@@ -30,7 +39,6 @@ def changeWatched(params):
             meta.change_watched(mediaType, name, imdbID, season=season, episode=episode)
             xbmc.executebuiltin('Container.Refresh')
     else:
-        META = False
         logger.error('Could not import package metahandler')
     return
 
@@ -139,6 +147,9 @@ def parseUrl():
             return
         elif sFunction == 'changeWatched':
             changeWatched(params)
+            return
+        elif sFunction == 'viewInfo':
+            viewInfo(params)
             return
         elif sFunction == 'updateMeta':
             updateMeta(params)
