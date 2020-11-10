@@ -104,8 +104,13 @@ class cGui:
                 contextmenus += [(contextitem.getTitle(), "RunPlugin(%s)" % (sTest,),)]
         itemValues = oGuiElement.getItemValues()
         contextitem = cContextElement()
-        contextitem.setTitle("Info")
-        contextmenus += [(contextitem.getTitle(), "Action(Info)",)]
+
+        if oGuiElement._mediaType == 'movie' or oGuiElement._mediaType == 'tvshow':
+            contextitem.setTitle("Erweiterte Info(IMDB)")
+            searchParams = {'searchTitle': oGuiElement.getTitle(), 'sMeta': oGuiElement._mediaType, 'sYear': oGuiElement._sYear}
+            contextmenus += [(contextitem.getTitle(), "RunPlugin(%s?function=viewInfo&%s)" % (self.pluginPath, urlencode(searchParams),),)]
+        # contextitem.setTitle("Info")
+        # contextmenus += [(contextitem.getTitle(), "Action(Info)",)]
         # search for alternative source
         contextitem.setTitle("Weitere Quellen")
         searchParams = {'searchTitle': oGuiElement.getTitle()}
