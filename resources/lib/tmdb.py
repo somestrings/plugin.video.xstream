@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json, re
 from requestHandler import cRequestHandler
+from resources.lib.config import cConfig
 try:
     from urllib import quote_plus
 except ImportError:
@@ -15,8 +16,8 @@ class cTMDB:
     def __init__(self, api_key='', lang='de'):
         self.api_key = '86dd18b04874d9c94afadde7993d94e3'
         self.lang = lang
-        self.poster = 'https://image.tmdb.org/t/p/w342'
-        self.fanart = 'https://image.tmdb.org/t/p/w1280'
+        self.poster = 'https://image.tmdb.org/t/p/%s' % cConfig().getSetting('poster_tmdb')
+        self.fanart = 'https://image.tmdb.org/t/p/%s' % cConfig().getSetting('backdrop_tmdb')
 
     def get_idbyname(self, name, year='', mediaType='movie', page=1):
         if year:
@@ -35,7 +36,7 @@ class cTMDB:
             return False
         return False
 
-    def search_movie_name(self, name, year='', page=1):
+    def search_movie_name(self, name, year='', page=1, advanced='false'):
         name = re.sub(" +", " ", name)
         if year:
             term = quote_plus(name) + '&year=' + year
@@ -68,8 +69,11 @@ class cTMDB:
                                 break
                     if not movie:
                         movie = meta['results'][0]
-                tmdb_id = movie['id']
-                meta = self.search_movie_id(tmdb_id)
+                if advanced == 'true':
+                    tmdb_id = movie['id']
+                    meta = self.search_movie_id(tmdb_id)
+                else:
+                    meta = movie
         else:
             meta = {}
         return meta
@@ -110,7 +114,7 @@ class cTMDB:
             meta = {}
         return meta
 
-    def search_tvshow_name(self, name, year='', page=1, genre=''):
+    def search_tvshow_name(self, name, year='', page=1, genre='', advanced='false'):
         if year:
             term = quote_plus(name) + '&year=' + year
         else:
@@ -402,10 +406,14 @@ class cTMDB:
             casts = listCredits['cast']
             crews = []
             if len(casts) > 0:
+                licast = []
                 if 'crew' in listCredits:
                     crews = listCredits['crew']
-                if len(crews) > 0:
-                    _meta['credits'] = "{'cast': " + str(casts) + ", 'crew': " + str(crews) + "}"
+                if len(crews)>0:
+                    _meta['credits'] = "{'cast': " + str(casts) + ", 'crew': "+str(crews) + "}"
+                    for cast in casts:
+                        licast.append((cast['name'], cast['character'], self.poster + str(cast['profile_path']), str(cast['id'])))
+                    _meta['cast'] = licast
                 else:
                     _meta['credits'] = "{'cast': " + str(casts) + '}'
             if len(crews) > 0:
@@ -422,19 +430,19 @@ class cTMDB:
                         _meta['writer'] += '%s (%s)' % (crew['job'], crew['name'])
         return _meta
 
-    def get_meta(self, media_type, name, imdb_id='', tmdb_id='', year='', season='', episode=''):
+    def get_meta(self, media_type, name, imdb_id='', tmdb_id='', year='', season='', episode='', advanced='false'):
         name = re.sub(" +", " ", name)
         meta = {}
         if media_type == 'movie':
             if tmdb_id:
                 meta = self.search_movie_id(tmdb_id)
             elif name:
-                meta = self.search_movie_name(name, year)
+                meta = self.search_movie_name(name, year, advanced=advanced)
         elif media_type == 'tvshow':
             if tmdb_id:
                 meta = self.search_tvshow_id(tmdb_id)
             elif name:
-                meta = self.search_tvshow_name(name, year)
+                meta = self.search_tvshow_name(name, year, advanced=advanced)
         elif media_type == 'anime':
             if tmdb_id:
                 meta = self.search_tvshow_id(tmdb_id)
@@ -453,7 +461,7 @@ class cTMDB:
         elif media_type == 'network':
             if tmdb_id:
                 meta = self.search_network_id(tmdb_id)
-        if meta and 'tmdb_id' in meta:
+        if meta and 'id' in meta:
             meta = self._format(meta, name)
         return meta
 
