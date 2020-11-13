@@ -22,7 +22,7 @@ class cGui:
             self.pluginPath = sys.argv[0]
         except:
             self.pluginPath = ''
-        self.isMetaOn = cConfig().getSetting('metahandler') == 'true'
+        self.isMetaOn = cConfig().getSetting('TMDBMETA') == 'true'
         if cConfig().getSetting('metaOverwrite') == 'true':
             self.metaMode = 'replace'
         else:
@@ -133,19 +133,7 @@ class cGui:
             if ('episode' in itemValues and itemValues['episode'] and int(itemValues['episode']) > 0 and 'season' in itemValues and itemValues['season'] and int(itemValues['season'])):
                 metaParams['episode'] = itemValues['episode']
                 metaParams['mediaType'] = 'episode'
-            # if an imdb id is available we can mark this element as seen/unseen in the metahandler
-            if itemValues['imdb_id']:
-                metaParams['imdbID'] = itemValues['imdb_id']
-                if itemValues['overlay'] == '7':
-                    contextitem.setTitle("Als ungesehen markieren")
-                else:
-                    contextitem.setTitle("Als gesehen markieren")
-                contextmenus += [(contextitem.getTitle(), "RunPlugin(%s?function=changeWatched&%s)" % (self.pluginPath, urlencode(metaParams),),)]
-            # if year is set we can search reliably for metainfos via metahandler
-            if 'year' in itemValues and itemValues['year']:
-                metaParams['year'] = itemValues['year']
-            contextitem.setTitle("Suche Metainfos")
-            contextmenus += [(contextitem.getTitle(), "RunPlugin(%s?function=updateMeta&%s)" % (self.pluginPath, urlencode(metaParams),),)]
+
         # context options for movies or episodes
         if not bIsFolder:
             contextitem.setTitle("add to Playlist")
