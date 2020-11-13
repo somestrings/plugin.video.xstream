@@ -21,119 +21,6 @@ def viewInfo(params):
     sYear = parms.getValue('sYear')
     WindowsBoxes(sCleanTitle, sCleanTitle, sMeta, sYear)
 
-
-def changeWatched(params):
-    if not cConfig().getSetting('metahandler') == 'true': return
-    meta = get_metahandler()
-    if meta:
-        season = ''
-        episode = ''
-        mediaType = params.getValue('mediaType')
-        imdbID = params.getValue('imdbID')
-        name = params.getValue('title')
-        if params.exist('season'):
-            season = params.getValue('season')
-        if params.exist('episode'):
-            episode = params.getValue('episode')
-        if imdbID:
-            meta.change_watched(mediaType, name, imdbID, season=season, episode=episode)
-            xbmc.executebuiltin('Container.Refresh')
-    else:
-        logger.error('Could not import package metahandler')
-    return
-
-
-def updateMeta(params):
-    if not cConfig().getSetting('metahandler') == 'true':
-        return
-    # videoType, name, imdbID, season=season, episode=episode, year=year, watched=watched
-    try:
-        from metahandler import metahandlers
-    except Exception as e:
-        logger.error('Could not import package metahandler')
-        logger.error(e)
-        return
-    meta = get_metahandler()
-    if not meta:
-        return
-    season = ''
-    episode = ''
-    mediaType = params.getValue('mediaType')
-    imdbID = params.getValue('imdbID')
-    name = str(params.getValue('title'))
-    year = params.getValue('year')
-    logger.info("MediaType: " + mediaType)
-    if mediaType == 'movie' or mediaType == 'tvshow':
-        # show meta search input
-        oGui = cGui()
-        sSearchText = oGui.showKeyBoard(name)
-        if not sSearchText: return
-        if mediaType == 'movie':
-            try:
-                foundInfo = meta.search_movies(sSearchText)
-            except:
-                logger.error('error or nothing found')
-                foundInfo = False
-        elif mediaType == 'tvshow':
-            foundInfo = metahandlers.TheTVDB().get_matching_shows(sSearchText, language="all", want_raw=True)
-        else:
-            return
-
-        if not foundInfo:
-            oGui.showInfo('xStream', 'Suchanfrage lieferte kein Ergebnis')
-            return
-        # select possible match
-        dialog = xbmcgui.Dialog()
-        items = []
-        for item in foundInfo:
-            if mediaType == 'movie':
-                items.append(str(item['title'].encode('utf-8')) + ' (' + str(item['year']) + ')')
-            elif mediaType == 'tvshow':
-                if 'FirstAired' in item:
-                    items.append(
-                        item['SeriesName'] + ' (' + str(item['FirstAired'])[:4] + ') ' + item.get('language', ''))
-                else:
-                    items.append(item['SeriesName'] + ' ' + item.get('language', ''))
-            else:
-                return
-        index = dialog.select('Film/Serie wählen', items)
-        if index > -1:
-            item = foundInfo[index]
-        else:
-            return False
-
-    if not imdbID:
-        imdbID = ''
-    if not year:
-        year = ''
-    if mediaType == 'movie':
-        meta.update_meta(mediaType, name, imdbID, new_imdb_id=str(item['imdb_id']), new_tmdb_id=str(item['tmdb_id']), year=year)
-    elif mediaType == 'tvshow':
-        if params.exist('season'):
-            season = params.getValue('season')
-            meta.update_season(name, imdbID, season)
-        if params.exist('episode'):
-            episode = params.getValue('episode')
-        if season and episode:
-            meta.update_episode_meta(name, imdbID, season, episode)
-        elif season:
-            meta.update_season(name, imdbID, season)
-        else:
-            meta.update_meta(mediaType, name, imdbID, new_imdb_id=str(item.get('IMDB_ID', '')), new_tmdb_id=str(item['id']), year=year)
-    xbmc.executebuiltin("Container.Refresh")
-    return
-
-
-def get_metahandler():
-    try:
-        from metahandler import metahandlers
-        return metahandlers.MetaData(tmdb_api_key='86dd18b04874d9c94afadde7993d94e3')
-    except Exception as e:
-        logger.error('Could not import package metahandler')
-        logger.error(e)
-        return False
-
-
 def parseUrl():
     params = ParameterHandler()
     logger.info(params.getAllParameters())
@@ -213,11 +100,7 @@ def parseUrl():
     elif sSiteName == 'urlresolver':
         import urlresolver
         urlresolver.display_settings()
-    # If metahandler settings are called
-    elif sSiteName == 'metahandler':
-        import metahandler
-        metahandler.display_settings()
-    # # If UpdateManager are called (manual update)
+    # If UpdateManager are called (manual update)
     elif sSiteName == 'devUpdates':
         from resources.lib import updateManager
         updateManager.devUpdates()
@@ -294,16 +177,6 @@ def settingsGuiElements():
     oGuiElement.setFunction('display_settings')
     oGuiElement.setThumbnail('DefaultAddonRepository.png')
     urlResolverSettings = oGuiElement
-
-    # Create a gui element for metahandler settings
-    oGuiElement = cGuiElement()
-    oGuiElement.setTitle(cConfig().getLocalizedString(30044))
-    oGuiElement.setSiteName('metahandler')
-    oGuiElement.setFunction('display_settings')
-    oGuiElement.setThumbnail('DefaultAddonTvInfo.png')
-    metaSettings = oGuiElement
-    if cConfig().getSetting('metahandler') == 'true':
-        return xStreamSettings, urlResolverSettings, metaSettings
     return xStreamSettings, urlResolverSettings
 
 
