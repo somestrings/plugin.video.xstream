@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import xbmc, unicodedata, time, xbmcgui
+from resources.lib.config import cConfig
 from resources.lib.tmdb import cTMDB
 from datetime import date, datetime
-
+from resources.lib.gui.gui import cGui
 
 def WindowsBoxes(sTitle, sFileName, metaType, year=''):
     try:
-        meta = cTMDB().get_meta(metaType, sFileName, tmdb_id=xbmc.getInfoLabel('ListItem.Property(TmdbId)'), year=year)
+        meta = cTMDB().get_meta(metaType, sFileName, tmdb_id=xbmc.getInfoLabel('ListItem.Property(TmdbId)'), year=year, advanced='true')
         try:
             meta['plot'] = str(meta['plot'].encode('latin-1'), 'utf-8')
         except:
@@ -16,7 +17,7 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
         pass
 
     if (not 'imdb_id' in meta and not 'tmdb_id' in meta and not 'tvdb_id' in meta):
-        print('error')
+        xbmc.executebuiltin("Notification(TMDB, Kein Eintrag gefunden, 1000, '')")
         return
     if 'premiered' in meta and meta['premiered']:
         releaseDate = datetime(*(time.strptime(meta['premiered'], '%Y-%m-%d')[0:6]))
@@ -38,8 +39,8 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
             pass
 
         def onInit(self):
-            self.setProperty('color', 'lightblue')
-            self.poster = 'https://image.tmdb.org/t/p/%s' % 'w342'
+            self.setProperty('color', cConfig().getSetting('Color'))
+            self.poster = 'https://image.tmdb.org/t/p/%s' % cConfig().getSetting('poster_tmdb')
             self.none_poster = 'https://eu.ui-avatars.com/api/?background=000&size=512&name=%s&color=FFF&font-size=0.33'
             self.setFocusId(9000)
             if 'credits' in meta and meta['credits']:
@@ -130,9 +131,12 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
 
         def onClick(self, controlId):
             if controlId == 11:
-                # Trailer
-                self.close()
-                return xbmc.executebuiltin('RunPlugin(%s)' % self.getProperty('trailer'))
+                if self.getProperty('trailer'):
+                    # Trailer
+                    self.close()
+                    return xbmc.executebuiltin('RunPlugin(%s)' % self.getProperty('trailer'))
+                else:
+                    xbmc.executebuiltin("Notification(TMDB, Kein Trailer gefunden, 1000, '')")
             elif controlId == 30:
                 self.close()
                 return
