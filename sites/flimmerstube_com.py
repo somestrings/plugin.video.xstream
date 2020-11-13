@@ -62,20 +62,14 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     total = len(aResult)
     for sName, sThumbnail, sUrl in aResult:
+        sName = sName.replace('(HD)', '')
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isMatch, sYear = cParser.parse(sName, "(.*?)\((\d{4})\)")
-        for name, year in sYear:
-            sName = name
-            sYear = year
-            break
-
         if sThumbnail.startswith('/'):
             sThumbnail = URL_MAIN + sThumbnail
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
-        if sYear:
-            oGuiElement.setYear(sYear)
         oGuiElement.setThumbnail(sThumbnail)
+        oGuiElement.setMediaType('movie')
         params.setParam('entryUrl', URL_MAIN + sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
     if not sGui:
