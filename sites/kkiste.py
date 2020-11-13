@@ -69,6 +69,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setYear(sYear)
         oGuiElement.setDescription(sDesc)
         oGuiElement.addItemValue('duration', sDuration)
+        oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setThumbnail(sThumbnail)
         params.setParam('entryUrl', sUrl)
         params.setParam('sThumbnail', sThumbnail)
