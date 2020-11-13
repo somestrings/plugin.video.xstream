@@ -34,7 +34,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         pattern = 'href="([^"]+)"[^>]title="([^"]+).*?src="([^"]+)'
         isMatch, aResult = cParser.parse(sContainer, pattern)
     if not isMatch:
-        cGui().showInfo()
+        if not sGui: oGui.showInfo()
         return
 
     total = len(aResult)
@@ -59,13 +59,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 def showHosters():
     hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
-    sHtmlContent = cRequestHandler(sUrl, caching=False).request()
+    sHtmlContent = cRequestHandler(sUrl).request()
     isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, 'iplayer[^>]*src="([^"]+)')
     if isMatch:
         oRequest = cRequestHandler(sUrl, caching=False)
         oRequest.request()
         sUrl = oRequest.getRealUrl()
-        oRequest = cRequestHandler(sUrl, caching=False)
+        oRequest = cRequestHandler(sUrl)
         sHtmlContent = oRequest.request()
         pattern = 'var file = "([^"]+)"'
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
