@@ -212,7 +212,7 @@ class cGuiElement:
             TVShowTitle (str)   :
             mode (str)          : 'add'/'replace' defines if fetched metainformtions should be added to existing informations, or if they should replace them.
         '''
-        if cConfig().getSetting('metahandler') == 'false':
+        if cConfig().getSetting('TMDBMETA') == 'false':
             return False
         if not self._mediaType:
             self.setMediaType(mediaType)
@@ -225,19 +225,22 @@ class cGuiElement:
         if not self._mediaType:
             logger.error('Could not get MetaInformations for %s, mediaType not defined' % self.getTitle())
             return False
-        from xstream import get_metahandler
-        oMetaget = get_metahandler()
+        from tmdb import cTMDB
+        oMetaget = cTMDB()
         if not oMetaget:
             return False
-        if self._mediaType == 'movie' or self._mediaType == 'tvshow':
-            if self._mediaType == 'tvshow' and self.__aItemValues.get('TVShowTitle', False):
-                meta = oMetaget.get_meta(self._mediaType, self.__aItemValues['TVShowTitle'])
+
+        if self._mediaType == 'movie':
+            if self._sYear:
+                meta = oMetaget.get_meta(self._mediaType, self.getTitle(), year=self._sYear, advanced=cConfig().getSetting('advanced'))
             else:
-                meta = oMetaget.get_meta(self._mediaType, self.__sTitle)
+                meta = oMetaget.get_meta(self._mediaType, self.getTitle(), advanced=cConfig().getSetting('advanced'))
+        elif self._mediaType == 'tvshow':
+            meta = oMetaget.get_meta(self._mediaType, self.getTitle(), advanced=cConfig().getSetting('advanced'))
         elif self._mediaType == 'season':
-            meta = oMetaget.get_seasons(TVShowTitle, imdbID, [str(season)])
+            meta = {}
         elif self._mediaType == 'episode':
-            meta = oMetaget.get_episode_meta(TVShowTitle, imdbID, str(season), str(episode))
+            meta = {}
         else:
             return False
 
@@ -249,19 +252,20 @@ class cGuiElement:
 
         if mode == 'replace':
             self.setItemValues(meta)
-            if not meta['cover_url'] == '':
+            if 'cover_url' in meta :
                 self.setThumbnail(meta['cover_url'])
-            if not meta['backdrop_url'] == '':
+            if 'backdrop_url' in meta:
                 self.setFanart(meta['backdrop_url'])
         else:
             meta.update(self.__aItemValues)
             meta.update(self.__aProperties)
-            if meta['cover_url'] != '' and self.__sThumbnail == '':
+            if 'cover_url' in meta != '' and self.__sThumbnail == '':
                 self.setThumbnail(meta['cover_url'])
-            if meta['backdrop_url'] != '' and self.__sFanart == self.DEFAULT_FANART:
+
+            if 'backdrop_url' in meta and self.__sFanart == self.DEFAULT_FANART:
                 self.setFanart(meta['backdrop_url'])
             self.setItemValues(meta)
-        if meta['imdb_id']:
+        if 'imdb_id' in meta:
             self._imdbID = meta['imdb_id']
         self._isMetaSet = True
         return meta
