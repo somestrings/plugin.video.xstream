@@ -1,4 +1,6 @@
 3.5.19~nightly
+- [general] Ersetzte script.module.metahandler durch TMDB scraper
+- [general] füge contextmenu Erweiterte Info TMDB hinzu
 - [general] add erkennung von jahr in title
 - [general] add einstellung Benutze Cover als Fanart
 - [hd-streams.to] fix episode
