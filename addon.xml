@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.xstream" name="xStream" version="3.5.19~nightly" provider-name="xStream-Team">
  <requires>
-    <!-- <import addon="xbmc.python" version="2.14.0"/> -->
     <import addon="script.module.requests"/>
     <import addon="script.module.urlresolver"/>
     <import addon="script.module.six" version="1.11.0"/>
     <import addon="repository.xstream" optional="true"/>
-    <import addon="script.module.metahandler" version="3.0.2.1" optional="true"/>
     <import addon="script.module.inputstreamhelper" version="0.3.3" optional="true"/>
  </requires>
  <extension point="xbmc.python.pluginsource" library="default.py">
    <provides>video</provides>
  </extension>
-     <extension point="xbmc.service" library="service.py" start="startup" /> <!-- ka: die Updates werden gleich schon beim Start von Kodi ausgeführt! -->
+     <extension point="xbmc.service" library="service.py" start="startup" />
  <extension point="xbmc.addon.metadata">
    <summary lang="de">Watch xStream!</summary>
    <description lang="de">Mit diesem Addon kannst du auf alle angebotenen Streams verschiedenster deutschen Quellen zugreifen</description>
@@ -22,6 +20,8 @@
    <platform>all</platform>
    <news>
 3.5.19~nightly
+- [general] Ersetzte script.module.metahandler durch TMDB scraper
+- [general] füge contextmenu Erweiterte Info TMDB hinzu
 - [general] add erkennung von jahr in title
 - [general] add einstellung Benutze Cover als Fanart
 - [hd-streams.to] fix episode
