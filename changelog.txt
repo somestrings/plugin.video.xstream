@@ -1,4 +1,5 @@
-3.5.19~nightly
+3.5.19
+  15.11.2020
 - [moviestream] Seite hinzugefügt
 - [general] Ersetzte script.module.metahandler durch TMDB scraper
 - [general] füge contextmenu Erweiterte Info TMDB hinzu
