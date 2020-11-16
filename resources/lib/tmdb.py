@@ -228,6 +228,10 @@ class cTMDB:
         _meta['cover_url'] = ''
         _meta['backdrop_path'] = ''
         _meta['backdrop_url'] = ''
+        _meta['original_title'] = ''
+        _meta['original_language'] = ''
+        _meta['budget'] = ''
+        _meta['revenue'] = ''
         _meta['episode'] = 0
 
         if 'title' in meta and meta['title']:
@@ -236,6 +240,14 @@ class cTMDB:
             _meta['title'] = meta['name']
         if 'id' in meta:
             _meta['tmdb_id'] = meta['id']
+        if 'budget' in meta and meta['budget']:
+            _meta['budget'] = meta['budget']
+        if 'revenue' in meta and meta['revenue']:
+            _meta['revenue'] = meta['revenue']
+        if 'original_title' in meta and meta['original_title']:
+            _meta['original_title'] = meta['original_title']
+        if 'original_language' in meta and meta['original_language']:
+            _meta['original_language'] = meta['original_language']
         if 'tmdb_id' in meta:
             _meta['tmdb_id'] = meta['tmdb_id']
         if 'imdb_id' in meta:
@@ -409,8 +421,8 @@ class cTMDB:
                 licast = []
                 if 'crew' in listCredits:
                     crews = listCredits['crew']
-                if len(crews)>0:
-                    _meta['credits'] = "{'cast': " + str(casts) + ", 'crew': "+str(crews) + "}"
+                if len(crews) > 0:
+                    _meta['credits'] = "{'cast': " + str(casts) + ", 'crew': " + str(crews) + "}"
                     for cast in casts:
                         licast.append((cast['name'], cast['character'], self.poster + str(cast['profile_path']), str(cast['id'])))
                     _meta['cast'] = licast
