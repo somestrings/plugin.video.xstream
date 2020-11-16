@@ -1,4 +1,5 @@
 3.5.20~nightly
+- [Erweiterte Info (TMDB)] Info überarbeitet
 
 3.5.19
   15.11.2020
