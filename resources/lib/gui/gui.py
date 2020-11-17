@@ -45,9 +45,9 @@ class cGui:
             self.searchResults.append({'guiElement': oGuiElement, 'params': copy.deepcopy(params), 'isFolder': bIsFolder})
             return
         if not oGuiElement._isMetaSet and self.isMetaOn and oGuiElement._mediaType:
-            imdbID = params.getValue('imdbID')
-            if imdbID:
-                oGuiElement.getMeta(oGuiElement._mediaType, imdbID, mode=self.metaMode)
+            tmdbID = params.getValue('tmdbID')
+            if tmdbID:
+                oGuiElement.getMeta(oGuiElement._mediaType, tmdbID, mode=self.metaMode)
             else:
                 oGuiElement.getMeta(oGuiElement._mediaType, mode=self.metaMode)
         sUrl = self.__createItemUrl(oGuiElement, bIsFolder, params)
@@ -109,8 +109,9 @@ class cGui:
             contextitem.setTitle("Erweiterte Info (TMDB)")
             searchParams = {'searchTitle': oGuiElement.getTitle(), 'sMeta': oGuiElement._mediaType, 'sYear': oGuiElement._sYear}
             contextmenus += [(contextitem.getTitle(), "RunPlugin(%s?function=viewInfo&%s)" % (self.pluginPath, urlencode(searchParams),),)]
-        # contextitem.setTitle("Info")
-        # contextmenus += [(contextitem.getTitle(), "Action(Info)",)]
+        if oGuiElement._mediaType == 'season' or oGuiElement._mediaType == 'episode':
+            contextitem.setTitle("Info")
+            contextmenus += [(contextitem.getTitle(), "Action(Info)",)]
         # search for alternative source
         contextitem.setTitle("Weitere Quellen")
         searchParams = {'searchTitle': oGuiElement.getTitle()}
@@ -194,8 +195,8 @@ class cGui:
         if params == '':
             params = ParameterHandler()
         itemValues = oGuiElement.getItemValues()
-        if 'imdb_id' in itemValues and itemValues['imdb_id']:
-            params.setParam('imdbID', itemValues['imdb_id'])
+        if 'tmdb_id' in itemValues and itemValues['tmdb_id']:
+            params.setParam('tmdbID', itemValues['tmdb_id'])
         if 'TVShowTitle' in itemValues and itemValues['TVShowTitle']:
             params.setParam('TVShowTitle', itemValues['TVShowTitle'])
         if 'season' in itemValues and itemValues['season'] and int(itemValues['season']) > 0:
