@@ -508,3 +508,38 @@ class cTMDB:
             if genre:
                 sGenres.append(genre)
         return sGenres
+
+    def _format_episodes(self, meta, name):
+        _meta = {}
+        if 'air_date' in meta:
+            _meta['aired'] = meta['air_date']
+        if 'episode_number' in meta:
+            _meta['episode'] = meta['episode_number']
+        if 'name' in meta:
+            _meta['title'] = meta['name']
+        if 'overview' in meta:
+            _meta['plot'] = meta['overview']
+        if 'production_code' in meta:
+            _meta['code'] = str(meta['production_code'])
+        if 'season_number' in meta:
+            _meta['season'] = meta['season_number']
+        if 'still_path' in meta:
+            _meta['cover_url'] = self.poster + meta['still_path']
+        if 'vote_average' in meta:
+            _meta['rating'] = meta['vote_average']
+        if 'vote_count' in meta:
+            _meta['votes'] = meta['vote_count']
+        return _meta
+
+    def get_meta_episodes(self, media_type, name, tmdb_id='', season='', episode='', advanced='false'):
+        if media_type == 'episode' and tmdb_id and season and episode:
+            url = '%stv/%s/season/%s?api_key=%s&language=de' % (self.URL, tmdb_id, season, self.api_key)
+            sHtmlContent = cRequestHandler(url).request()
+            meta = json.loads(sHtmlContent)
+        if 'episodes' in meta:
+            for e in meta['episodes']:
+                if 'episode_number':
+                    if e['episode_number'] == int(episode):
+                        return self._format_episodes(e, name)
+        else:
+            return {}
