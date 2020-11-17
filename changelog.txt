@@ -1,4 +1,5 @@
 3.5.20~nightly
+- [TMDB] episodes unterstützung hinzugefügt
 - [Erweiterte Info (TMDB)] Info überarbeitet
 
 3.5.19
