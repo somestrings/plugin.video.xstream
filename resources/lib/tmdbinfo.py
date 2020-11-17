@@ -3,7 +3,11 @@ import xbmc, unicodedata, time, xbmcgui
 from resources.lib.config import cConfig
 from resources.lib.tmdb import cTMDB
 from datetime import date, datetime
-from resources.lib.gui.gui import cGui
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
+
 
 def WindowsBoxes(sTitle, sFileName, metaType, year=''):
     try:
@@ -192,6 +196,9 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                 item = self.getControl(controlId).getSelectedItem()
                 sTitle = item.getLabel()
                 # suche
+                self.close()
+                searchParams = {'searchTitle': sTitle}
+                xbmc.executebuiltin("Container.Update(%s?function=searchTMDB&%s)" % ('plugin://plugin.video.xstream/', urlencode(searchParams)))
                 return
 
         def onFocus(self, controlId):
