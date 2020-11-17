@@ -21,6 +21,7 @@ def viewInfo(params):
     sYear = parms.getValue('sYear')
     WindowsBoxes(sCleanTitle, sCleanTitle, sMeta, sYear)
 
+
 def parseUrl():
     params = ParameterHandler()
     logger.info(params.getAllParameters())
@@ -32,17 +33,14 @@ def parseUrl():
         elif sFunction == 'clearCache':
             cRequestHandler('dummy').clearCache()
             return
-        elif sFunction == 'changeWatched':
-            changeWatched(params)
-            return
         elif sFunction == 'viewInfo':
             viewInfo(params)
             return
-        elif sFunction == 'updateMeta':
-            updateMeta(params)
-            return
         elif sFunction == 'searchAlter':
             searchAlter(params)
+            return
+        elif sFunction == 'searchTMDB':
+            searchTMDB(params)
             return
         elif sFunction == 'devUpdates':
             from resources.lib import updateManager
@@ -286,6 +284,49 @@ def searchAlter(params):
     oGui.setView()
     oGui.setEndOfDirectory()
     xbmc.executebuiltin('Container.Update')
+    return True
+
+
+def searchTMDB(params):
+    sSearchText = params.getValue('searchTitle')
+    import threading
+    oGui = cGui()
+    oGui.globalSearch = True
+    oGui._collectMode = True
+    if not sSearchText: return True
+    aPlugins = []
+    aPlugins = cPluginHandler().getAvailablePlugins()
+    dialog = xbmcgui.DialogProgress()
+    dialog.create('xStream', 'Searching...')
+    numPlugins = len(aPlugins)
+    threads = []
+    for count, pluginEntry in enumerate(aPlugins):
+        if not pluginEntry['globalsearch']:
+            continue
+        dialog.update((count + 1) * 50 // numPlugins, 'Searching: ' + str(pluginEntry['name']) + '...')
+        if sys.version_info[0] == 2:
+            logger.info('Searching for %s at %s' % (sSearchText.decode('utf-8'), pluginEntry['id']))
+        else:
+            logger.info('Searching for %s at %s' % (sSearchText, pluginEntry['id']))
+
+        t = threading.Thread(target=_pluginSearch, args=(pluginEntry, sSearchText, oGui), name=pluginEntry['name'])
+        threads += [t]
+        t.start()
+    for count, t in enumerate(threads):
+        t.join()
+        dialog.update((count + 1) * 50 // numPlugins + 50, t.getName() + ' returned')
+    dialog.close()
+    # deactivate collectMode attribute because now we want the elements really added
+    oGui._collectMode = False
+    total = len(oGui.searchResults)
+    dialog = xbmcgui.DialogProgress()
+    dialog.create('xStream', 'Gathering info...')
+    for count, result in enumerate(sorted(oGui.searchResults, key=lambda k: k['guiElement'].getSiteName()), 1):
+        oGui.addFolder(result['guiElement'], result['params'], bIsFolder=result['isFolder'], iTotal=total)
+        dialog.update(count * 100 // total, str(count) + ' of ' + str(total) + ': ' + result['guiElement'].getTitle())
+    dialog.close()
+    oGui.setView()
+    oGui.setEndOfDirectory()
     return True
 
 
