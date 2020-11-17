@@ -4,6 +4,7 @@ from resources.lib.config import cConfig
 from resources.lib.common import addon
 from os import path
 
+
 class cGuiElement:
     '''
     This class "abstracts" a xbmc listitem.
@@ -38,7 +39,7 @@ class cGuiElement:
         self._mediaType = ''
         self._season = ''
         self._episode = ''
-        self._imdbID = ''
+        self._tmdbID = ''
         self._rating = ''
         self._isMetaSet = False
 
@@ -202,13 +203,13 @@ class cGuiElement:
     def setSubLanguage(self, sLang):
         self._sSubLanguage = str(sLang)
 
-    def getMeta(self, mediaType, imdbID='', TVShowTitle='', season='', episode='', mode='add'):
+    def getMeta(self, mediaType, tmdbID='', TVShowTitle='', season='', episode='', mode='add'):
         '''
         Fetch metainformations for GuiElement.
         Args:
             mediaType(str): 'movie'/'tvshow'/'season'/'episode'
         Kwargs:
-            imdbID (str)        :
+            tmdbID (str)        :
             TVShowTitle (str)   :
             mode (str)          : 'add'/'replace' defines if fetched metainformtions should be added to existing informations, or if they should replace them.
         '''
@@ -240,7 +241,7 @@ class cGuiElement:
         elif self._mediaType == 'season':
             meta = {}
         elif self._mediaType == 'episode':
-            meta = {}
+            meta = oMetaget.get_meta_episodes(self._mediaType, TVShowTitle, tmdbID, str(season), str(episode))
         else:
             return False
 
@@ -252,10 +253,13 @@ class cGuiElement:
 
         if mode == 'replace':
             self.setItemValues(meta)
-            if 'cover_url' in meta :
+            if 'cover_url' in meta:
                 self.setThumbnail(meta['cover_url'])
             if 'backdrop_url' in meta:
                 self.setFanart(meta['backdrop_url'])
+            if 'title' in meta and episode:
+                self.setTitle(str(episode) + '. ' + meta['title'])
+
         else:
             meta.update(self.__aItemValues)
             meta.update(self.__aProperties)
@@ -265,7 +269,7 @@ class cGuiElement:
             if 'backdrop_url' in meta and self.__sFanart == self.DEFAULT_FANART:
                 self.setFanart(meta['backdrop_url'])
             self.setItemValues(meta)
-        if 'imdb_id' in meta:
-            self._imdbID = meta['imdb_id']
+        if 'tmdb_id' in meta:
+            self._tmdbID = meta['tmdb_id']
         self._isMetaSet = True
         return meta
