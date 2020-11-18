@@ -159,7 +159,7 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                         try:
                             birthday = datetime(*(time.strptime(meta['birthday'], '%Y-%m-%d')[0:6]))
                             age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
-                            age = '%s Alter' % age
+                            age = '%s Jahre' % age
                         except:
                             age = ''
                     else:
