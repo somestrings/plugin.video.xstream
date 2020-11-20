@@ -20,6 +20,9 @@
    <platform>all</platform>
    <news>
 3.5.20~nightly
+- [filmpalast] fix episodes
+- [moviestream] fix episodes
+- [movietown] fix episodes
 - [TMDB] episodes unterstützung hinzugefügt
 - [Erweiterte Info (TMDB)] Info überarbeitet
 
