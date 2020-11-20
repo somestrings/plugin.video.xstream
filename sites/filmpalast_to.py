@@ -167,12 +167,12 @@ def showEpisodes():
         cGui().showInfo()
         return
 
-    pattern = 'href="([^"]+).*?staffStreams_(\d+)'
+    pattern = 'href="([^"]+)'
     isMatch, aResult = cParser.parse(sContainer, pattern)
     isDesc, sDesc = cParser.parseSingleResult(sHtmlContent, '"description">([^<]+)')
     total = len(aResult)
-    for sUrl, sName in aResult:
-        sName = int(sName) + 1
+    for sUrl in aResult:
+        isMatch, sName = cParser.parseSingleResult(sUrl, 'e(\d+)')
         oGuiElement = cGuiElement('Folge ' + str(sName), SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setTVShowTitle(sShowName)
