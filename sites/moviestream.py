@@ -88,7 +88,6 @@ def showSeasons():
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue('sThumbnail')
-    sTVShowTitle = params.getValue('sName')
     sHtmlContent = cRequestHandler(sUrl).request()
     isMatch, aResult = cParser().parse(sHtmlContent, 'number":([\d]+)')
     if not isMatch:
@@ -100,39 +99,44 @@ def showSeasons():
     for sSeasonNr in aResult:
         oGuiElement = cGuiElement('Staffel ' + sSeasonNr, SITE_IDENTIFIER, 'showEpisodes')
         oGuiElement.setMediaType('season')
-        oGuiElement.setTVShowTitle(sTVShowTitle)
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         if isDesc:
             oGuiElement.setDescription(sDesc[0])
-        params.setParam('sSeasonNr', sUrl + '&seasonNumber=' + sSeasonNr)
+        params.setParam('sSeasonNr', sSeasonNr)
         cGui().addFolder(oGuiElement, params, True, total)
     cGui().setView('seasons')
     cGui().setEndOfDirectory()
 
 
 def showEpisodes():
+    oGui = cGui()
     params = ParameterHandler()
+    sUrl = params.getValue('entryUrl')
     sSeasonNr = params.getValue('sSeasonNr')
-    sHtmlContent = cRequestHandler(sSeasonNr).request()
-    pattern = 'id":\d+,"name":"([^"]+)","description":"([^"]+).*?poster":"([^"]+).*?episode_number":([\d]+)'
+    sThumbnail = params.getValue('sThumbnail')
+    sUrl = sUrl + '&seasonNumber=%s' % sSeasonNr
+    sHtmlContent = cRequestHandler(sUrl).request()
+    pattern = 'name":"([^"]+)".*?season_id":\d+,"season_number":%s,"episode_number":([\d]+)' % sSeasonNr
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if not isMatch:
-        cGui().showInfo()
+        oGui.showInfo()
         return
 
     total = len(aResult)
-    for sName, sDesc, sThumbnail, sEpisodeNr in aResult:
+    for sName, sEpisodeNr in aResult:
+        isDesc, sDesc = cParser.parse(sHtmlContent, 'name":"%s","description":"([^"]+)' % sName)
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
-        oGuiElement.setMediaType('sEpisodeNr')
+        oGuiElement.setEpisode(sEpisodeNr)
+        oGuiElement.setSeason(sSeasonNr)
+        oGuiElement.setMediaType('episode')
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
-        oGuiElement.setDescription(sDesc)
-        params.setParam('entryUrl', sSeasonNr + '&episodeNumber=' + sEpisodeNr)
-        cGui().addFolder(oGuiElement, params, False, total)
-    cGui().setView('episodes')
-    cGui().setEndOfDirectory()
+        if isDesc:
+            oGuiElement.setDescription(sDesc[0])
+        params.setParam('entryUrl', sUrl + '&episodeNumber=' + sEpisodeNr)
+        oGui.addFolder(oGuiElement, params, False, total)
+    oGui.setView('episodes')
+    oGui.setEndOfDirectory()
 
 
 def showSearchEntries(entryUrl=False, sGui=False, sSearchText=False):
