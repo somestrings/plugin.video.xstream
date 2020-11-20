@@ -120,7 +120,9 @@ def showEpisodes():
     for sName, sEpisodeNr in aResult:
         isDesc, sDesc = cParser.parse(sHtmlContent, 'name":"%s","description":"([^"]+)' % sName)
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
-        oGuiElement.setMediaType('sEpisodeNr')
+        oGuiElement.setEpisode(sEpisodeNr)
+        oGuiElement.setSeason(sSeasonNr)
+        oGuiElement.setMediaType('episode')
         oGuiElement.setThumbnail(sThumbnail)
         if isDesc:
             oGuiElement.setDescription(sDesc[0])
