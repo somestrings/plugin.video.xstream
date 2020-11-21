@@ -147,8 +147,11 @@ class cTMDB:
                                 break
                     if not movie:
                         movie = meta['results'][0]
-                tmdb_id = movie['id']
-                meta = self.search_tvshow_id(tmdb_id)
+                if advanced == 'true':
+                    tmdb_id = movie['id']
+                    meta = self.search_movie_id(tmdb_id)
+                else:
+                    meta = movie
         else:
             meta = {}
         return meta
@@ -529,13 +532,33 @@ class cTMDB:
             _meta['rating'] = meta['vote_average']
         if 'vote_count' in meta:
             _meta['votes'] = meta['vote_count']
+        if 'crew' in meta:
+            _meta['writer'] = ''
+            _meta['director'] = ''
+            _meta['cast'] = ''
+            for crew in meta['crew']:
+                if crew['department'] == 'Directing':
+                    if _meta['director'] != '':
+                        _meta['director'] += ' / '
+                    _meta['director'] += '%s: %s' % (crew['job'], crew['name'])
+                elif crew['department'] == 'Writing':
+                    if _meta['writer'] != '':
+                        _meta['writer'] += ' / '
+                    _meta['writer'] += '%s: %s' % (crew['job'], crew['name'])
+        if 'guest_stars' in meta:
+            licast = []
+            for c in meta['guest_stars']:
+                licast.append((c['name'], c['character'], self.poster + str(c['profile_path'])))
+            _meta['cast'] = licast
         return _meta
 
     def get_meta_episodes(self, media_type, name, tmdb_id='', season='', episode='', advanced='false'):
+        meta = {}
         if media_type == 'episode' and tmdb_id and season and episode:
             url = '%stv/%s/season/%s?api_key=%s&language=de' % (self.URL, tmdb_id, season, self.api_key)
-            sHtmlContent = cRequestHandler(url).request()
-            meta = json.loads(sHtmlContent)
+            Data = cRequestHandler(url, ignoreErrors=True).request()
+            if Data:
+                meta = json.loads(Data)
         if 'episodes' in meta:
             for e in meta['episodes']:
                 if 'episode_number':
