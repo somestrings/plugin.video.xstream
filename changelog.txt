@@ -1,4 +1,5 @@
 3.5.20~nightly
+- [TMDB] episodes add support crew
 - [filmpalast] fix episodes
 - [moviestream] fix episodes
 - [movietown] fix episodes
