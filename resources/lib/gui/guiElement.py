@@ -81,7 +81,7 @@ class cGuiElement:
             if isMatch:
                 self.__sTitle = aYear[0][0]
                 self.setYear(aYear[0][1])
-        if '*ENGLISH*' in self.__sTitle:
+        if '*english*' in self.__sTitle.lower():
             isMatch, aLang = cParser.parse(self.__sTitle, '(.*?)\*(.*?)\*')
             if isMatch:
                 self.__sTitle = aLang[0][0]
