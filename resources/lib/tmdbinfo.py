@@ -111,7 +111,7 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
         def credit(self, meta='', control=''):
             listitems = []
             if not meta:
-                meta = [{u'id': 0, u'title': u'Keine information', u'poster_path': u'', u'vote_average': 0}]
+                meta = {}
             try:
                 for i in meta:
                     try:
