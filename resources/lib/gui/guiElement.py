@@ -86,6 +86,12 @@ class cGuiElement:
             if isMatch:
                 self.__sTitle = aLang[0][0]
                 self.setLanguage('Englisch')
+        if 'English:' in self.__sTitle:
+            self.__sTitle = self.__sTitle.replace('English:', '')
+            self.setLanguage('Englisch')
+        if '(omu)' in self.__sTitle.lower():
+            self.__sTitle = self.__sTitle.replace('(OmU) ', '').replace('(Omu) ', '')
+            self.setLanguage('OmU')
         return self.__sTitle.strip()
 
     def setMediaType(self, mediaType):
