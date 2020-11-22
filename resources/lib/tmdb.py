@@ -149,7 +149,7 @@ class cTMDB:
                         movie = meta['results'][0]
                 if advanced == 'true':
                     tmdb_id = movie['id']
-                    meta = self.search_movie_id(tmdb_id)
+                    meta = self.search_tvshow_id(tmdb_id)
                 else:
                     meta = movie
         else:
