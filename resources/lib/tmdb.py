@@ -175,8 +175,11 @@ class cTMDB:
         elif 's_year' in meta:
             _meta['year'] = meta['s_year']
         else:
-            if 'premiered' in _meta:
-                _meta['year'] = int(_meta['premiered'][:4])
+            try:
+                if 'premiered' in _meta and _meta['premiered']:
+                    _meta['year'] = int(_meta['premiered'][:4])
+            except Exception:
+                pass
         if 'rating' in meta:
             _meta['rating'] = meta['rating']
         elif 'vote_average' in meta:
