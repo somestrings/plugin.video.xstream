@@ -1,4 +1,5 @@
 3.5.20~nightly
+- [s.to] TMDB deaktiviert bei "Alle Serien"
 - [TMDB] fix ValueError invalid literal for int
 - [TMDB] serien erkennung erhöht, overhead reduziert, code cleanup
 - [topstreamfilm] add Beliebte, code cleanup
