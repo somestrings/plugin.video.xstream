@@ -19,23 +19,6 @@ class cTMDB:
         self.poster = 'https://image.tmdb.org/t/p/%s' % cConfig().getSetting('poster_tmdb')
         self.fanart = 'https://image.tmdb.org/t/p/%s' % cConfig().getSetting('backdrop_tmdb')
 
-    def get_idbyname(self, name, year='', mediaType='movie', page=1):
-        if year:
-            term = quote_plus(name) + '&year=' + year
-        else:
-            term = quote_plus(name)
-        meta = self._call('search/' + str(mediaType), 'query=' + term + '&page=' + str(page))
-
-        if 'errors' not in meta and 'status_code' not in meta:
-            if 'total_results' in meta and meta['total_results'] == 0 and year:
-                meta = self.search_movie_name(name, '')
-            if 'total_results' in meta and meta['total_results'] != 0:
-                tmdb_id = meta['results'][0]['id']
-                return tmdb_id
-        else:
-            return False
-        return False
-
     def search_movie_name(self, name, year='', page=1, advanced='false'):
         name = re.sub(" +", " ", name)
         if year:
@@ -78,43 +61,12 @@ class cTMDB:
             meta = {}
         return meta
 
-    def search_collection_name(self, name):
-        name = re.sub(" +", " ", name)
-        term = quote_plus(name)
-        meta = self._call('search/collection', 'query=' + term)
-        if 'errors' not in meta and 'status_code' not in meta:
-            if 'total_results' in meta and meta['total_results'] != 0:
-                collection = ''
-                if meta['total_results'] == 1:
-                    collection = meta['results'][0]
-                else:
-                    for searchCollec in meta['results']:
-                        cleanTitleTMDB = searchCollec['name'].lower()
-                        cleanTitleSearch = name.lower()
-                        if not cleanTitleSearch.endswith('saga'):
-                            cleanTitleSearch += 'saga'
-                        if cleanTitleTMDB == cleanTitleSearch:
-                            collection = searchCollec
-                            break
-                        elif (cleanTitleSearch + 'saga') == cleanTitleTMDB:
-                            collection = searchCollec
-                            break
-                    if not collection:
-                        for searchCollec in meta['results']:
-                            if 'animation' not in searchCollec['name']:
-                                collection = searchCollec
-                                break
-                    if not collection:
-                        collection = meta['results'][0]
-                meta = collection
-                tmdb_id = collection['id']
-                meta['tmdb_id'] = tmdb_id
-                meta = self.search_collection_id(tmdb_id)
-        else:
-            meta = {}
-        return meta
-
     def search_tvshow_name(self, name, year='', page=1, genre='', advanced='false'):
+        name = name.lower()
+        if '- staffel' in name:
+            name = re.sub('-[^>]\wtaffel[^>]\d+', '', name)
+        elif 'staffel' in name:
+            name = re.sub('\wtaffel[^>]\d+', '', name)
         if year:
             term = quote_plus(name) + '&year=' + year
         else:
@@ -179,68 +131,15 @@ class cTMDB:
         result['tmdb_id'] = show_id
         return result
 
-    def search_collection_id(self, collection_id):
-        result = self._call('collection/' + str(collection_id))
-        result['tmdb_id'] = collection_id
-        return result
-
     def search_person_id(self, person_id):
         result = self._call('person/' + str(person_id))
         result['tmdb_id'] = person_id
         return result
 
-    def search_network_id(self, network_id):
-        result = self._call('network/%s/images' % str(network_id))
-        if 'status_code' not in result and 'logos' in result:
-            network = result['logos'][0]
-            vote = -1
-            for logo in result['logos']:
-                logoVote = float(logo['vote_average'])
-                if logoVote > vote:
-                    network = logo
-                    vote = logoVote
-            network['tmdb_id'] = network_id
-            network.pop('vote_average')
-            return network
-        return {}
-
     def _format(self, meta, name):
         _meta = {}
-        _meta['imdb_id'] = ''
-        _meta['tmdb_id'] = ''
-        _meta['tvdb_id'] = ''
-        _meta['title'] = name
-        _meta['media_type'] = ''
-        _meta['rating'] = 0
-        _meta['votes'] = 0
-        _meta['duration'] = 0
-        _meta['plot'] = ''
-        _meta['mpaa'] = ''
-        _meta['premiered'] = ''
-        _meta['year'] = ''
-        _meta['trailer'] = ''
-        _meta['tagline'] = ''
         _meta['genre'] = ''
-        _meta['studio'] = ''
-        _meta['status'] = ''
-        _meta['credits'] = ''
-        _meta['cast'] = []
-        _meta['director'] = ''
         _meta['writer'] = ''
-        _meta['poster_path'] = ''
-        _meta['cover_url'] = ''
-        _meta['backdrop_path'] = ''
-        _meta['backdrop_url'] = ''
-        _meta['original_title'] = ''
-        _meta['original_language'] = ''
-        _meta['budget'] = ''
-        _meta['revenue'] = ''
-        _meta['episode'] = 0
-
-        if 'title' in meta and meta['title']:
-            _meta['title'] = meta['title']
-        elif 'name' in meta and meta['name']:
-            _meta['title'] = meta['name']
         if 'id' in meta:
             _meta['tmdb_id'] = meta['id']
         if 'budget' in meta and meta['budget']:
@@ -276,11 +175,8 @@ class cTMDB:
         elif 's_year' in meta:
             _meta['year'] = meta['s_year']
         else:
-            try:
-                if 'premiered' in _meta and _meta['premiered']:
-                    _meta['year'] = int(_meta['premiered'][:4])
-            except:
-                pass
+            if 'premiered' in _meta:
+                _meta['year'] = int(_meta['premiered'][:4])
         if 'rating' in meta:
             _meta['rating'] = meta['rating']
         elif 'vote_average' in meta:
@@ -289,17 +185,15 @@ class cTMDB:
             _meta['votes'] = meta['votes']
         elif 'vote_count' in meta:
             _meta['votes'] = meta['vote_count']
-        try:
-            duration = 0
-            if 'runtime' in meta and meta['runtime']:
-                duration = int(meta['runtime'])
-            elif 'episode_run_time' in meta and meta['episode_run_time']:
-                duration = int(meta['episode_run_time'][0])
-            if duration < 300:
-                duration *= 60
+        duration = 0
+        if 'runtime' in meta and meta['runtime']:
+            duration = int(meta['runtime'])
+        elif 'episode_run_time' in meta and meta['episode_run_time']:
+            duration = int(meta['episode_run_time'][0])
+        if duration < 300:
+            duration *= 60
+        if duration > 1:
             _meta['duration'] = duration
-        except:
-            _meta['duration'] = 0
         if 'overview' in meta and meta['overview']:
             _meta['plot'] = meta['overview']
         elif 'parts' in meta:
@@ -335,10 +229,6 @@ class cTMDB:
                     _meta['genre'] += genre
                 else:
                     _meta['genre'] += ' / ' + genre
-            try:
-                _meta['genre'] = unicode(_meta['genre'], 'utf-8')
-            except:
-                pass
         elif 'parts' in meta:
             genres = self.getGenresFromIDs(meta['parts'][0]['genre_ids'])
             _meta['genre'] = ''
@@ -347,10 +237,6 @@ class cTMDB:
                     _meta['genre'] += genre
                 else:
                     _meta['genre'] += ' / ' + genre
-            try:
-                _meta['genre'] = unicode(_meta['genre'], 'utf-8')
-            except:
-                pass
         trailer_id = ''
         if 'trailer' in meta and meta['trailer']:
             _meta['trailer'] = meta['trailer']
@@ -458,24 +344,11 @@ class cTMDB:
                 meta = self.search_tvshow_id(tmdb_id)
             elif name:
                 meta = self.search_tvshow_name(name, year, advanced=advanced)
-        elif media_type == 'anime':
-            if tmdb_id:
-                meta = self.search_tvshow_id(tmdb_id)
-            elif name:
-                meta = self.search_tvshow_name(name, year, genre=16)
-        elif media_type == 'collection':
-            if tmdb_id:
-                meta = self.search_collection_id(tmdb_id)
-            elif name:
-                meta = self.search_collection_name(name)
         elif media_type == 'person':
             if tmdb_id:
                 meta = self.search_person_id(tmdb_id)
             elif name:
                 meta = self.search_person_name(name)
-        elif media_type == 'network':
-            if tmdb_id:
-                meta = self.search_network_id(tmdb_id)
         if meta and 'id' in meta:
             meta = self._format(meta, name)
         return meta
