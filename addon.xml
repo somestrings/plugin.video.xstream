@@ -20,6 +20,8 @@
    <platform>all</platform>
    <news>
 3.5.20~nightly
+- [TMDB] serien erkennung erhöht, overhead reduziert, code cleanup
+- [topstreamfilm] add Beliebte, code cleanup
 - [TMDB] episodes add support crew
 - [filmpalast] fix episodes
 - [moviestream] fix episodes
