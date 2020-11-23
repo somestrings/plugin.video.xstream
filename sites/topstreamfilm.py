@@ -9,9 +9,9 @@ SITE_IDENTIFIER = 'topstreamfilm'
 SITE_NAME = 'Topstreamfilm'
 SITE_ICON = 'topstreamfilm.png'
 URL_MAIN = 'https://topstreamfilm.com/'
-URL_MOVIES = URL_MAIN + 'filme'
-URL_SHOWS = URL_MAIN + 'serien'
-URL_POPULAR = URL_MAIN + 'beliebte-filme-serien'
+URL_MOVIES = URL_MAIN + 'filme-stream-b/'
+URL_SHOWS = URL_MAIN + 'serien/'
+URL_POPULAR = URL_MAIN + 'beliebte-filme-serien/'
 URL_SEARCH = URL_MAIN + '?s=%s'
 
 
@@ -23,6 +23,7 @@ def load():
     params.setParam('sUrl', URL_SHOWS)
     cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_POPULAR)
+    cGui().addFolder(cGuiElement('Beliebte', SITE_IDENTIFIER, 'showEntries'), params)
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
@@ -169,7 +170,7 @@ def showHosters():
         import time
         m3u8 = 'https://{0}/playlist/{1}/{2}'.format(netloc, id, int(time.time() * 1000))
     if isMatch:
-        oRequest = cRequestHandler(m3u8, caching=True, ignoreErrors=True)
+        oRequest = cRequestHandler(m3u8)
         oRequest.addHeaderEntry('Referer', sUrl)
         oRequest.addHeaderEntry('Upgrade-Insecure-Requests', '1')
         sHtmlContent = oRequest.request()
