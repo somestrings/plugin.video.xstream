@@ -143,9 +143,9 @@ class cTMDB:
         if 'id' in meta:
             _meta['tmdb_id'] = meta['id']
         if 'budget' in meta and meta['budget']:
-            _meta['budget'] = meta['budget']
+            _meta['budget'] = "{:,} $".format(meta['budget'])
         if 'revenue' in meta and meta['revenue']:
-            _meta['revenue'] = meta['revenue']
+            _meta['revenue'] = "{:,} $".format(meta['revenue'])
         if 'original_title' in meta and meta['original_title']:
             _meta['original_title'] = meta['original_title']
         if 'original_language' in meta and meta['original_language']:
