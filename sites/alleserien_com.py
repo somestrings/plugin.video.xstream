@@ -162,6 +162,7 @@ def showEpisodes():
         oGuiElement.setMediaType('episode')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setFanart(sThumbnail)
+        oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setEpisode(sEpisodeNr)
         if isDesc:
             oGuiElement.setDescription(sDesc)
