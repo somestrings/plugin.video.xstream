@@ -49,8 +49,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
-    oRequest = cRequestHandler(entryUrl)
-    sHtmlContent = oRequest.request()
+    sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
     pattern = 'TPost C.*?href="([^"]+).*?src="([^"]+)(.*?)</article>'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if not isMatch:
