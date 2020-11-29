@@ -1,4 +1,7 @@
 3.5.20~nightly
+- [kinoag] add site
+- [hd-streams.to] entfernt
+- [stream_to] entfernt
 - [s.to] TMDB deaktiviert bei "Alle Serien"
 - [TMDB] fix ValueError invalid literal for int
 - [TMDB] serien erkennung erhöht, overhead reduziert, code cleanup
