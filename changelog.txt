@@ -1,4 +1,6 @@
 3.5.20~nightly
+- [Erweiterte Info (TMDB)] Trailers überarbeitet
+- [TMDB] überarbeitet und code cleanup
 - [kinoag] add site
 - [hd-streams.to] entfernt
 - [stream_to] entfernt
