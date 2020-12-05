@@ -14,13 +14,13 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
         meta = cTMDB().get_meta(metaType, sFileName, tmdb_id=xbmc.getInfoLabel('ListItem.Property(TmdbId)'), year=year, advanced='true')
         try:
             meta['plot'] = str(meta['plot'].encode('latin-1'), 'utf-8')
-        except:
+        except Exception:
             pass
-    except:
-        print("error")
+    except Exception:
+        print("TMDB - error")
         pass
 
-    if (not 'imdb_id' in meta and not 'tmdb_id' in meta and not 'tvdb_id' in meta):
+    if 'tmdb_id' not in meta:
         xbmc.executebuiltin("Notification(TMDB, Kein Eintrag gefunden, 1000, '')")
         return
     if 'premiered' in meta and meta['premiered']:
@@ -46,13 +46,15 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
             self.setProperty('color', cConfig().getSetting('Color'))
             self.poster = 'https://image.tmdb.org/t/p/%s' % cConfig().getSetting('poster_tmdb')
             self.none_poster = 'https://eu.ui-avatars.com/api/?background=000&size=512&name=%s&color=FFF&font-size=0.33'
+            if 'trailer' in meta:
+                self.setProperty('isTrailer', 'true')
             self.setFocusId(9000)
             if 'credits' in meta and meta['credits']:
                 cast = []
                 crew = []
                 try:
                     data = eval(str(meta['credits'].encode('latin-1'), 'utf-8'))
-                except:
+                except Exception:
                     data = eval(str(meta['credits']))
                 try:
                     listitems = []
@@ -70,7 +72,7 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                         listitems.append(listitem_)
                         cast.append(slabel.encode('ascii', 'ignore'))
                     self.getControl(50).addItems(listitems)
-                except:
+                except Exception:
                     pass
                 try:
                     listitems2 = []
@@ -88,7 +90,7 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                         listitems2.append(listitem_)
                         crew.append(slabel.encode('ascii', 'ignore'))
                     self.getControl(5200).addItems(listitems2)
-                except:
+                except Exception:
                     pass
             meta['title'] = sTitle
             if 'rating' not in meta or meta['rating'] == 0:
@@ -102,7 +104,7 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                         self.setProperty(prop, meta[prop].encode('utf-8'))
                     else:
                         self.setProperty(prop, str(meta[prop]))
-                except:
+                except Exception:
                     if isinstance(meta[prop], str):
                         self.setProperty(prop, meta[prop].encode('utf-8'))
                     else:
@@ -116,7 +118,7 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                 for i in meta:
                     try:
                         sTitle = unicodedata.normalize('NFKD', i['title']).encode('ascii', 'ignore')
-                    except:
+                    except Exception:
                         sTitle = 'Keine information'
                     if i['poster_path']:
                         sThumbnail = self.poster + str(i['poster_path'])
@@ -125,32 +127,37 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                     listitem_ = xbmcgui.ListItem(label=sTitle)
                     try:
                         listitem_.setInfo('video', {'rating': i['vote_average'].encode('utf-8')})
-                    except:
+                    except Exception:
                         listitem_.setInfo('video', {'rating': str(i['vote_average'])})
                     listitem_.setArt({'icon': sThumbnail})
                     listitems.append(listitem_)
                 self.getControl(control).addItems(listitems)
-            except:
+            except Exception:
                 pass
 
         def onClick(self, controlId):
             if controlId == 11:
-                if self.getProperty('trailer'):
-                    # Trailer
+                sUrl = 'movie/%s/videos' % str(self.getProperty('tmdb_id'))
+                meta = cTMDB().getUrl(sUrl)
+                name = []
+                url = []
+                for result in meta['results']:
+                    name.append((result['name']))
+                    url.append((result['key']))
+                index = xbmcgui.Dialog().select('Trailer/Teaser', name)
+                if index > -1:
                     self.close()
-                    return xbmc.executebuiltin('RunPlugin(%s)' % self.getProperty('trailer'))
-                else:
-                    xbmc.executebuiltin("Notification(TMDB, Kein Trailer gefunden, 1000, '')")
+                    YT = 'plugin://plugin.video.youtube/play/?video_id=%s' % url[index]
+                    return xbmc.executebuiltin('RunPlugin(%s)' % YT)
             elif controlId == 30:
                 self.close()
                 return
             elif controlId == 50 or controlId == 5200:
                 item = self.getControl(controlId).getSelectedItem()
                 sid = item.getProperty('id')
-                grab = cTMDB()
                 sUrl = 'person/' + str(sid)
                 try:
-                    meta = grab.getUrl(sUrl, '', "append_to_response=movie_credits,tv_credits")
+                    meta = cTMDB().getUrl(sUrl, '', "append_to_response=movie_credits,tv_credits")
                     meta_credits = meta['movie_credits']['cast']
                     self.credit(meta_credits, 5215)
                     sTitle = meta['name']
@@ -160,7 +167,7 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                             birthday = datetime(*(time.strptime(meta['birthday'], '%Y-%m-%d')[0:6]))
                             age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
                             age = '%s Jahre' % age
-                        except:
+                        except Exception:
                             age = ''
                     else:
                         age = meta['deathday']
@@ -170,34 +177,29 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                     self.setProperty('Person_deathday', str(age))
                     self.setProperty('Person_biography', meta['biography'])
                     self.setFocusId(9000)
-                except:
+                except Exception:
                     return
                 self.setProperty('xstream_menu', 'Person')
             elif controlId == 9:
                 sid = self.getProperty('tmdb_id')
-                grab = cTMDB()
                 sUrl_simil = 'movie/%s/similar' % str(sid)
                 sUrl_recom = 'movie/%s/recommendations' % str(sid)
-
                 try:
-                    meta = grab.getUrl(sUrl_simil)
+                    meta = cTMDB().getUrl(sUrl_simil)
                     meta = meta['results']
                     self.credit(meta, 5205)
-                except:
+                except Exception:
                     pass
                 try:
-                    meta = grab.getUrl(sUrl_recom)
+                    meta = cTMDB().getUrl(sUrl_recom)
                     meta = meta['results']
                     self.credit(meta, 5210)
-                except:
+                except Exception:
                     return
-
             elif controlId == 5215 or controlId == 5205 or controlId == 5210:
                 item = self.getControl(controlId).getSelectedItem()
-                sTitle = item.getLabel()
-                # suche
                 self.close()
-                searchParams = {'searchTitle': sTitle}
+                searchParams = {'searchTitle': item.getLabel()}
                 xbmc.executebuiltin("Container.Update(%s?function=searchTMDB&%s)" % ('plugin://plugin.video.xstream/', urlencode(searchParams)))
                 return
 
