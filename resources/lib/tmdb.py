@@ -322,13 +322,20 @@ class cTMDB:
                         if _meta['writer'] != '':
                             _meta['writer'] += ' / '
                         _meta['writer'] += '%s: %s' % (crew['job'], crew['name'])
-            if 'trailers' in meta and meta['trailers']:
-                if 'youtube' in meta['trailers']:
-                    if len(meta['trailers']['youtube']) > 0:
-                        trailers = []
-                        for t in meta['trailers']['youtube']:
-                            if t['type'] == 'Trailer':
-                                trailers.append((t['name'], self.URL_TRAILER % t['source']))
-                        if trailers:
-                            _meta['trailer'] = trailers[0][1]
+        if 'trailers' in meta and meta['trailers']:
+            if 'youtube' in meta['trailers']:
+                trailers = ''
+                for t in meta['trailers']['youtube']:
+                    if t['type'] == 'Trailer':
+                        trailers = self.URL_TRAILER % t['source']
+                if trailers:
+                    _meta['trailer'] = trailers
+        elif 'videos' in meta and meta['videos']:
+            if 'results' in meta['videos']:
+                trailers = ''
+                for t in meta['videos']['results']:
+                    if t['type'] == 'Trailer' and t['site'] == 'YouTube':
+                        trailers = self.URL_TRAILER % t['key']
+                if trailers:
+                    _meta['trailer'] = trailers
         return _meta
