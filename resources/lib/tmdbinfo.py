@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import xbmc, unicodedata, time, xbmcgui
+import xbmc, time, xbmcgui
 from resources.lib.config import cConfig
 from resources.lib.tmdb import cTMDB
 from datetime import date, datetime
@@ -56,42 +56,39 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                     data = eval(str(meta['credits'].encode('latin-1'), 'utf-8'))
                 except Exception:
                     data = eval(str(meta['credits']))
-                try:
-                    listitems = []
-                    for i in data['cast']:
-                        slabel = i['name']
-                        slabel2 = i['character']
-                        if i['profile_path']:
-                            sicon = self.poster + str(i['profile_path'])
-                        else:
-                            sicon = self.none_poster % slabel
-                        sid = i['id']
-                        listitem_ = xbmcgui.ListItem(label=slabel, label2=slabel2)
-                        listitem_.setProperty('id', str(sid))
-                        listitem_.setArt({'icon': sicon})
-                        listitems.append(listitem_)
-                        cast.append(slabel.encode('ascii', 'ignore'))
-                    self.getControl(50).addItems(listitems)
-                except Exception:
-                    pass
-                try:
-                    listitems2 = []
-                    for i in data['crew']:
-                        slabel = i['name']
-                        slabel2 = i['job']
-                        if i['profile_path']:
-                            sicon = self.poster + str(i['profile_path'])
-                        else:
-                            sicon = self.none_poster % slabel
-                        sid = i['id']
-                        listitem_ = xbmcgui.ListItem(label=slabel, label2=slabel2)
-                        listitem_.setProperty('id', str(sid))
-                        listitem_.setArt({'icon': sicon})
-                        listitems2.append(listitem_)
-                        crew.append(slabel.encode('ascii', 'ignore'))
-                    self.getControl(5200).addItems(listitems2)
-                except Exception:
-                    pass
+
+                listitems = []
+                for i in data['cast']:
+                    slabel = i['name']
+                    slabel2 = i['character']
+                    if i['profile_path']:
+                        sicon = self.poster + str(i['profile_path'])
+                    else:
+                        sicon = self.none_poster % slabel
+                    sid = i['id']
+                    listitem_ = xbmcgui.ListItem(label=slabel, label2=slabel2)
+                    listitem_.setProperty('id', str(sid))
+                    listitem_.setArt({'icon': sicon})
+                    listitems.append(listitem_)
+                    cast.append(slabel.encode('ascii', 'ignore'))
+                self.getControl(50).addItems(listitems)
+
+                listitems2 = []
+                for i in data['crew']:
+                    slabel = i['name']
+                    slabel2 = i['job']
+                    if i['profile_path']:
+                        sicon = self.poster + str(i['profile_path'])
+                    else:
+                        sicon = self.none_poster % slabel
+                    sid = i['id']
+                    listitem_ = xbmcgui.ListItem(label=slabel, label2=slabel2)
+                    listitem_.setProperty('id', str(sid))
+                    listitem_.setArt({'icon': sicon})
+                    listitems2.append(listitem_)
+                    crew.append(slabel.encode('ascii', 'ignore'))
+                self.getControl(5200).addItems(listitems2)
+
             meta['title'] = sTitle
             if 'rating' not in meta or meta['rating'] == 0:
                 meta['rating'] = '-'
@@ -114,30 +111,26 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
             listitems = []
             if not meta:
                 meta = {}
-            try:
-                for i in meta:
-                    try:
-                        sTitle = unicodedata.normalize('NFKD', i['title']).encode('ascii', 'ignore')
-                    except Exception:
-                        sTitle = 'Keine information'
-                    if i['poster_path']:
-                        sThumbnail = self.poster + str(i['poster_path'])
-                    else:
-                        sThumbnail = self.none_poster % sTitle
-                    listitem_ = xbmcgui.ListItem(label=sTitle)
-                    try:
-                        listitem_.setInfo('video', {'rating': i['vote_average'].encode('utf-8')})
-                    except Exception:
-                        listitem_.setInfo('video', {'rating': str(i['vote_average'])})
-                    listitem_.setArt({'icon': sThumbnail})
-                    listitems.append(listitem_)
-                self.getControl(control).addItems(listitems)
-            except Exception:
-                pass
+            for i in meta:
+                if metaType == 'movie':
+                    sTitle = i['title']
+                else:
+                    sTitle = i['name']
+                if i['poster_path']:
+                    sThumbnail = self.poster + str(i['poster_path'])
+                else:
+                    sThumbnail = self.none_poster % sTitle
+                listitem_ = xbmcgui.ListItem(label=sTitle)
+                listitem_.setArt({'icon': sThumbnail})
+                listitems.append(listitem_)
+            self.getControl(control).addItems(listitems)
 
         def onClick(self, controlId):
             if controlId == 11:
-                sUrl = 'movie/%s/videos' % str(self.getProperty('tmdb_id'))
+                if metaType == 'movie':
+                    sUrl = 'movie/%s/videos' % str(self.getProperty('tmdb_id'))
+                else:
+                    sUrl = 'tv/%s/videos' % str(self.getProperty('tmdb_id'))
                 meta = cTMDB().getUrl(sUrl)
                 name = []
                 url = []
@@ -182,8 +175,12 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                 self.setProperty('xstream_menu', 'Person')
             elif controlId == 9:
                 sid = self.getProperty('tmdb_id')
-                sUrl_simil = 'movie/%s/similar' % str(sid)
-                sUrl_recom = 'movie/%s/recommendations' % str(sid)
+                if metaType == 'movie':
+                    sUrl_simil = 'movie/%s/similar' % str(sid)
+                    sUrl_recom = 'movie/%s/recommendations' % str(sid)
+                else:
+                    sUrl_simil = 'tv/%s/similar' % str(sid)
+                    sUrl_recom = 'tv/%s/recommendations' % str(sid)
                 try:
                     meta = cTMDB().getUrl(sUrl_simil)
                     meta = meta['results']
@@ -199,8 +196,7 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
             elif controlId == 5215 or controlId == 5205 or controlId == 5210:
                 item = self.getControl(controlId).getSelectedItem()
                 self.close()
-                searchParams = {'searchTitle': item.getLabel()}
-                xbmc.executebuiltin("Container.Update(%s?function=searchTMDB&%s)" % ('plugin://plugin.video.xstream/', urlencode(searchParams)))
+                xbmc.executebuiltin("Container.Update(%s?function=searchTMDB&%s)" % ('plugin://plugin.video.xstream/', urlencode({'searchTitle': item.getLabel()})))
                 return
 
         def onFocus(self, controlId):
