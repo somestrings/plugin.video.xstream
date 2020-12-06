@@ -112,9 +112,9 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
             if not meta:
                 meta = {}
             for i in meta:
-                if metaType == 'movie':
+                if 'title' in i and i['title']:
                     sTitle = i['title']
-                else:
+                elif 'name' in i and i['name']:
                     sTitle = i['name']
                 if i['poster_path']:
                     sThumbnail = self.poster + str(i['poster_path'])
