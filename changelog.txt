@@ -1,4 +1,5 @@
 3.5.20~nightly
+- [kinoger] fix hoster protonvideo
 - [Erweiterte Info (TMDB)] Cast überarbeitet
 - [Erweiterte Info (TMDB)] Trailers überarbeitet
 - [TMDB] überarbeitet und code cleanup
