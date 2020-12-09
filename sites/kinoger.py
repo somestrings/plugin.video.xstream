@@ -74,7 +74,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for sUrl, sName, sThumbnail, sDummy in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isTvshow = True if 'staffel' in sName.lower() else False
+        isTvshow = True if 'staffel' in sName.lower() or 'serie' in entryUrl else False
         isYear, sYear = cParser.parse(sName, '(.*?)\((\d*)\)')
         for name, year in sYear:
             sName = name
@@ -209,6 +209,7 @@ def showEpisodes():
         oGuiElement.setTVShowTitle(sTVShowTitle)
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setEpisode(i)
+        oGuiElement.setMediaType('episode')
         if sDesc:
             oGuiElement.setDescription(sDesc)
         if sThumbnail:
@@ -236,7 +237,7 @@ def showHosters():
                 oRequest = cRequestHandler(sUrl)
                 oRequest.addHeaderEntry('Referer', URL_MAIN)
                 sHtmlContent = oRequest.request()
-                isMatch, aResult = cParser.parse(sHtmlContent, '(\d+p)[^>](http[^ "]+)')
+                isMatch, aResult = cParser.parse(sHtmlContent, 'file":"[^>](\d+p)[^>]([^",]+)')
                 for sQualy, sUrl in aResult:
                     hoster = {'link': sUrl, 'name': sQualy + ' ProtonVideo'}
                     hosters.append(hoster)
@@ -275,6 +276,8 @@ def Qualy(sUrl):
         return '1080p'
 
 def getHosterUrl(sUrl=False):
+    if sUrl.startswith('//'):
+        sUrl = 'https:' + sUrl
     return [{'streamUrl': sUrl, 'resolved': True}]
 
 
