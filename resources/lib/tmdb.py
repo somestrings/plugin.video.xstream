@@ -69,9 +69,9 @@ class cTMDB:
     def search_tvshow_name(self, name, year='', page=1, genre='', advanced='false'):
         name = name.lower()
         if '- staffel' in name:
-            name = re.sub('-[^>]\wtaffel[^>]\d+', '', name)
+            name = re.sub('\s-\s\wtaffel[^>]([1-9\-]+)', '', name)
         elif 'staffel' in name:
-            name = re.sub('\wtaffel[^>]\d+', '', name)
+            name = re.sub('\s\wtaffel[^>]([1-9\-]+)', '', name)
         if year:
             term = quote_plus(name) + '&year=' + year
         else:
