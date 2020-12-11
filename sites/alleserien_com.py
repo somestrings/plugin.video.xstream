@@ -83,14 +83,14 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oRequest.addParameters('to', time.strftime('%Y', time.localtime()))
     oRequest.addParameters('type', type)
     sHtmlContent = oRequest.request()
-    pattern = '<a title=[^>]"(.*?)" href=[^>]"([^"]+).*?src=[^>]"([^"]+)'
+    pattern = '<a title=[^>]"(.*?)" href=[^>]"([^"]+).*?src=[^>]"([^"]+).*?sh1[^>]">(\d{4})'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
 
     total = len(aResult)
-    for sName, sUrl, sThumbnail in aResult:
+    for sName, sUrl, sThumbnail, sYear in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         isTvshow = True if 'folge' in sUrl else False
@@ -98,6 +98,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setThumbnail(sThumbnail[:-1])
         oGuiElement.setFanart(sThumbnail[:-1])
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
+        oGuiElement.setYear(sYear)
         params.setParam('sThumbnail', sThumbnail)
         params.setParam('sName', sName)
         params.setParam('entryUrl', sUrl[:-1])
