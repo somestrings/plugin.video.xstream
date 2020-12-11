@@ -243,7 +243,10 @@ class cGuiElement:
             else:
                 meta = oMetaget.get_meta(self._mediaType, self.getTitle(), advanced=cConfig().getSetting('advanced'))
         elif self._mediaType == 'tvshow':
-            meta = oMetaget.get_meta(self._mediaType, self.getTitle(), advanced=cConfig().getSetting('advanced'))
+            if self._sYear:
+                meta = oMetaget.get_meta(self._mediaType, self.getTitle(), year=self._sYear, advanced=cConfig().getSetting('advanced'))
+            else:
+                meta = oMetaget.get_meta(self._mediaType, self.getTitle(), advanced=cConfig().getSetting('advanced'))
         elif self._mediaType == 'season':
             meta = {}
         elif self._mediaType == 'episode':
