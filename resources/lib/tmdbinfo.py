@@ -58,36 +58,38 @@ def WindowsBoxes(sTitle, sFileName, metaType, year=''):
                     data = eval(str(meta['credits']))
 
                 listitems = []
-                for i in data['cast']:
-                    slabel = i['name']
-                    slabel2 = i['character']
-                    if i['profile_path']:
-                        sicon = self.poster + str(i['profile_path'])
-                    else:
-                        sicon = self.none_poster % slabel
-                    sid = i['id']
-                    listitem_ = xbmcgui.ListItem(label=slabel, label2=slabel2)
-                    listitem_.setProperty('id', str(sid))
-                    listitem_.setArt({'icon': sicon})
-                    listitems.append(listitem_)
-                    cast.append(slabel.encode('ascii', 'ignore'))
-                self.getControl(50).addItems(listitems)
+                if 'cast' in data and data['cast']:
+                    for i in data['cast']:
+                        slabel = i['name']
+                        slabel2 = i['character']
+                        if i['profile_path']:
+                            sicon = self.poster + str(i['profile_path'])
+                        else:
+                            sicon = self.none_poster % slabel
+                        sid = i['id']
+                        listitem_ = xbmcgui.ListItem(label=slabel, label2=slabel2)
+                        listitem_.setProperty('id', str(sid))
+                        listitem_.setArt({'icon': sicon})
+                        listitems.append(listitem_)
+                        cast.append(slabel.encode('ascii', 'ignore'))
+                    self.getControl(50).addItems(listitems)
 
                 listitems2 = []
-                for i in data['crew']:
-                    slabel = i['name']
-                    slabel2 = i['job']
-                    if i['profile_path']:
-                        sicon = self.poster + str(i['profile_path'])
-                    else:
-                        sicon = self.none_poster % slabel
-                    sid = i['id']
-                    listitem_ = xbmcgui.ListItem(label=slabel, label2=slabel2)
-                    listitem_.setProperty('id', str(sid))
-                    listitem_.setArt({'icon': sicon})
-                    listitems2.append(listitem_)
-                    crew.append(slabel.encode('ascii', 'ignore'))
-                self.getControl(5200).addItems(listitems2)
+                if 'crew' in data and data['crew']:
+                    for i in data['crew']:
+                        slabel = i['name']
+                        slabel2 = i['job']
+                        if i['profile_path']:
+                            sicon = self.poster + str(i['profile_path'])
+                        else:
+                            sicon = self.none_poster % slabel
+                        sid = i['id']
+                        listitem_ = xbmcgui.ListItem(label=slabel, label2=slabel2)
+                        listitem_.setProperty('id', str(sid))
+                        listitem_.setArt({'icon': sicon})
+                        listitems2.append(listitem_)
+                        crew.append(slabel.encode('ascii', 'ignore'))
+                    self.getControl(5200).addItems(listitems2)
 
             meta['title'] = sTitle
             if 'rating' not in meta or meta['rating'] == 0:
