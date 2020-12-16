@@ -214,6 +214,7 @@ def searchGlobal(sSearchText=False):
         if not pluginEntry['globalsearch']:
             continue
         dialog.update((count + 1) * 50 // numPlugins, 'Searching: ' + str(pluginEntry['name']) + '...')
+        if (dialog.iscanceled()): return
         if sys.version_info[0] == 2:
             logger.info('Searching for %s at %s' % (sSearchText.decode('utf-8'), pluginEntry['id']))
         else:
@@ -223,6 +224,7 @@ def searchGlobal(sSearchText=False):
         threads += [t]
         t.start()
     for count, t in enumerate(threads):
+        if (dialog.iscanceled()): return
         t.join()
         dialog.update((count + 1) * 50 // numPlugins + 50, t.getName() + ' returned')
     dialog.close()
@@ -232,6 +234,7 @@ def searchGlobal(sSearchText=False):
     dialog = xbmcgui.DialogProgress()
     dialog.create('xStream', 'Gathering info...')
     for count, result in enumerate(sorted(oGui.searchResults, key=lambda k: k['guiElement'].getSiteName()), 1):
+        if (dialog.iscanceled()): return
         oGui.addFolder(result['guiElement'], result['params'], bIsFolder=result['isFolder'], iTotal=total)
         dialog.update(count * 100 // total, str(count) + ' of ' + str(total) + ': ' + result['guiElement'].getTitle())
     dialog.close()
