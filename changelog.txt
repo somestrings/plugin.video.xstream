@@ -1,4 +1,5 @@
 3.5.20~nightly
+- [general] Globale Suche abbrechbar
 - [alleserien] fix year
 - [general] staffel erkennung verbessert
 - [kinoger] fix hoster protonvideo
