@@ -1,4 +1,6 @@
 3.5.20~nightly
+- [TMDB] Fix Problem mit Jahr
+- xStream Einstellungen TMDB neu gestaltet
 - [general] Globale Suche abbrechbar
 - [alleserien] fix year
 - [general] staffel erkennung verbessert
