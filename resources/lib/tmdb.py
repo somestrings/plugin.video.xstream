@@ -250,7 +250,7 @@ class cTMDB:
             _meta['premiered'] = meta['release_date']
         elif 'first_air_date' in meta and meta['first_air_date']:
             _meta['premiered'] = meta['first_air_date']
-        if 'premiered' in _meta and _meta['premiered']:
+        if 'premiered' in _meta and _meta['premiered'] and len(_meta['premiered']) == 10:
             _meta['year'] = int(_meta['premiered'][:4])
         if 'budget' in meta and meta['budget']:
             _meta['budget'] = "{:,} $".format(meta['budget'])
