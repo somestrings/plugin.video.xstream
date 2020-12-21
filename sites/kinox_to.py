@@ -574,6 +574,8 @@ def showHosters():
     if aResult[0]:
         for aEntry in aResult[1]:
             sHoster = aEntry[1]
+            if 'EvoLoad' in sHoster:
+                continue
             pattern = '<b>Mirror</b>: [0-9]+/([0-9]+)'
             aResult = cParser().parse(aEntry[2], pattern)
             mirrors = 1
@@ -592,38 +594,46 @@ def showHosters():
 
 
 def getHosterUrl(sUrl=False):
-    results = []
-    parms = ParameterHandler()
-    sTitle = parms.getValue('title')
-    if not sUrl: sUrl = parms.getValue('url')
+    sHtmlContent = cRequestHandler(sUrl).request()
     oRequest = cRequestHandler(sUrl)
     oRequest.addHeaderEntry('Referer', URL_MAIN)
     sHtmlContent = oRequest.request()
-    pattern = '<a rel=\\\\"(.*?)\\\\"'
-    aResult = cParser().parse(sHtmlContent, pattern)
-    if aResult[0]:
-        aMovieParts = aResult[1]
-        ii = 1
-        for sPartUrl in aMovieParts:
-            oRequest = cRequestHandler(sUrl + '&Part=' + str(ii))
-            oRequest.addHeaderEntry('Referer', URL_MAIN)
-            sHtmlContent = oRequest.request()
-            pattern = '<a\shref=\\\\".*?(https?:.*?)\\\\"'
+    isMatch, sStreamUrl = cParser.parseSingleResult(sHtmlContent, 'a\shref=\\\\".*?(https?:.*?)\\\\"')
+    if not isMatch:
+        isMatch, sStreamUrl = cParser.parseSingleResult(sHtmlContent, '<iframe src=[^"]*"([^"]+)')
+    if isMatch:
+        if sStreamUrl.startswith('//'):
+            sStreamUrl = 'https:' + sStreamUrl
+        if 'streamcrypt.net' in sStreamUrl:
+            oRequest = cRequestHandler(sStreamUrl, caching=False)
+            oRequest.request()
+            sStreamUrl = oRequest.getRealUrl()
+        if 'thevideos.ga' in sStreamUrl:
+            sStreamUrl = sStreamUrl.replace('embed-', 'stream').replace('html', 'mp4')
+            sUrl = _redirectHoster(sStreamUrl)
+            return [{'streamUrl': sUrl, 'resolved': True}]
+        return [{'streamUrl': sStreamUrl, 'resolved': False}]
 
-            aResult = cParser().parse(sHtmlContent, pattern)
-            if aResult[0]:
-                aParts = aResult[1]
-                sPartUrl = aParts[0]
-                result = {'streamUrl': sPartUrl, 'resolved': False, 'title': sTitle + ' Part ' + str(ii)}
-                results.append(result)
-                ii += 1
-    else:
-        isMatch, sStreamUrl = cParser.parseSingleResult(sHtmlContent, '<a\shref=\\\\".*?(https?:.*?)\\\\"')
-        if not isMatch:
-            isMatch, sStreamUrl = cParser.parseSingleResult(sHtmlContent, '<iframe src=[^"]*"([^"]+)')
-        if isMatch:
-            results.append({'streamUrl': sStreamUrl, 'resolved': False})
-    return results
+
+def _redirectHoster(url):
+    try:
+        from urllib2 import build_opener, HTTPError
+    except ImportError:
+        from urllib.error import HTTPError
+        from urllib.request import build_opener
+    opener = build_opener()
+    opener.addheaders = [('Referer', url)]
+    try:
+        resp = opener.open(url)
+        if url != resp.geturl():
+            return resp.geturl()
+        else:
+            return url
+    except HTTPError as e:
+        if e.code == 403:
+            if url != e.geturl():
+                return e.geturl()
+        raise
 
 
 def showSearch():
