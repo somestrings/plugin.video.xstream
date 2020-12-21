@@ -20,6 +20,7 @@
    <platform>all</platform>
    <news>
 3.5.20~nightly
+- [kinox] fix hoster
 - [TMDB] Fix Problem mit Jahr
 - xStream Einstellungen TMDB neu gestaltet
 - [general] Globale Suche abbrechbar
