@@ -22,7 +22,7 @@ class cRequestHandler:
     def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True):
         self.__sUrl = sUrl
         self.__sRealUrl = ''
-        self.__USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0'
+        self.__USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0'
         self.__aParameters = {}
         self.__aResponses = {}
         self.__headerEntries = {}
@@ -80,8 +80,8 @@ class cRequestHandler:
 
     def __setDefaultHeader(self):
         self.addHeaderEntry('User-Agent', self.__USER_AGENT)
-        self.addHeaderEntry('Accept-Language', 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3')
-        self.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
+        self.addHeaderEntry('Accept-Language', 'de,en-US;q=0.7,en;q=0.3')
+        self.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8')
         if self.compression:
             self.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
 
