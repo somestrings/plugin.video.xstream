@@ -8,13 +8,13 @@ try:
     from urlparse import urlparse
     from urllib import quote, urlencode
     from urllib2 import HTTPError, URLError, HTTPHandler, HTTPSHandler, HTTPCookieProcessor, build_opener, Request, urlopen
-    from cookielib import LWPCookieJar
+    from cookielib import LWPCookieJar, Cookie
     from httplib import HTTPSConnection, HTTPException
 except ImportError:
     from urllib.parse import quote, urlencode, urlparse
     from urllib.error import HTTPError, URLError
     from urllib.request import HTTPHandler, HTTPSHandler, HTTPCookieProcessor, build_opener, Request, urlopen
-    from http.cookiejar import LWPCookieJar
+    from http.cookiejar import LWPCookieJar, Cookie
     from http.client import HTTPSConnection, HTTPException
 
 
@@ -123,8 +123,7 @@ class cRequestHandler:
                 data = e.fp.read()
                 if 'DDOS-GUARD' in str(data):
                     opener = build_opener(HTTPCookieProcessor(cookieJar))
-                    opener.addheaders = [('User-Agent', self.__USER_AGENT)]
-                    opener.addheaders = [('Referer', self.__sUrl)]
+                    opener.addheaders = [('User-agent', self.__USER_AGENT), ('Referer', self.__sUrl)]
                     response = opener.open('https://check.ddos-guard.net/check.js')
                     if sys.version_info[0] == 2:
                         content = response.read()
@@ -134,14 +133,11 @@ class cRequestHandler:
                     url3 = urlparse(self.__sUrl)
                     url3 = '%s://%s/%s' % (url3.scheme, url3.netloc, url2[0])
                     opener = build_opener(HTTPCookieProcessor(cookieJar))
-                    opener.addheaders = [('User-Agent', self.__USER_AGENT)]
-                    opener.addheaders = [('Referer', self.__sUrl)]
+                    opener.addheaders = [('User-agent', self.__USER_AGENT), ('Referer', self.__sUrl)]
                     response = opener.open(url3)
                     content = response.read()
-                    time.sleep(2)
                     opener = build_opener(HTTPCookieProcessor(cookieJar))
-                    opener.addheaders = [('User-Agent', self.__USER_AGENT)]
-                    opener.addheaders = [('Referer', self.__sUrl)]
+                    opener.addheaders = [('User-agent', self.__USER_AGENT), ('Referer', self.__sUrl)]
                     oResponse = opener.open(self.__sUrl)
 
                     if not oResponse:
@@ -172,15 +168,19 @@ class cRequestHandler:
         self.__sResponseHeader = oResponse.info()
         if self.__sResponseHeader.get('Content-Encoding') == 'gzip':
             sContent = gzip.GzipFile(fileobj=io.BytesIO(oResponse.read())).read()
-            if sys.version_info[0] == 2:
-                sContent = sContent
-            else:
+            if sys.version_info[0] == 3:
                 sContent = sContent.decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
         else:
             if sys.version_info[0] == 2:
                 sContent = oResponse.read()
             else:
                 sContent = oResponse.read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+        if 'lazingfast' in sContent:
+            bf = cBF().resolve(self.__sUrl, sContent, cookieJar, self.__USER_AGENT)
+            if bf:
+                sContent = bf
+            else:
+                logger.error('Failed BF Url: ' + self.__sUrl)
         cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
         if self.__bRemoveNewLines:
             sContent = sContent.replace('\n', '')
@@ -293,9 +293,7 @@ class cRequestHandler:
         files = os.listdir(self.__cachePath)
         for file in files:
             cacheFile = os.path.join(self.__cachePath, file)
-            fileAge = self.getFileAge(cacheFile)
-            if fileAge > self.cacheTime:
-                os.remove(cacheFile)
+            os.remove(cacheFile)
 
 
 # python 2.7.9 and 2.7.10 certificate workaround
@@ -310,3 +308,50 @@ class newHTTPSConnection(HTTPSConnection):
         import ssl
         context = ssl._create_unverified_context()
         HTTPSConnection.__init__(self, host, port, key_file, cert_file, strict, timeout, source_address, context)
+
+
+class cBF:
+    def resolve(self, url, html, cookie_jar, user_agent):
+        page = urlparse(url).scheme + '://' + urlparse(url).netloc
+        j = re.findall('<script[^>]src="([^"]+)', html)
+        if j:
+            opener = build_opener(HTTPCookieProcessor(cookie_jar))
+            opener.addheaders = [('User-agent', user_agent), ('Referer', url)]
+            opener.open(page + j[0])
+        a = re.findall('xhr\.open\("GET","([^,]+)",', html)
+        if a:
+            import random
+            aespage = page + a[0].replace('" + ww +"', str(random.randint(700, 1500)))
+            opener = build_opener(HTTPCookieProcessor(cookie_jar))
+            opener.addheaders = [('User-agent', user_agent), ('Referer', url)]
+            if sys.version_info[0] == 2:
+                html = opener.open(aespage).read()
+            else:
+                html = opener.open(aespage).read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+            cval = self.aes_decode(html)
+            cdata = re.findall('cookie="([^="]+).*?domain[^>]=([^;]+)', html)
+            if cval and cdata:
+                c = Cookie(version=0, name=cdata[0][0], value=cval, port=None, port_specified=False, domain=cdata[0][1], domain_specified=True, domain_initial_dot=False, path="/", path_specified=True, secure=False, expires=time.time() + 21600, discard=False, comment=None, comment_url=None, rest={})
+                cookie_jar.set_cookie(c)
+                opener = build_opener(HTTPCookieProcessor(cookie_jar))
+                opener.addheaders = [('User-agent', user_agent), ('Referer', url)]
+                if sys.version_info[0] == 2:
+                    return opener.open(url).read()
+                else:
+                    return opener.open(url).read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+
+    def aes_decode(self, html):
+        try:
+            import pyaes
+            keys = re.findall('toNumbers\("([^"]+)"', html)
+            if keys:
+                from binascii import hexlify, unhexlify
+                msg = unhexlify(keys[2])
+                key = unhexlify(keys[0])
+                iv = unhexlify(keys[1])
+                decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(key, iv))
+                plain_text = decrypter.feed(msg)
+                plain_text += decrypter.feed()
+                return hexlify(plain_text).decode()
+        except Exception as e:
+            logger.error(e)
