@@ -1,4 +1,7 @@
 3.5.20~nightly
+- [view4U] Seite hinzugefügt
+- [moviestream] Seite entfernt
+- [topstreamfilm] Seite entfernt
 - [kinox] fix hoster
 - [TMDB] Fix Problem mit Jahr
 - xStream Einstellungen TMDB neu gestaltet
