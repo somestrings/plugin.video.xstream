@@ -237,30 +237,36 @@ def showHosters():
                 oRequest = cRequestHandler(sUrl)
                 oRequest.addHeaderEntry('Referer', URL_MAIN)
                 sHtmlContent = oRequest.request()
+                if sHtmlContent == '': continue
                 isMatch, aResult = cParser.parse(sHtmlContent, 'file":"[^>](\d+p)[^>]([^",\s]+)')
                 for sQualy, sUrl in aResult:
                     hoster = {'link': sUrl, 'name': sQualy + ' ProtonVideo'}
                     hosters.append(hoster)
-            if 'sst' in sUrl:
+
+            elif 'sst' in sUrl:
                 oRequest = cRequestHandler(sUrl)
                 oRequest.addHeaderEntry('Referer', sUrl)
                 sHtmlContent = oRequest.request()
+                if sHtmlContent == '': continue
                 isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, 'file:"(.*?)"')
                 isMatch, aResult = cParser().parse(sContainer[0], '(http[^",]+)')
                 for sUrl in aResult:
                     hoster = {'link': sUrl, 'name': Qualy(sUrl) + ' Fsst.Online'}
                     hosters.append(hoster)
-            if 'kinoger.re' in sUrl:
+
+            elif 'kinoger.re' in sUrl:
                 oRequest = cRequestHandler(sUrl.replace('/v/', '/api/source/'))
                 oRequest.addHeaderEntry('Referer', sUrl)
                 oRequest.addParameters('r', URL_MAIN)
                 oRequest.addParameters('d', 'kinoger.re')
                 sHtmlContent = oRequest.request()
+                if sHtmlContent == '': continue
                 pattern = 'file":"([^"]+)","label":"([^"]+)'
                 isMatch, aResult = cParser.parse(sHtmlContent, pattern)
                 for sUrl, sQualy in aResult:
                     hoster = {'link': sUrl, 'name': sQualy + ' Kinoger.re'}
                     hosters.append(hoster)
+
         if hosters:
             hosters.append('getHosterUrl')
         return hosters
