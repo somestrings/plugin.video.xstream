@@ -18,8 +18,8 @@ class cParser:
         aMatches = re.compile(pattern).findall(sHtmlContent)
         if len(aMatches) == 1:
             aMatches[0] = cParser.__replaceSpecialCharacters(aMatches[0])
-            return (True, aMatches[0])
-        return (False, aMatches)
+            return True, aMatches[0]
+        return False, aMatches
 
     @staticmethod
     def __replaceSpecialCharacters(s):
@@ -41,8 +41,8 @@ class cParser:
         else:
             aMatches = re.compile(pattern, re.DOTALL).findall(sHtmlContent)
         if len(aMatches) >= iMinFoundValue:
-            return (True, aMatches)
-        return (False, aMatches)
+            return True, aMatches
+        return False, aMatches
 
     @staticmethod
     def replace(pattern, sReplaceString, sValue):
@@ -128,7 +128,7 @@ class logger:
                 sLog = "\t[%s] %s" % (common.addonName, sLog)
             xbmc.log(sLog, cLogLevel)
         except Exception as e:
-            xbmc.log('Logging Failure: %s' % (e), cLogLevel)
+            xbmc.log('Logging Failure: %s' % e, cLogLevel)
             pass
 
 
