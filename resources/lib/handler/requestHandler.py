@@ -104,7 +104,7 @@ class cRequestHandler:
         if (2, 7, 9) <= sys.version_info < (2, 7, 11):
             handlers.append(newHTTPSHandler)
         opener = build_opener(*handlers)
-        if (len(sParameters) > 0):
+        if len(sParameters) > 0:
             oRequest = Request(self.__sUrl, sParameters)
         else:
             oRequest = Request(self.__sUrl)
