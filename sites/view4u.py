@@ -27,7 +27,31 @@ def load():
     cGui().addFolder(cGuiElement('Animation Filme', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_FILMNEU)
     cGui().addFolder(cGuiElement('Film Neuheiten', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('value', 'Genre')
+    cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
+    params.setParam('value', 'Year')
+    cGui().addFolder(cGuiElement('Jahr', SITE_IDENTIFIER, 'showValue'), params)
+    params.setParam('value', 'Country')
+    cGui().addFolder(cGuiElement('Land', SITE_IDENTIFIER, 'showValue'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'), params)
+    cGui().setEndOfDirectory()
+
+
+def showValue():
+    params = ParameterHandler()
+    value = params.getValue("value")
+    sHtmlContent = cRequestHandler(params.getValue('sUrl')).request()
+    pattern = 'class="nav-title">%s</div>(.*?)</ul>' % value
+    isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
+    if isMatch:
+        isMatch, aResult = cParser.parse(sContainer, 'href="([^"]+)">([^<]+)')
+    if not isMatch:
+        cGui().showInfo()
+        return
+
+    for sUrl, sName in aResult:
+        params.setParam('sUrl', URL_MAIN + sUrl)
+        cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
     cGui().setEndOfDirectory()
 
 
@@ -42,18 +66,26 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oRequest.addParameters('story', sSearchText)
         params.setParam('search', sSearchText)
     sHtmlContent = oRequest.request()
-    pattern = 'class="th-item.*?href="([^"]+).*?fx-last">([^<]+).*?:?data-src="([^"]+)?'
+    pattern = 'class="th-item.*?href="([^"]+).*?fx-last">([^<]+)(.*?)</article>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
 
     total = len(aResult)
-    for sUrl, sName, sThumbnail in aResult:
+    for sUrl, sName, sDummy in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
-        oGuiElement.setThumbnail(URL_MAIN + sThumbnail)
+        isThumbnail, sThumbnail = cParser.parse(sDummy, 'data-src="([^"]+)')
+        if isThumbnail:
+            oGuiElement.setThumbnail(URL_MAIN + sThumbnail[0])
+        isYear, sYear = cParser.parseSingleResult(sDummy, '">(\d{4})<')
+        if isYear:
+            oGuiElement.setYear(sYear)
+        isDesc, sDesc = cParser.parseSingleResult(sDummy, 'text">([^<]+)')
+        if isDesc:
+            oGuiElement.setDescription(sDesc)
         oGuiElement.setMediaType('movie')
         params.setParam('entryUrl', sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
@@ -70,12 +102,15 @@ def showHosters():
     hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = 'class="tabs-b video-box">.*?</div>'
-    isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
-    if isMatch:
-        isMatch, aResult = cParser.parse(sContainer, 'data-src="([^"]+)')
+    isMatch, aResult = cParser.parse(sHtmlContent, 'data-src="([^"]+)"\Wf')
     if isMatch:
         for sUrl in aResult:
+            if 'youtube' in sUrl:
+                continue
+            if 'streamcrypt.net' in sUrl:
+                oRequest = cRequestHandler(sUrl, caching=False)
+                oRequest.request()
+                sUrl = oRequest.getRealUrl()
             hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
             hosters.append(hoster)
         if hosters:
@@ -84,10 +119,6 @@ def showHosters():
 
 
 def getHosterUrl(sUrl=False):
-    if 'streamcrypt.net' in sUrl:
-        oRequest = cRequestHandler(sUrl, caching=False)
-        oRequest.request()
-        sUrl = oRequest.getRealUrl()
     return [{'streamUrl': sUrl, 'resolved': False}]
 
 
