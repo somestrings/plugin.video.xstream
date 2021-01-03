@@ -7,23 +7,23 @@ from resources.lib.handler.requestHandler import cRequestHandler
 
 class cJDownloaderHandler:
     def sendToJDownloader(self, sUrl):
-        if (self.__checkConfig() == False):
+        if self.__checkConfig() == False:
             cGui().showError('JDownloader', 'Settings ueberpruefen (XBMC)', 5)
             return False
 
-        if (self.__checkConnection() == False):
+        if self.__checkConnection() == False:
             cGui().showError('JDownloader', 'Verbindung fehlgeschlagen (JD aus?)', 5)
             return False
 
         bDownload = self.__download(sUrl)
-        if (bDownload == True):
+        if bDownload == True:
             cGui().showInfo('JDownloader', 'Link gesendet', 5)
 
     def __checkConfig(self):
         logger.info('check JD Addon setings')
         
         bEnabled = cConfig().getSetting('jd_enabled')
-        if (bEnabled == 'true'):
+        if bEnabled == 'true':
             return True
         return False
 
@@ -35,13 +35,13 @@ class cJDownloaderHandler:
 
     def __getAutomaticStart(self):
         bAutomaticStart = cConfig().getSetting('jd_automatic_start')
-        if (bAutomaticStart == 'true'):
+        if bAutomaticStart == 'true':
             return True
         return False
 
     def __getLinkGrabber(self):
         bAutomaticStart = cConfig().getSetting('jd_grabber')
-        if (bAutomaticStart == 'true'):
+        if bAutomaticStart == 'true':
             return True
         return False
 
@@ -58,10 +58,10 @@ class cJDownloaderHandler:
 
     def __createJDUrl(self, sFileUrl, sHost, sPort, bAutomaticDownload, bLinkGrabber):
         sGrabber = '0'
-        if (bLinkGrabber == True):
+        if bLinkGrabber == True:
             sGrabber = '1'
         sAutomaticStart = '0'
-        if (bAutomaticDownload == True):
+        if bAutomaticDownload == True:
             sAutomaticStart = '1'
         sUrl = 'http://' + str(sHost) + ':' + str(sPort) + '/action/add/links/grabber' + str(sGrabber) + '/start' + str(
             sAutomaticStart) + '/' + sFileUrl
