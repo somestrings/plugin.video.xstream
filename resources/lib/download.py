@@ -30,18 +30,18 @@ class cDownload:
             header = dict([item.split('=') for item in (url.split('|')[1]).split('&')])
         except:
             header = {}
-        logger.info('Header for download: %s' % (header))
+        logger.info('Header for download: %s' % header)
         url = url.split('|')[0]
         sTitle = self.__createTitle(url, sTitle)
         self.__sTitle = self.__createDownloadFilename(sTitle)
         if showDialog:
             self.__sTitle = cGui().showKeyBoard(self.__sTitle)
-            if (self.__sTitle != False and len(self.__sTitle) > 0):
+            if self.__sTitle != False and len(self.__sTitle) > 0:
                 sPath = cConfig().getSetting('download-folder')
                 if sPath == '':
                     dialog = xbmcgui.Dialog()
                     sPath = dialog.browse(3, 'Downloadfolder', 'files', '')
-                if (sPath != ''):
+                if sPath != '':
                     sDownloadPath = translatePath(sPath + '%s' % (self.__sTitle,))
                     self.__prepareDownload(url, header, sDownloadPath, downloadDialogTitle)
         elif self.__sTitle != False:
@@ -79,10 +79,10 @@ class cDownload:
 
     def __createTitle(self, sUrl, sTitle):
         aTitle = sTitle.rsplit('.')
-        if (len(aTitle) > 1):
+        if len(aTitle) > 1:
             return sTitle
         aUrl = sUrl.rsplit('.')
-        if (len(aUrl) > 1):
+        if len(aUrl) > 1:
             sSuffix = aUrl[-1]
             sTitle = sTitle + '.' + sSuffix
         return sTitle
@@ -97,12 +97,12 @@ class cDownload:
             avgSpd = 5
         value = self.__sTitle, str('%s/%s@%dKB/s' % (self.__formatFileSize(currentLoaded), self.__formatFileSize(iTotalSize), avgSpd))
         self.__oDialog.update(iPercent, str(value))
-        if (self.__oDialog.iscanceled()):
+        if self.__oDialog.iscanceled():
             self.__processIsCanceled = True
             self.__oDialog.close()
 
     def __formatFileSize(self, iBytes):
         iBytes = int(iBytes)
-        if (iBytes == 0):
+        if iBytes == 0:
             return '%.*f %s' % (2, 0, 'MB')
         return '%.*f %s' % (2, int(iBytes) // (1024 * 1024.0), 'MB')
