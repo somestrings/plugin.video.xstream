@@ -34,7 +34,7 @@ class cPyLoadHandler:
             mydata = [('username', py_user), ('password', py_passwd)]
             mydata = urlencode(mydata)
             # check if host has a leading http://
-            if (py_host.find('http://') != 0):
+            if py_host.find('http://') != 0:
                 py_host = 'http://' + py_host
             logger.info('Attemting to connect to PyLoad at: ' + py_host + ':' + py_port)
             req = Request(py_host + ':' + py_port + '/api/login', mydata)
