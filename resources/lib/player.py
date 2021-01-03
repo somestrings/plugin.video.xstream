@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.config import cConfig
-from resources.lib.tools import logger
-from resources.lib.gui.gui import cGui
 import xbmc
+from resources.lib.gui.gui import cGui
+from resources.lib.tools import logger
 
 
 class XstreamPlayer(xbmc.Player):
