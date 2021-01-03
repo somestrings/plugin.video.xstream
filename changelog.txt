@@ -1,4 +1,6 @@
 3.5.20~nightly
+- [view4u] seite überarbeitet
+- [general] code optimiert BIG TNX damnms
 - [streamworld] Seite hinzugefügt
 - [kinoger] fix hoster TNX kasi
 - [view4U] Seite hinzugefügt
