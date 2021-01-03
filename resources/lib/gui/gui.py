@@ -131,7 +131,7 @@ class cGui:
             if 'season' in itemValues and itemValues['season'] and int(itemValues['season']) > 0:
                 metaParams['season'] = itemValues['season']
                 metaParams['mediaType'] = 'season'
-            if ('episode' in itemValues and itemValues['episode'] and int(itemValues['episode']) > 0 and 'season' in itemValues and itemValues['season'] and int(itemValues['season'])):
+            if 'episode' in itemValues and itemValues['episode'] and int(itemValues['episode']) > 0 and 'season' in itemValues and itemValues['season'] and int(itemValues['season']):
                 metaParams['episode'] = itemValues['episode']
                 metaParams['mediaType'] = 'episode'
 
