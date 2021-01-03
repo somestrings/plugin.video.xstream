@@ -49,7 +49,7 @@ class cJDownloader2Handler:
     def __checkConfig(self):
         logger.info('check JD2 Addon setings')
         bEnabled = cConfig().getSetting('jd2_enabled')
-        if (bEnabled == 'true'):
+        if bEnabled == 'true':
             return True
         return False
 
