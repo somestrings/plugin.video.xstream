@@ -214,7 +214,7 @@ def searchGlobal(sSearchText=False):
         if not pluginEntry['globalsearch']:
             continue
         dialog.update((count + 1) * 50 // numPlugins, 'Searching: ' + str(pluginEntry['name']) + '...')
-        if (dialog.iscanceled()): return
+        if dialog.iscanceled(): return
         if sys.version_info[0] == 2:
             logger.info('Searching for %s at %s' % (sSearchText.decode('utf-8'), pluginEntry['id']))
         else:
@@ -224,7 +224,7 @@ def searchGlobal(sSearchText=False):
         threads += [t]
         t.start()
     for count, t in enumerate(threads):
-        if (dialog.iscanceled()): return
+        if dialog.iscanceled(): return
         t.join()
         dialog.update((count + 1) * 50 // numPlugins + 50, t.getName() + ' returned')
     dialog.close()
@@ -234,7 +234,7 @@ def searchGlobal(sSearchText=False):
     dialog = xbmcgui.DialogProgress()
     dialog.create('xStream', 'Gathering info...')
     for count, result in enumerate(sorted(oGui.searchResults, key=lambda k: k['guiElement'].getSiteName()), 1):
-        if (dialog.iscanceled()): return
+        if dialog.iscanceled(): return
         oGui.addFolder(result['guiElement'], result['params'], bIsFolder=result['isFolder'], iTotal=total)
         dialog.update(count * 100 // total, str(count) + ' of ' + str(total) + ': ' + result['guiElement'].getTitle())
     dialog.close()
@@ -258,6 +258,7 @@ def searchAlter(params):
     numPlugins = len(aPlugins)
     threads = []
     for count, pluginEntry in enumerate(aPlugins):
+        if dialog.iscanceled(): return
         dialog.update((count + 1) * 50 // numPlugins, 'Searching: ' + str(pluginEntry['name']) + '...')
         if sys.version_info[0] == 2:
             logger.info('Searching for ' + searchTitle + pluginEntry['id'].encode('utf-8'))
@@ -268,6 +269,7 @@ def searchAlter(params):
         t.start()
     for count, t in enumerate(threads):
         t.join()
+        if dialog.iscanceled(): return
         dialog.update((count + 1) * 50 // numPlugins + 50, t.getName() + ' returned')
     dialog.close()
     # check results, put this to the threaded part, too
@@ -306,6 +308,7 @@ def searchTMDB(params):
     for count, pluginEntry in enumerate(aPlugins):
         if not pluginEntry['globalsearch']:
             continue
+        if dialog.iscanceled(): return
         dialog.update((count + 1) * 50 // numPlugins, 'Searching: ' + str(pluginEntry['name']) + '...')
         if sys.version_info[0] == 2:
             logger.info('Searching for %s at %s' % (sSearchText.decode('utf-8'), pluginEntry['id']))
@@ -317,6 +320,7 @@ def searchTMDB(params):
         t.start()
     for count, t in enumerate(threads):
         t.join()
+        if dialog.iscanceled(): return
         dialog.update((count + 1) * 50 // numPlugins + 50, t.getName() + ' returned')
     dialog.close()
     # deactivate collectMode attribute because now we want the elements really added
@@ -325,6 +329,7 @@ def searchTMDB(params):
     dialog = xbmcgui.DialogProgress()
     dialog.create('xStream', 'Gathering info...')
     for count, result in enumerate(sorted(oGui.searchResults, key=lambda k: k['guiElement'].getSiteName()), 1):
+        if dialog.iscanceled(): return
         oGui.addFolder(result['guiElement'], result['params'], bIsFolder=result['isFolder'], iTotal=total)
         dialog.update(count * 100 // total, str(count) + ' of ' + str(total) + ': ' + result['guiElement'].getTitle())
     dialog.close()
