@@ -199,11 +199,15 @@ class cRequestHandler:
 
     def __setCookiePath(self):
         profilePath = common.profilePath
-        cookieFile = os.path.join(profilePath, 'cookies.txt')
+        cookieFile = os.path.join(profilePath, 'cookies')
         if not os.path.exists(cookieFile):
-            file = open(cookieFile, 'w')
-            file.close()
-        self._cookiePath = cookieFile
+            os.makedirs(cookieFile)
+        if not 'dummy' in self.__sUrl:
+            cookieFile = os.path.join(cookieFile, urlparse(self.__sUrl).netloc.replace('.', '_') + '.txt')
+            if not os.path.exists(cookieFile):
+                file = open(cookieFile, 'w')
+                file.close()
+            self._cookiePath = cookieFile
 
     def getCookie(self, sCookieName, sDomain=''):
         cookieJar = LWPCookieJar()
