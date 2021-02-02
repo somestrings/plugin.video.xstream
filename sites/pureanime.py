@@ -4,6 +4,7 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
+from resources.lib import jsunpacker
 
 SITE_IDENTIFIER = 'pureanime'
 SITE_NAME = 'Pureanime'
@@ -144,43 +145,14 @@ def showHosters():
     isMatch, aResult = cParser().parse(sHtmlContent, "data-type='([^']+).*?post='([^']+).*?nume='([^']+).*?class='title'>([^<]+).*?src='([^']+)")
     if isMatch:
         for sType, sPost, sNume, sName, sLang in aResult:
-            oRequest = cRequestHandler('https://pure-anime.net/wp-admin/admin-ajax.php')
+            oRequest = cRequestHandler('https://pure-anime.net/wp-admin/admin-ajax.php', ignoreErrors=True)
             oRequest.addParameters('action', 'doo_player_ajax')
             oRequest.addParameters('post', sPost)
             oRequest.addParameters('nume', sNume)
             oRequest.addParameters('type', sType)
             sHtmlContent = oRequest.request()
             isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, '(http[^"]+)')
-            if 'cloudplayer' in sUrl:
-                from resources.lib import jsunpacker
-                sHtmlContent = cRequestHandler(sUrl).request()
-                isMatch, sUrl = cParser.parse(sHtmlContent, 'src":"([^"]+)')
-                if isMatch:
-                    sHtmlContent = cRequestHandler(sUrl[0], ignoreErrors=True).request()
-                    isMatch, sUrl = cParser.parse(sHtmlContent, 'JuicyCodes.Run[^>]"(.*?)"[^>];')
-                if isMatch:
-                    sHtmlContent = cParser.B64decode(sUrl[0].replace('"+"', ''))
-                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\\(function\\(p,a,c,k,e,d\\).+)\s+?')
-                if isMatch:
-                    sHtmlContent = jsunpacker.unpack(sUrl[0])
-                    isMatch, aResult = cParser.parse(sHtmlContent, 'file":"([^"]+).*?label":"([^"]+)')
-                    for sUrl, sQualy in aResult:
-                        hoster = {'link': sUrl, 'name': sName + Language(sLang) + sQualy}
-                        hosters.append(hoster)
-            if 'uniquestream' in sUrl:
-                from resources.lib import jsunpacker
-                sHtmlContent = cRequestHandler(sUrl, ignoreErrors=True).request()
-                isMatch, sUrl = cParser.parse(sHtmlContent, 'JuicyCodes.Run[^>]"(.*?)"[^>];')
-                if isMatch:
-                    sHtmlContent = cParser.B64decode(sUrl[0].replace('"+"', ''))
-                    isMatch, sUrl = cParser.parse(sHtmlContent, '(eval\\(function\\(p,a,c,k,e,d\\).+)\s+?')
-                if isMatch:
-                    sHtmlContent = jsunpacker.unpack(sUrl[0])
-                    isMatch, aResult = cParser.parse(sHtmlContent, 'file":"([^"]+).*?label":"([^"]+)')
-                    for sUrl, sQualy in aResult:
-                        hoster = {'link': sUrl, 'name': sName + Language(sLang) + sQualy}
-                        hosters.append(hoster)
-            else:
+            if isMatch:
                 hoster = {'link': sUrl, 'name': sName + Language(sLang)}
                 hosters.append(hoster)
     if hosters:
@@ -206,10 +178,57 @@ def Language(sLang):
 
 
 def getHosterUrl(sUrl=False):
-    if 'cloudplayer' in sUrl or 'uniquestream' in sUrl:
+    if 'stream.pure-anime' in sUrl:
+        sUrl = PureStream(sUrl)
         return [{'streamUrl': sUrl, 'resolved': True}]
+    elif 'gproxy.stream' in sUrl:
+        sUrl = gproxy_stream(sUrl)
+        return [{'streamUrl': sUrl + '|Referer=https://gproxy.stream/', 'resolved': True}]
     else:
         return [{'streamUrl': sUrl, 'resolved': False}]
+
+
+def PureStream(sUrl):
+    from resources.lib import jsunpacker
+    html = cRequestHandler(sUrl, caching=False, ignoreErrors=True).request()
+    isMatch, packed = cParser.parseSingleResult(html, 'eval.*0,')
+    if isMatch:
+        unpack = jsunpacker.unpack(packed)
+        isMatch, sUrl2 = cParser.parse(unpack, "file[^>]':[^>]'([^']+)")
+    if isMatch:
+        return 'https://stream.pure-anime.net' + sUrl2[0] + '|Referer=' + sUrl
+
+
+def decrypt(key, enc_text):
+    L = list(range(256))
+    f = 0
+    t = ''
+    for i in range(256):
+        f = (f + L[i] + ord(key[i % len(key)])) % 256
+        s = L[i]
+        L[i] = L[f]
+        L[f] = s
+    i = 0
+    f = 0
+    for k in range(len(enc_text)):
+        i = (i + 1) % 256
+        f = (f + L[i]) % 256
+        s = L[i]
+        L[i] = L[f]
+        L[f] = s
+        t += chr(ord(enc_text[k]) ^ L[(L[i] + L[f]) % 256])
+    return t
+
+
+def gproxy_stream(sUrl):
+    html = cRequestHandler(sUrl, caching=False, ignoreErrors=True).request()
+    Match, packed = cParser.parse(html, '(eval\s*\(function.*?)</script>')
+    if Match:
+        for p in packed:
+            p = jsunpacker.unpack(p)
+            Match2, url = cParser.parse(p, 'file":"([^"]+)')
+    if Match2:
+        return decrypt("\x63\x64\x34", cParser.urlDecode(url[0]))
 
 
 def showSearch():
