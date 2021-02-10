@@ -9,6 +9,7 @@ try:
     from itertools import izip_longest as ziplist
 except ImportError:
     from itertools import zip_longest as ziplist
+import base64, random
 
 SITE_IDENTIFIER = 'kinoger'
 SITE_NAME = 'Kinoger'
@@ -142,19 +143,19 @@ def showSeasons():
     for i in range(0, total):
         try:
             params.setParam('L11', L11[i])
-        except:
+        except Exception:
             pass
         try:
             params.setParam('L22', L22[i])
-        except:
+        except Exception:
             pass
         try:
             params.setParam('L33', L33[i])
-        except:
+        except Exception:
             pass
         try:
             params.setParam('L44', L44[i])
-        except:
+        except Exception:
             pass
         i = i + 1
         oGuiElement = cGuiElement('Staffel ' + str(i), SITE_IDENTIFIER, 'showEpisodes')
@@ -242,7 +243,6 @@ def showHosters():
                 for sQualy, sUrl in aResult:
                     hoster = {'link': sUrl, 'name': sQualy + ' ProtonVideo'}
                     hosters.append(hoster)
-
             elif 'sst' in sUrl:
                 oRequest = cRequestHandler(sUrl)
                 oRequest.addHeaderEntry('Referer', sUrl)
@@ -253,7 +253,6 @@ def showHosters():
                 for sUrl in aResult:
                     hoster = {'link': sUrl, 'name': Qualy(sUrl) + ' Fsst.Online'}
                     hosters.append(hoster)
-
             elif 'kinoger.re' in sUrl:
                 oRequest = cRequestHandler(sUrl.replace('/v/', '/api/source/'))
                 oRequest.addHeaderEntry('Referer', sUrl)
@@ -266,10 +265,27 @@ def showHosters():
                 for sUrl, sQualy in aResult:
                     hoster = {'link': sUrl, 'name': sQualy + ' Kinoger.re'}
                     hosters.append(hoster)
-
+            elif 'start.u' in sUrl:
+                a = ''
+                import json
+                t = sUrl.split('/')
+                ID = t[5]
+                ID2 = t[4]
+                token = encodeUrl(ID2 + ':' + ID)
+                url2 = 'http://start.u-stream.in/ustGet.php?id=' + ID + '&token=' + token
+                oRequest = cRequestHandler(url2)
+                oRequest.addHeaderEntry('Referer', sUrl)
+                content = oRequest.request()
+                t = json.loads(content)
+                if 'url' in t:
+                    for u in t['url']:
+                        a = decodeStr(u)
+                        hoster = {'link': a, 'name': Qualy2(a) + cParser.urlparse(sUrl)}
+                        hosters.append(hoster)
         if hosters:
             hosters.append('getHosterUrl')
         return hosters
+
 
 def Qualy(sUrl):
     if '360p' in sUrl:
@@ -280,6 +296,20 @@ def Qualy(sUrl):
         return '720p'
     else:
         return '1080p'
+
+
+def Qualy2(q):
+    if '360-' in q:
+        return '360p '
+    elif '480-' in q:
+        return '480p '
+    elif '720-' in q:
+        return '720p '
+    elif '1080-' in q:
+        return '1080p '
+    else:
+        return 'SD '
+
 
 def getHosterUrl(sUrl=False):
     if sUrl.startswith('//'):
@@ -296,3 +326,107 @@ def showSearch():
 
 def _search(oGui, sSearchText):
     showEntries(URL_MAIN, oGui, sSearchText)
+
+
+def toString(number, base):
+    string = "0123456789abcdefghijklmnopqrstuvwxyz"
+    if number < base:
+        return string[number]
+    else:
+        return toString(number // base, base) + string[number % base]
+
+
+def keys(s):
+    if s == '1':
+        return ('54A80Ibc3VBdefWGTSFg1X7hEYNijZU', 'kQl2mCnDoMpOq9rHsPt6uLvawRxJyKz')
+    if s == '2':
+        return ('4YMHUe5OFZ7L2PEJ8fgKAh1RGiIj0kV', 'aTlNmCn3oBpDqSr9sbtWu6vcwdxXyQz')
+    elif s == '3':
+        return ('AN4YZVHTJEOeLS2fGaFghiKWjQMbIkl', 'Xmc1d3nCo7p5qBrUsDt9u8vRw6x0yPz')
+    elif s == '4':
+        return ('V6YD2ZNWaTefXgObhS3UcRAP4dIiJjK', 'k7l5mLnCoEpMqGrBsFtQuHv1w0x9y8z')
+    elif s == '5':
+        return ('OGAFaN985MDHTbYW7ceQfdIgZhJiXj3', 'kSl6mRn2oCpKqErPsUt1u0v4wLxByVz')
+    elif s == '6':
+        return ('cZXK8O3BS5NRedFPfLAg2U6hIiDj7VT', 'k9lQmJnWoGp1q0rCsatHuYvbw4xMyEz')
+    elif s == '7':
+        return ('UZQXTPHcVS7deEfWDgRMLh9iIa1Y0j2', 'klb3m8nOoBpNqKr5s6tJuAvCwGxFy4z')
+    elif s == '8':
+        return ('AZI4WCcKOdNJGF3YEa2eHfgb8hMiLjD', 'kUlPmBnSoVp5q7r6s9t1uTv0wQxRyXz')
+    elif s == '9':
+        return ('OWZYcP3adUNSbeCfJVghTQDRIiKjBkG', 'X5lMmFnAoLp1q7r6s0tHu2vEw9x4y8z')
+    else:
+        return ('', '')
+
+
+def decodeStr(text):
+    ergebnis = ''
+    k = text[-1]
+    t0, t1 = keys(k)
+    text = text[:-1]
+
+    for i in range(len(text)):
+        for ii in range(len(t0)):
+            if text[i] in t0[ii]:
+                ergebnis = ergebnis + t1[ii]
+            elif text[i] in t1[ii]:
+                ergebnis = ergebnis + t0[ii]
+    return cParser.unquotePlus(base64.b64decode(ergebnis[::-1] + '==').decode())
+
+
+def decodeUrl(text):
+    text = decodeStr(text)
+    ergebnis = ''
+    k = text[-1]
+    t0, t1 = keys(k)
+    text = text[:-1]
+
+    for i in range(len(text)):
+        for ii in range(len(t0)):
+            if text[i] in t0[ii]:
+                ergebnis = ergebnis + t1[ii]
+            elif text[i] in t1[ii]:
+                ergebnis = ergebnis + t0[ii]
+    ergebnis = base64.b64decode(ergebnis + '==').decode()
+    a = int(k) + 5
+    ergebnis = ''.join(chr(int(i, a)) for i in ergebnis.split('!'))
+    return ergebnis
+
+
+def encodeStr(text):
+    ergebnis = ''
+    k = str(random.randint(2, 7))
+    t0, t1 = keys(k)
+    text = cParser.quotePlus(text)
+    text = base64.b64encode(text.encode())
+    text = text.decode().replace('=', '')[::-1]
+
+    for i in range(len(text)):
+        for ii in range(len(t0)):
+            if text[i] in t0[ii]:
+                ergebnis = ergebnis + t1[ii]
+            elif text[i] in t1[ii]:
+                ergebnis = ergebnis + t0[ii]
+    return ergebnis + k
+
+
+def encodeUrl(e):
+    r = 0,
+    n = ''
+    t = 1
+    a = (random.randint(2, 9))
+    t0, t1 = keys(str(a))
+    t = a + 5
+
+    for r in range(len(e)):
+        n += toString(ord(e[r]), t)
+        n += '!'
+    n = base64.b64encode(n[:-1].encode()).decode().replace('=', '')
+    e = ''
+    for i in range(len(n)):
+        for ii in range(len(t0)):
+            if n[i] in t0[ii]:
+                e = e + t1[ii]
+            elif n[i] in t1[ii]:
+                e = e + t0[ii]
+    return encodeStr(e + str(a))
