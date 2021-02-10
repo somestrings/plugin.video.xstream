@@ -1,4 +1,5 @@
 3.5.21~nightly
+- [kinoger] add hoster start.u-stream
 - [pureanime] add hoster Flex, PureStream
 
 3.5.20
