@@ -299,16 +299,14 @@ def Qualy(sUrl):
 
 
 def Qualy2(q):
-    if '360-' in q:
-        return '360p '
-    elif '480-' in q:
+    if '480-' in q:
         return '480p '
     elif '720-' in q:
         return '720p '
     elif '1080-' in q:
         return '1080p '
     else:
-        return 'SD '
+        return '360p '
 
 
 def getHosterUrl(sUrl=False):
