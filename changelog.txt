@@ -1,4 +1,6 @@
 3.5.21~nightly
+- [kinoger] hoster optimiert
+- [kkiste] fix serien
 - [kinoger] add hoster start.u-stream
 - [pureanime] add hoster Flex, PureStream
 
