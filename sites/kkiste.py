@@ -17,14 +17,14 @@ def load():
     params.setParam('sUrl', URL_MAIN)
     cGui().addFolder(cGuiElement('Filme & Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('Value', 'Genres')
-    cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
+    cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
     params.setParam('Value', 'Release Jahre')
-    cGui().addFolder(cGuiElement('Release Jahre', SITE_IDENTIFIER, 'showGenre'), params)
+    cGui().addFolder(cGuiElement('Release Jahre', SITE_IDENTIFIER, 'showValue'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
 
 
-def showGenre():
+def showValue():
     params = ParameterHandler()
     sHtmlContent = cRequestHandler(URL_MAIN).request()
     pattern = '>{0}<.*?</ul>'.format(params.getValue('Value'))
@@ -63,7 +63,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for sUrl, sName, sThumbnail, sDesc, sYear, sDuration in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isTvshow = True if 'staffel' in sUrl or 'serie' in sUrl else False
+        isTvshow = True if 'taffel' in sName or 'serie' in sUrl else False
         sThumbnail = URL_MAIN + sThumbnail
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showEpisodes' if isTvshow else 'showHosters')
         oGuiElement.setYear(sYear)
@@ -119,12 +119,12 @@ def showHosters():
     isMatch, aResult = cParser().parse(sHtmlContent, 'link="([^"]+)')
     if isMatch:
         for sUrl in aResult:
-            if 'vod' not in sUrl and 'youtube' not in sUrl and 'streamcherry' not in sUrl:
-                if sUrl.startswith('http'):
-                    hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
-                else:
-                    hoster = {'link': 'https:' + sUrl, 'name': cParser.urlparse(sUrl)}
-                hosters.append(hoster)
+            if 'youtube' in sUrl:
+                continue
+            elif sUrl.startswith('//'):
+                sUrl = 'https:' + sUrl
+            hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
+            hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
