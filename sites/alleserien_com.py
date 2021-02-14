@@ -50,7 +50,6 @@ def showGenre():
     if not isMatch:
         cGui().showInfo()
         return
-
     for sName in aResult:
         params.setParam('type', sName)
         cGui().addFolder(cGuiElement(sName, SITE_IDENTIFIER, 'showEntries'), params)
@@ -64,15 +63,15 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     sortBy = params.getValue('sortBy')
     page = params.getValue('page')
-    type = params.getValue('type')
-    sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
+    stype = params.getValue('type')
+    sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=sGui is not False).request()
     isMatch, url = cParser.parseSingleResult(sHtmlContent, ",url.*?'([^']+)")
     isMatch, token = cParser.parseSingleResult(sHtmlContent, "token':'([^']+)',")
-    oRequest = cRequestHandler(url, ignoreErrors=(sGui is not False))
+    oRequest = cRequestHandler(url, ignoreErrors=sGui is not False)
     if sSearchText:
         oRequest.addParameters('search', sSearchText)
         page = '1'
-        type = 'Alle'
+        stype = 'Alle'
         sortBy = 'latest'
     oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
     oRequest.addParameters('_token', token)
@@ -81,7 +80,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oRequest.addParameters('rating', 0)
     oRequest.addParameters('sortBy', sortBy)
     oRequest.addParameters('to', time.strftime('%Y', time.localtime()))
-    oRequest.addParameters('type', type)
+    oRequest.addParameters('type', stype)
     sHtmlContent = oRequest.request()
     pattern = '<a title=[^>]"(.*?)" href=[^>]"([^"]+).*?src=[^>]"([^"]+).*?sh1[^>]">(\d{4})'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
@@ -96,11 +95,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         isTvshow = True if 'folge' in sUrl else False
         oGuiElement = cGuiElement(sName[:-1], SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail[:-1])
-        oGuiElement.setFanart(sThumbnail[:-1])
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
         oGuiElement.setYear(sYear)
-        params.setParam('sThumbnail', sThumbnail)
-        params.setParam('sName', sName)
+        params.setParam('sThumbnail', sThumbnail[:-1])
+        params.setParam('sName', sName[:-1])
         params.setParam('entryUrl', sUrl[:-1])
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui:
@@ -133,7 +131,6 @@ def showSeasons():
         oGuiElement.setTVShowTitle(sTVShowTitle)
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         if isDesc:
             oGuiElement.setDescription(sDesc)
         params.setParam('sSeasonNr', sSeasonNr)
@@ -162,7 +159,6 @@ def showEpisodes():
         oGuiElement = cGuiElement('Folge ' + sEpisodeNr, SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setMediaType('episode')
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setFanart(sThumbnail)
         oGuiElement.setSeason(sSeasonNr)
         oGuiElement.setEpisode(sEpisodeNr)
         if isDesc:
@@ -177,39 +173,20 @@ def showHosters():
     hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl, ignoreErrors=True).request()
-    isMatch, aResult = cParser().parse(sHtmlContent, '<iframe[^>]src="([^"]+)')
-    if not isMatch:
-        pattern = '"partItem" data-id="([\d]+).*?data-controlid="([\d]+).*?e/([^"]+).png'
-        isMatch, aResult = cParser().parse(sHtmlContent, pattern)
+    isMatch, sUrl = cParser().parseSingleResult(sHtmlContent, '<iframe[^>]src="([^"]+)')
     if isMatch:
-        if 'alleserien' in aResult[0]:
-            result, hash = cParser().parseSingleResult(sHtmlContent, 'o/([^"]+)')
-            oRequest = cRequestHandler(aResult[0] + '?do=getVideo')
-            oRequest.addHeaderEntry('Referer', ParameterHandler().getValue('entryUrl'))
+        if 'alleserien' in sUrl:
+            oRequest = cRequestHandler(sUrl + '?do=getVideo', ignoreErrors=True)
             oRequest.addHeaderEntry('Origin', 'http://alleserienplayer.com')
-            oRequest.addHeaderEntry('Host', 'alleserienplayer.com')
             oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
-            oRequest.addParameters('do', 'getVideo')
-            oRequest.addParameters('hash', hash[0])
-            oRequest.addParameters('r', ParameterHandler().getValue('entryUrl'))
+            oRequest.addParameters('r', URL_MAIN)
+            oRequest.addParameters('hash', sUrl[47:])
             sHtmlContent = oRequest.request()
             isMatch, aResult = cParser().parse(sHtmlContent, 'file":"([^"]+).*?label":"([^"]+)')
             if isMatch:
                 for sUrl, sName in aResult:
                     hoster = {'link': sUrl, 'name': sName}
                     hosters.append(hoster)
-    else:
-        if isMatch:
-            result, token = cParser().parseSingleResult(sHtmlContent, "_token':'([^']+)")
-            for ID, controlid, sName in aResult:
-                oRequest = cRequestHandler('https://alleserien.com/getpart')
-                oRequest.addParameters('_token', token[0])
-                oRequest.addParameters('PartID', ID)
-                oRequest.addParameters('ControlID', controlid)
-                sHtmlContent = oRequest.request()
-                result, link = cParser().parseSingleResult(sHtmlContent, 'src="([^"]+)')
-                hoster = {'link': link, 'name': sName}
-                hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
