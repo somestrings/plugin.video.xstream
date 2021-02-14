@@ -20,7 +20,7 @@ class cTMDB:
         self.fanart = 'https://image.tmdb.org/t/p/%s' % cConfig().getSetting('backdrop_tmdb')
 
     def search_movie_name(self, name, year='', page=1, advanced='false'):
-        name = re.sub(" +", " ", name)
+        name = re.sub(' +', ' ', name)
         if year:
             term = quote_plus(name) + '&year=' + year
         else:
@@ -119,7 +119,7 @@ class cTMDB:
         return result
 
     def get_meta(self, media_type, name, imdb_id='', tmdb_id='', year='', season='', episode='', advanced='false'):
-        name = re.sub(" +", " ", name)
+        name = re.sub(' +', ' ', name)
         meta = {}
         if media_type == 'movie':
             if tmdb_id:
@@ -142,7 +142,7 @@ class cTMDB:
             else:
                 term = 'page=' + str(page)
             result = self._call(url, term)
-        except:
+        except Exception:
             return False
         return result
 
@@ -191,28 +191,28 @@ class cTMDB:
 
     def _format_episodes(self, meta, name):
         _meta = {}
-        if 'air_date' in meta:
+        if 'air_date' in meta and meta['air_date']:
             _meta['aired'] = meta['air_date']
-        if 'episode_number' in meta:
+        if 'episode_number' in meta and meta['episode_number']:
             _meta['episode'] = meta['episode_number']
-        if 'name' in meta:
+        if 'name' in meta and meta['name']:
             _meta['title'] = meta['name']
-        if 'overview' in meta:
+        if 'overview' in meta and meta['overview']:
             _meta['plot'] = meta['overview']
-        if 'production_code' in meta:
+        if 'production_code' in meta and meta['production_code']:
             _meta['code'] = str(meta['production_code'])
-        if 'season_number' in meta:
+        if 'season_number' in meta and meta['season_number']:
             _meta['season'] = meta['season_number']
-        if 'still_path' in meta:
+        if 'still_path' in meta and meta['still_path']:
             _meta['cover_url'] = self.poster + meta['still_path']
-        if 'vote_average' in meta:
+        if 'vote_average' in meta and meta['vote_average']:
             _meta['rating'] = meta['vote_average']
-        if 'vote_count' in meta:
+        if 'vote_count' in meta and meta['vote_count']:
             _meta['votes'] = meta['vote_count']
-        if 'crew' in meta:
+        if 'crew' in meta and meta['crew']:
             _meta['writer'] = ''
             _meta['director'] = ''
-            _meta['cast'] = ''
+
             for crew in meta['crew']:
                 if crew['department'] == 'Directing':
                     if _meta['director'] != '':
@@ -222,7 +222,7 @@ class cTMDB:
                     if _meta['writer'] != '':
                         _meta['writer'] += ' / '
                     _meta['writer'] += '%s: %s' % (crew['job'], crew['name'])
-        if 'guest_stars' in meta:
+        if 'guest_stars' in meta and meta['guest_stars']:
             licast = []
             for c in meta['guest_stars']:
                 licast.append((c['name'], c['character'], self.poster + str(c['profile_path'])))
@@ -253,9 +253,9 @@ class cTMDB:
         if 'premiered' in _meta and _meta['premiered'] and len(_meta['premiered']) == 10:
             _meta['year'] = int(_meta['premiered'][:4])
         if 'budget' in meta and meta['budget']:
-            _meta['budget'] = "{:,} $".format(meta['budget'])
+            _meta['budget'] = '{:,} $'.format(meta['budget'])
         if 'revenue' in meta and meta['revenue']:
-            _meta['revenue'] = "{:,} $".format(meta['revenue'])
+            _meta['revenue'] = '{:,} $'.format(meta['revenue'])
         if 'status' in meta and meta['status']:
             _meta['status'] = meta['status']
         duration = 0
