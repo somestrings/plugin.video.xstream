@@ -1,4 +1,5 @@
 3.5.21~nightly
+- [alleserien] code optimiert
 - [kinoger] hoster optimiert
 - [kkiste] fix serien
 - [kinoger] add hoster start.u-stream
