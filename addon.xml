@@ -20,6 +20,7 @@
    <platform>all</platform>
    <news>
 3.5.21~nightly
+- [kinoger] fix protonvideo
 - [alleserien] code optimiert
 - [kinoger] hoster optimiert
 - [kkiste] fix serien
