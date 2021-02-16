@@ -234,25 +234,20 @@ def showHosters():
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
         for sUrl in aResult:
-            if 'protonvideo' in sUrl:
+            if 'protonvideo' in sUrl or 'sst' in sUrl:
                 oRequest = cRequestHandler(sUrl)
                 oRequest.addHeaderEntry('Referer', URL_MAIN)
                 sHtmlContent = oRequest.request()
                 if sHtmlContent == '': continue
-                isMatch, aResult = cParser.parse(sHtmlContent, 'file":"[^>](\d+p)[^>]([^",\s]+)')
-                for sQualy, sUrl in aResult:
-                    hoster = {'link': sUrl, 'name': sQualy + ' ProtonVideo'}
-                    hosters.append(hoster)
-            elif 'sst' in sUrl:
-                oRequest = cRequestHandler(sUrl)
-                oRequest.addHeaderEntry('Referer', sUrl)
-                sHtmlContent = oRequest.request()
-                if sHtmlContent == '': continue
-                isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, 'file:"(.*?)"')
-                isMatch, aResult = cParser().parse(sContainer[0], '(http[^",]+)')
-                for sUrl in aResult:
-                    hoster = {'link': sUrl, 'name': Qualy(sUrl) + ' Fsst.Online'}
-                    hosters.append(hoster)
+                isMatch, sContainer = cParser.parse(sHtmlContent, 'file(?:":"|:")([^"]+)')
+                if isMatch:
+                    isMatch, aResult = cParser.parse(sContainer[0], '(?:(\d+p)[^>])?((?:http|//)[^",]+)')
+                    if isMatch:
+                        for sQualy, sUrl2 in aResult:
+                            if not sQualy:
+                                sQualy = Qualy(sUrl2)
+                            hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl)}
+                            hosters.append(hoster)
             elif 'kinoger.re' in sUrl:
                 oRequest = cRequestHandler(sUrl.replace('/v/', '/api/source/'))
                 oRequest.addHeaderEntry('Referer', sUrl)
