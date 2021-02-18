@@ -66,7 +66,7 @@ class cParser:
 
     @staticmethod
     def urlparse(sUrl):
-        return urlparse(sUrl).netloc.title()
+        return urlparse(sUrl.replace('www.', '')).netloc.title()
 
     @staticmethod
     def urlDecode(sUrl):
@@ -161,10 +161,10 @@ class cUtil:
         if isinstance(text, str):
             try:
                 text = text.decode('utf-8')
-            except:
+            except Exception:
                 try:
                     text = text.decode('utf-8', 'ignore')
-                except:
+                except Exception:
                     pass
         return re.sub("&(\\w+;|#x?\\d+;?)", fixup, text.strip())
 
