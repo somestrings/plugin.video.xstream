@@ -4,14 +4,13 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
-from resources.lib.config import cConfig
 import json
 
 SITE_IDENTIFIER = 'netzkino_de'
 SITE_NAME = 'NetzKino'
 SITE_ICON = 'netzkino.png'
-URL_MAIN = 'http://api.netzkino.de.simplecache.net/capi-2.0a/categories/%s.json?d=www&l=de-DE&v=unknown'
-URL_SEARCH = 'http://api.netzkino.de.simplecache.net/capi-2.0a/search?q=%s&d=www&l=de-DE&v=unknown'
+URL_MAIN = 'https://api.netzkino.de.simplecache.net/capi-2.0a/categories/%s.json?d=www&l=de-DE'
+URL_SEARCH = 'https://api.netzkino.de.simplecache.net/capi-2.0a/search?q=%s&d=www&l=de-DE'
 
 
 def load():
@@ -42,13 +41,12 @@ def load():
     oGui.addFolder(cGuiElement('Spasskino', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN % 'queerkino')
     oGui.addFolder(cGuiElement('Queerkino', SITE_IDENTIFIER, 'showEntries'), params)
-    if showAdult():
-        params.setParam('sUrl', URL_MAIN % 'horrorkino')
-        oGui.addFolder(cGuiElement('Horrorkino', SITE_IDENTIFIER, 'showEntries'), params)
-        params.setParam('sUrl', URL_MAIN % 'prickelkino')
-        oGui.addFolder(cGuiElement('Prickelkino', SITE_IDENTIFIER, 'showEntries'), params)
-        params.setParam('sUrl', URL_MAIN % 'kinoab18')
-        oGui.addFolder(cGuiElement('Kino ab 18', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'horrorkino')
+    oGui.addFolder(cGuiElement('Horrorkino', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'prickelkino')
+    oGui.addFolder(cGuiElement('Prickelkino', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'kinoab18')
+    oGui.addFolder(cGuiElement('Kino ab 18', SITE_IDENTIFIER, 'showEntries'), params)
     oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     oGui.setEndOfDirectory()
 
@@ -57,7 +55,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
-    isShowAdult = showAdult()
     sJson = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
     if not sJson:
         if not sGui: oGui.showError('xStream', 'Fehler beim Laden der Daten.')
@@ -71,11 +68,9 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for item in aJson["posts"]:
         try:
             FSK = ','.join(item['custom_fields']['FSK'])
-            if not isShowAdult and '18' in FSK.lower():
-                continue
             if sSearchText and not cParser().search(sSearchText, item['title']):
                 continue
-            oGuiElement = cGuiElement(item['title'], SITE_IDENTIFIER, 'getHosterUrl')
+            oGuiElement = cGuiElement(item['title'], SITE_IDENTIFIER, 'showHosters')
             oGuiElement.setThumbnail(item['thumbnail'])
             sFanart = ','.join(item['custom_fields']['featured_img_all'])
             oGuiElement.setFanart(sFanart)
@@ -83,7 +78,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             oGuiElement.setYear(sYahr)
             oGuiElement.setDescription(item['content'])
             Streaming = ','.join(item['custom_fields']['Streaming'])
-            params.setParam('Streaming', Streaming)
+            params.setParam('entryUrl', Streaming)
             oGui.addFolder(oGuiElement, params, False, total)
         except:
             pass
@@ -92,9 +87,17 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setEndOfDirectory()
 
 
-def getHosterUrl(Streaming=False):
-    if not Streaming: Streaming = ParameterHandler().getValue('Streaming')
-    sUrl = 'http://netzkino_and-vh.akamaihd.net/i/%s.mp4/master.m3u8' % Streaming
+def showHosters():
+    hosters = []
+    sUrl = 'http://netzkino_and-vh.akamaihd.net/i/%s.mp4/master.m3u8' % ParameterHandler().getValue('entryUrl')
+    hoster = {'link': sUrl, 'name': 'Netzkino'}
+    hosters.append(hoster)
+    if hosters:
+        hosters.append('getHosterUrl')
+    return hosters
+
+
+def getHosterUrl(sUrl=False):
     return [{'streamUrl': sUrl, 'resolved': True}]
 
 
@@ -107,9 +110,3 @@ def showSearch():
 
 def _search(oGui, sSearchText):
     showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, cParser().quotePlus(sSearchText))
-
-
-def showAdult():
-    if cConfig().getSetting('showAdult') == 'true':
-        return True
-    return False
