@@ -1,4 +1,6 @@
 3.5.21~nightly
+- [dokus4] fix hosterauswahl list
+- [general] www von hostername entfernt
 - [flimmerstube] entfernt
 - [netzkino] fix hosterauswahl list
 - [general] TMDB-Handler bei mehr als 99 einträge deaktivieren
