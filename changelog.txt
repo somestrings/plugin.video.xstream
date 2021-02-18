@@ -1,4 +1,6 @@
 3.5.21~nightly
+- [netzkino] fix hosterauswahl list
+- [general] TMDB-Handler bei mehr als 99 einträge deaktivieren
 - [kinoger] fix protonvideo
 - [alleserien] code optimiert
 - [kinoger] hoster optimiert
