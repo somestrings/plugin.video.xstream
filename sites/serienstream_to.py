@@ -67,7 +67,7 @@ def showAllSeries(entryUrl=False, sGui=False, sSearchText=False):
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons')
-        # oGuiElement.setMediaType('tvshow')
+        oGuiElement.setMediaType('tvshow')
         params.setParam('sUrl', URL_MAIN + sUrl)
         params.setParam('TVShowTitle', sName)
         oGui.addFolder(oGuiElement, params, True, total)
