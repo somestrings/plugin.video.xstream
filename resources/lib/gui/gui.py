@@ -44,7 +44,7 @@ class cGui:
             import copy
             self.searchResults.append({'guiElement': oGuiElement, 'params': copy.deepcopy(params), 'isFolder': bIsFolder})
             return
-        if not oGuiElement._isMetaSet and self.isMetaOn and oGuiElement._mediaType:
+        if not oGuiElement._isMetaSet and self.isMetaOn and oGuiElement._mediaType and iTotal < 100:
             tmdbID = params.getValue('tmdbID')
             if tmdbID:
                 oGuiElement.getMeta(oGuiElement._mediaType, tmdbID, mode=self.metaMode)
@@ -80,10 +80,6 @@ class cGui:
         if infoString:
             infoString = '[I]%s[/I]' % infoString
         itemValues['title'] = itemTitle + infoString
-        '''
-        # kodi 19 funktioniert nicht
-        listitem = xbmcgui.ListItem(itemTitle + infoString, oGuiElement.getTitleSecond(), oGuiElement.getIcon(), oGuiElement.getThumbnail())
-        '''
         listitem = xbmcgui.ListItem(itemTitle + infoString, oGuiElement.getIcon(), oGuiElement.getThumbnail())
         listitem.setInfo(oGuiElement.getType(), itemValues)
         listitem.setProperty('fanart_image', oGuiElement.getFanart())
