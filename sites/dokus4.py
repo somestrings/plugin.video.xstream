@@ -44,7 +44,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
-    pattern = 'tbl_titel.*?title="([^"]+).*?href="([^"]+)/"><img src="([^"]+).*?vid_desc">([^<]+)'
+    pattern = 'tbl_titel.*?title="([^"]+).*?href="([^"]+).*?src="([^"]+).*?vid_desc">([^<]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
@@ -54,10 +54,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for sName, sUrl, sThumbnail, sDesc in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'getHosterUrl')
+        oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setDescription(sDesc)
-        params.setParam('sUrl', sUrl)
+        params.setParam('entryUrl', sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
     if not sGui:
         isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, 'rel="next" href="([^"]+)')
@@ -68,14 +68,25 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oGui.setEndOfDirectory()
 
 
-def getHosterUrl(sUrl=False):
-    sHtmlContent = cRequestHandler(ParameterHandler().getValue('sUrl')).request()
-    isMatch, sUrl = cParser.parseSingleResult(sHtmlContent, '<p><iframe.*?src="([^"]+)"')
+def showHosters():
+    hosters = []
+    sUrl = ParameterHandler().getValue('entryUrl')
+    sHtmlContent = cRequestHandler(sUrl).request()
+    isMatch, aResult = cParser.parse(sHtmlContent, 'src="([^"]+)" f')
     if isMatch:
-        import xbmc
-        if not xbmc.getCondVisibility('System.HasAddon(%s)' % 'plugin.video.youtube'):
-            xbmc.executebuiltin('InstallAddon(%s)' % 'plugin.video.youtube')
-        return [{'streamUrl': sUrl, 'resolved': False}]
+        for sUrl in aResult:
+            hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
+            hosters.append(hoster)
+    if hosters:
+        hosters.append('getHosterUrl')
+    return hosters
+
+
+def getHosterUrl(sUrl=False):
+    import xbmc
+    if not xbmc.getCondVisibility('System.HasAddon(%s)' % 'plugin.video.youtube'):
+        xbmc.executebuiltin('InstallAddon(%s)' % 'plugin.video.youtube')
+    return [{'streamUrl': sUrl, 'resolved': False}]
 
 
 def showSearch():
