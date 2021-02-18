@@ -1,4 +1,5 @@
 3.5.21~nightly
+- [flimmerstube] entfernt
 - [netzkino] fix hosterauswahl list
 - [general] TMDB-Handler bei mehr als 99 einträge deaktivieren
 - [kinoger] fix protonvideo
