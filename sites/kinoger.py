@@ -246,6 +246,8 @@ def showHosters():
                         for sQualy, sUrl2 in aResult:
                             if not sQualy:
                                 sQualy = Qualy(sUrl2)
+                            if ' or ' in sUrl2:
+                                sUrl2 = sUrl2.split(' or ')[0]
                             hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl)}
                             hosters.append(hoster)
             elif 'kinoger.re' in sUrl:
