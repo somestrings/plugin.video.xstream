@@ -22,12 +22,6 @@ class cHosterGui:
         # get data
         mediaUrl = params.getValue('sMediaUrl')
         fileName = params.getValue('MovieTitle')
-        if not fileName:
-            fileName = params.getValue('Title')
-        if not fileName:  # only temporary
-            fileName = params.getValue('sMovieTitle')
-        if not fileName:
-            fileName = params.getValue('title')
         try:
             import urlresolver
             # resolve
@@ -370,6 +364,7 @@ class cHosterGui:
             else:
                 name = hoster['name']
             oGuiElement = cGuiElement(name, siteName, functionName)
+            oGuiElement.setThumbnail(str(params.getValue('thumb')))
             params.setParam('url', hoster['link'])
             params.setParam('isHoster', 'true')
             oGui.addFolder(oGuiElement, params, iTotal=total, isHoster=True)
