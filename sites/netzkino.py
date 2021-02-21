@@ -6,7 +6,7 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
 import json
 
-SITE_IDENTIFIER = 'netzkino_de'
+SITE_IDENTIFIER = 'netzkino'
 SITE_NAME = 'NetzKino'
 SITE_ICON = 'netzkino.png'
 URL_MAIN = 'https://api.netzkino.de.simplecache.net/capi-2.0a/categories/%s.json?d=www&l=de-DE'
@@ -57,7 +57,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     sJson = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
     if not sJson:
-        if not sGui: oGui.showError('xStream', 'Fehler beim Laden der Daten.')
+        if not sGui: oGui.showInfo()
         return
     aJson = json.loads(sJson)
     if 'posts' not in aJson or len(aJson['posts']) == 0:
@@ -76,6 +76,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             oGuiElement.setFanart(sFanart)
             sYahr = ','.join(item['custom_fields']['Jahr'])
             oGuiElement.setYear(sYahr)
+            oGuiElement.setMediaType('movie')
             oGuiElement.setDescription(item['content'])
             Streaming = ','.join(item['custom_fields']['Streaming'])
             params.setParam('entryUrl', Streaming)
