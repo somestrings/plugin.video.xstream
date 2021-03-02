@@ -9,9 +9,8 @@ SITE_IDENTIFIER = 'filmpalast_to'
 SITE_NAME = 'FilmPalast'
 SITE_ICON = 'filmpalast.png'
 URL_MAIN = 'https://filmpalast.to'
-URL_MOVIES = URL_MAIN + '/movies/new'
+URL_MOVIES = URL_MAIN + '/movies/%s'
 URL_SHOWS = URL_MAIN + '/serien/view'
-URL_TOP = URL_MAIN + '/movies/top'
 URL_ENGLISH = URL_MAIN + '/search/genre/Englisch'
 URL_SEARCH = URL_MAIN + '/search/title/%s'
 
@@ -29,16 +28,19 @@ def load():
 
 def showMovieMenu():
     params = ParameterHandler()
-    params.setParam('sUrl', URL_MOVIES)
-    cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
-    params.setParam('sUrl', URL_TOP)
-    cGui().addFolder(cGuiElement('Top Filme', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MOVIES % 'new')
+    cGui().addFolder(cGuiElement('Neuesten', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MOVIES % 'top')
+    cGui().addFolder(cGuiElement('Hits', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MOVIES % 'votes')
+    cGui().addFolder(cGuiElement('Votes', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MOVIES % 'imdb')
+    cGui().addFolder(cGuiElement('IMDB-Bewertung', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_ENGLISH)
     cGui().addFolder(cGuiElement('Englisch', SITE_IDENTIFIER, 'showEntries'), params)
-    params.setParam('sUrl', URL_MOVIES)
+    params.setParam('sUrl', URL_MOVIES % 'new')
     params.setParam('value', 'genre')
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
-    params.setParam('sUrl', URL_MOVIES)
     params.setParam('value', 'movietitle')
     cGui().addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showValue'), params)
     cGui().setEndOfDirectory()
