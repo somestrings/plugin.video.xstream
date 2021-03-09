@@ -1,4 +1,6 @@
 3.5.21~nightly
+- [kinoger] fix protonvideo
+- [requestHandler] add json post
 - [filmpalast] filmmenu an seite angepasst
 - [view4u] entfernt offline
 - [dokus4] fix hosterauswahl list
