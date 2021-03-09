@@ -3,7 +3,7 @@ from resources.lib.config import cConfig
 from resources.lib.tools import logger
 from resources.lib import common
 import io, gzip, time, xbmcgui, re
-import socket, os, sys, hashlib
+import socket, os, sys, hashlib, json
 try:
     from urlparse import urlparse
     from urllib import quote, urlencode
@@ -19,10 +19,10 @@ except ImportError:
 
 
 class cRequestHandler:
-    def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True):
+    def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True, jspost=False):
         self.__sUrl = sUrl
         self.__sRealUrl = ''
-        self.__USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0'
+        self.__USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
         self.__aParameters = {}
         self.__aResponses = {}
         self.__headerEntries = {}
@@ -33,6 +33,7 @@ class cRequestHandler:
         self.caching = caching
         self.ignoreErrors = ignoreErrors
         self.compression = compression
+        self.jspost = jspost
         self.cacheTime = int(cConfig().getSetting('cacheTime', 600))
         self.requestTimeout = int(cConfig().getSetting('requestTimeout', 10))
         self.removeBreakLines(True)
@@ -95,10 +96,16 @@ class cRequestHandler:
             cookieJar.load(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
         except Exception as e:
             logger.debug(e)
-        if sys.version_info[0] == 2:
-            sParameters = urlencode(self.__aParameters, True)
+        if self.jspost:
+            if sys.version_info[0] == 2:
+                sParameters = json.dumps(self.__aParameters)
+            else:
+                sParameters = json.dumps(self.__aParameters).encode()
         else:
-            sParameters = urlencode(self.__aParameters, True).encode()
+            if sys.version_info[0] == 2:
+                sParameters = urlencode(self.__aParameters, True)
+            else:
+                sParameters = urlencode(self.__aParameters, True).encode()
 
         handlers = [HTTPHandler(), HTTPSHandler(), HTTPCookieProcessor(cookiejar=cookieJar)]
         if (2, 7, 9) <= sys.version_info < (2, 7, 11):
@@ -111,6 +118,8 @@ class cRequestHandler:
 
         for key, value in self.__headerEntries.items():
             oRequest.add_header(key, value)
+        if self.jspost:
+            oRequest.add_header('Content-Type', 'application/json')
         cookieJar.add_cookie_header(oRequest)
         try:
             oResponse = opener.open(oRequest)
