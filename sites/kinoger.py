@@ -229,16 +229,20 @@ def showHosters():
         isMatch, aResult = cParser().parse(sUrl, "(http[^']+)")
     else:
         sUrl = params.getValue('entryUrl')
-        sHtmlContent = cRequestHandler(sUrl).request()
+        sHtmlContent = cRequestHandler(sUrl, ignoreErrors=True).request()
         pattern = "show[^>]\d,[^>][^>]'([^']+)"
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
         for sUrl in aResult:
             if 'protonvideo' in sUrl or 'sst' in sUrl:
-                oRequest = cRequestHandler(sUrl)
+                oRequest = cRequestHandler(sUrl, ignoreErrors=True)
                 oRequest.addHeaderEntry('Referer', URL_MAIN)
                 sHtmlContent = oRequest.request()
                 if sHtmlContent == '': continue
+                if 'api.protonvideo.to/api/v4/player' in sHtmlContent:
+                    oRequest = cRequestHandler('https://api.protonvideo.to/api/v4/player', ignoreErrors=True, jspost=True)
+                    oRequest.addParameters('idi', sUrl.split('/')[4])
+                    sHtmlContent = oRequest.request()
                 isMatch, sContainer = cParser.parse(sHtmlContent, 'file(?:":"|:")([^"]+)')
                 if isMatch:
                     isMatch, aResult = cParser.parse(sContainer[0], '(?:(\d+p)[^>])?((?:http|//)[^",]+)')
@@ -251,7 +255,7 @@ def showHosters():
                             hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl)}
                             hosters.append(hoster)
             elif 'kinoger.re' in sUrl:
-                oRequest = cRequestHandler(sUrl.replace('/v/', '/api/source/'))
+                oRequest = cRequestHandler(sUrl.replace('/v/', '/api/source/'), ignoreErrors=True)
                 oRequest.addHeaderEntry('Referer', sUrl)
                 oRequest.addParameters('r', URL_MAIN)
                 oRequest.addParameters('d', 'kinoger.re')
@@ -267,7 +271,7 @@ def showHosters():
                 t = sUrl.split('/')
                 token = encodeUrl(t[4] + ':' + t[5])
                 url2 = 'http://start.u-stream.in/ustGet.php?id=' + t[5] + '&token=' + token
-                oRequest = cRequestHandler(url2)
+                oRequest = cRequestHandler(url2, ignoreErrors=True)
                 oRequest.addHeaderEntry('Referer', sUrl)
                 content = oRequest.request()
                 t = json.loads(content)
