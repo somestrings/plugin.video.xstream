@@ -141,6 +141,23 @@ class cHosterGui:
         logger.info('call send to JDownloader2: ' + sMediaUrl)
         cJDownloader2Handler().sendToJDownloader2(sMediaUrl)
 
+    def sendToMyJDownloader(self, sMediaUrl=False, sMovieTitle='xStream'):
+        from resources.lib.handler.myjdownloaderHandler import cMyJDownloaderHandler
+        params = ParameterHandler()
+        if not sMediaUrl:
+            sMediaUrl = params.getValue('sMediaUrl')
+        sMovieTitle = params.getValue('MovieTitle')
+        if not sMovieTitle:
+            sMovieTitle = params.getValue('Title')
+        if not sMovieTitle:  # only temporary
+            sMovieTitle = params.getValue('sMovieTitle')
+        if not sMovieTitle:
+            sMovieTitle = params.getValue('title')
+        if self.dialog:
+            self.dialog.close()
+        logger.info('call send to My.JDownloader: ' + sMediaUrl)
+        cMyJDownloaderHandler().sendToMyJDownloader(sMediaUrl, sMovieTitle)
+
     def __getPriorities(self, hosterList, filter=True):
         # Sort hosters based on their resolvers priority.
         import urlresolver
@@ -213,7 +230,9 @@ class cHosterGui:
                 return
 
             self.dialog.update(60, 'prepare hosterlist..')
-            if (playMode != 'jd') and (playMode != 'jd2') and (playMode != 'pyload') and cConfig().getSetting('presortHoster') == 'true':
+            if (playMode != 'jd') and (playMode != 'jd2') and (playMode != 'pyload') and \
+                            cConfig().getSetting('presortHoster') == 'true' and \
+                            (playMode != 'myjd'):
                 # filter and sort hosters
                 siteResult = self.__getPriorities(siteResult)
             if not siteResult:
@@ -264,6 +283,8 @@ class cHosterGui:
             self.sendToJDownloader(siteResult['streamUrl'])
         elif playMode == 'jd2':
             self.sendToJDownloader2(siteResult['streamUrl'])
+        elif playMode == 'myjd':
+            self.sendToMyJDownloader(siteResult['streamUrl'])
         elif playMode == 'pyload':
             self.sendToPyLoad(siteResult)
 
