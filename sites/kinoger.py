@@ -75,7 +75,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for sUrl, sName, sThumbnail, sDummy in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isTvshow = True if 'staffel' in sName.lower() or 'serie' in entryUrl else False
+        isTvshow = True if 'staffel' in sName.lower() or 'serie' in entryUrl or ';">S0' in sDummy else False
         isYear, sYear = cParser.parse(sName, '(.*?)\((\d*)\)')
         for name, year in sYear:
             sName = name
@@ -252,7 +252,7 @@ def showHosters():
                                 sQualy = Qualy(sUrl2)
                             if ' or ' in sUrl2:
                                 sUrl2 = sUrl2.split(' or ')[0]
-                            hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl)}
+                            hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl), 'resolveable': True}
                             hosters.append(hoster)
             elif 'kinoger.re' in sUrl:
                 oRequest = cRequestHandler(sUrl.replace('/v/', '/api/source/'), ignoreErrors=True)
@@ -264,7 +264,7 @@ def showHosters():
                 pattern = 'file":"([^"]+)","label":"([^"]+)'
                 isMatch, aResult = cParser.parse(sHtmlContent, pattern)
                 for sUrl, sQualy in aResult:
-                    hoster = {'link': sUrl, 'name': sQualy + ' Kinoger.re'}
+                    hoster = {'link': sUrl, 'name': sQualy + ' Kinoger.re', 'resolveable': True}
                     hosters.append(hoster)
             elif 'start.u' in sUrl:
                 import json
@@ -278,7 +278,7 @@ def showHosters():
                 if 'url' in t and t['url']:
                     for u in t['url']:
                         a = decodeStr(u)
-                        hoster = {'link': a, 'name': Qualy2(a) + cParser.urlparse(sUrl)}
+                        hoster = {'link': a, 'name': Qualy2(a) + cParser.urlparse(sUrl), 'resolveable': True}
                         hosters.append(hoster)
             else:
                 hoster = {'link': sUrl + 'DIREKT', 'name': cParser.urlparse(sUrl)}
@@ -331,7 +331,7 @@ def _search(oGui, sSearchText):
 
 
 def toString(number, base):
-    string = "0123456789abcdefghijklmnopqrstuvwxyz"
+    string = '0123456789abcdefghijklmnopqrstuvwxyz'
     if number < base:
         return string[number]
     else:
