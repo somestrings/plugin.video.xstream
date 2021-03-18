@@ -20,6 +20,7 @@
    <platform>all</platform>
    <news>
 3.5.22~nightly
+- [kinoger] fix serien erkennung
 - [netzkino] seite neu geschrieben
 - Implement My.JDownloader support TNX HPort-x
 - [serienstream] change url
