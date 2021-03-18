@@ -18,7 +18,39 @@ def load():
     oGui = cGui()
     params = ParameterHandler()
     params.setParam('sUrl', URL_MAIN % 'neu')
-    oGui.addFolder(cGuiElement('Neu', SITE_IDENTIFIER, 'showEntries'), params)
+    oGui.addFolder(cGuiElement('Neu bei Netzkino', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'highlights')
+    oGui.addFolder(cGuiElement('Highlights', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'themenkino-frontpage')
+    oGui.addFolder(cGuiElement('Themenkino - Horrorkomödien', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'beste-bewertung')
+    oGui.addFolder(cGuiElement('Beste Bewertung', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'kriegsfilme-frontpage')
+    oGui.addFolder(cGuiElement('Die besten Kriegsfilme', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'meisgesehene_filme')
+    oGui.addFolder(cGuiElement('Meistgesehene Filme', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'beliebte-animes')
+    oGui.addFolder(cGuiElement('Beliebte Animes', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'mockbuster-frontpage')
+    oGui.addFolder(cGuiElement('Mockbuster', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'filme_mit_auszeichnungen')
+    oGui.addFolder(cGuiElement('Filme mit Auszeichnungen', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'letzte-chance')
+    oGui.addFolder(cGuiElement('Letzte Chance - Nur noch kurze Zeit verfügbar', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'frontpage-exklusiv')
+    oGui.addFolder(cGuiElement('Exklusiv bei Netzkino', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'top-20-frontpage')
+    oGui.addFolder(cGuiElement('Top 20 - Am besten bewertet auf IMDb', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_MAIN % 'empfehlungen_woche')
+    oGui.addFolder(cGuiElement('Unsere Empfehlungen der Woche', SITE_IDENTIFIER, 'showEntries'), params)
+    oGui.addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenreMenu'))
+    oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
+    oGui.setEndOfDirectory()
+
+
+def showGenreMenu():
+    oGui = cGui()
+    params = ParameterHandler()
     params.setParam('sUrl', URL_MAIN % 'actionkino')
     oGui.addFolder(cGuiElement('Actionkino', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN % 'animekino')
@@ -47,7 +79,6 @@ def load():
     oGui.addFolder(cGuiElement('Prickelkino', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN % 'kinoab18')
     oGui.addFolder(cGuiElement('Kino ab 18', SITE_IDENTIFIER, 'showEntries'), params)
-    oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     oGui.setEndOfDirectory()
 
 
@@ -55,7 +86,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
-    sJson = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False)).request()
+    sJson = cRequestHandler(entryUrl, ignoreErrors=sGui is not False).request()
     if not sJson:
         if not sGui: oGui.showInfo()
         return
@@ -65,24 +96,25 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         return
 
     total = len(aJson['posts'])
-    for item in aJson["posts"]:
-        try:
-            FSK = ','.join(item['custom_fields']['FSK'])
-            if sSearchText and not cParser().search(sSearchText, item['title']):
-                continue
-            oGuiElement = cGuiElement(item['title'], SITE_IDENTIFIER, 'showHosters')
-            oGuiElement.setThumbnail(item['thumbnail'])
-            sFanart = ','.join(item['custom_fields']['featured_img_all'])
-            oGuiElement.setFanart(sFanart)
-            sYahr = ','.join(item['custom_fields']['Jahr'])
-            oGuiElement.setYear(sYahr)
-            oGuiElement.setMediaType('movie')
-            oGuiElement.setDescription(item['content'])
-            Streaming = ','.join(item['custom_fields']['Streaming'])
-            params.setParam('entryUrl', Streaming)
-            oGui.addFolder(oGuiElement, params, False, total)
-        except:
-            pass
+    for item in aJson['posts']:
+        if sSearchText and not cParser().search(sSearchText, item['title']):
+            continue
+        oGuiElement = cGuiElement(item['title'], SITE_IDENTIFIER, 'showHosters')
+        oGuiElement.setThumbnail(item['thumbnail'])
+        oGuiElement.setDescription(item['content'])
+        oGuiElement.setFanart(item['custom_fields']['featured_img_all'][0])
+        oGuiElement.setYear(item['custom_fields']['Jahr'][0])
+        oGuiElement.setMediaType('movie')
+        if 'Duration' in item['custom_fields'] and item['custom_fields']['Duration'][0]:
+            oGuiElement.addItemValue('duration', item['custom_fields']['Duration'][0])
+        urls = ''
+        if 'Streaming' in item['custom_fields'] and item['custom_fields']['Streaming'][0]:
+            urls += 'http://netzkino_and-vh.akamaihd.net/i/%s.mp4/master.m3u8' % item['custom_fields']['Streaming'][0]
+        if 'Youtube_Delivery_Id' in item['custom_fields'] and item['custom_fields']['Youtube_Delivery_Id'][0]:
+            urls += '#' + 'plugin://plugin.video.youtube/play/?video_id=%s' % item['custom_fields']['Youtube_Delivery_Id'][0]
+        params.setParam('entryUrl', urls)
+        oGui.addFolder(oGuiElement, params, False, total)
+
     if not sGui:
         oGui.setView('movies')
         oGui.setEndOfDirectory()
@@ -90,9 +122,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
 def showHosters():
     hosters = []
-    sUrl = 'http://netzkino_and-vh.akamaihd.net/i/%s.mp4/master.m3u8' % ParameterHandler().getValue('entryUrl')
-    hoster = {'link': sUrl, 'name': 'Netzkino'}
-    hosters.append(hoster)
+    URL = ParameterHandler().getValue('entryUrl')
+    for sUrl in URL.split('#'):
+        hoster = {'link': sUrl, 'name': 'Netzkino' if 'netzkino' in sUrl else 'Youtube', 'resolveable': True}
+        hosters.append(hoster)
     if hosters:
         hosters.append('getHosterUrl')
     return hosters
@@ -110,4 +143,4 @@ def showSearch():
 
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, cParser().quotePlus(sSearchText))
+    showEntries(URL_SEARCH % cParser().quotePlus(sSearchText), oGui, sSearchText)
