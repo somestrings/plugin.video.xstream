@@ -44,12 +44,10 @@ class cPyLoadHandler:
             session = page[:-1]
             opener = build_opener()
             opener.addheaders.append(('Cookie', 'beaker.session.id=' + session))
-            # pyLoad doesn't like utf-8, so converting Package name to ascii, also stripping any characters that do not belong into a path name (\/:*?"<>|)
             sPackage = str(sPackage).decode("utf-8").encode('ascii', 'replace').translate(maketrans('\\/:*?"<>|', '_________'))
             py_url = py_host + ':' + py_port + '/api/addPackage?name="' + quote_plus(sPackage) + '"&links=["' + quote_plus(sUrl) + '"]'
             logger.info('PyLoad API call: ' + py_url)
-            sock = opener.open(py_url)
-            sock2 = sock.read()
+            sock = opener.open(py_url).read()
             sock.close()
             return True
         except HTTPError as e:
@@ -58,6 +56,6 @@ class cPyLoadHandler:
             logger.info(e.read())
             try:
                 sock.close()
-            except:
+            except Exception:
                 logger.info('unable to close socket...')
             return False
