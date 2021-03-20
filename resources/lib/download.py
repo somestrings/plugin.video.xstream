@@ -25,10 +25,9 @@ class cDownload:
     def download(self, url, sTitle, showDialog=True, downloadDialogTitle='Download'):
         sTitle = '%s' % sTitle
         self.__processIsCanceled = False
-        # extract header
         try:
             header = dict([item.split('=') for item in (url.split('|')[1]).split('&')])
-        except:
+        except Exception:
             header = {}
         logger.info('Header for download: %s' % header)
         url = url.split('|')[0]
