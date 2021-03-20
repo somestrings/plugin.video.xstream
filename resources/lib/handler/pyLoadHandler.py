@@ -49,7 +49,7 @@ class cPyLoadHandler:
             py_url = py_host + ':' + py_port + '/api/addPackage?name="' + quote_plus(sPackage) + '"&links=["' + quote_plus(sUrl) + '"]'
             logger.info('PyLoad API call: ' + py_url)
             sock = opener.open(py_url)
-            sock = sock.read()
+            sock2 = sock.read()
             sock.close()
             return True
         except HTTPError as e:
