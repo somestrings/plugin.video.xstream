@@ -23,6 +23,8 @@ def viewInfo(params):
 
 
 def parseUrl():
+    if xbmc.getInfoLabel('Container.PluginName') == 'plugin.video.osmosis':
+        sys.exit()
     params = ParameterHandler()
     logger.info(params.getAllParameters())
     # If no function is set, we set it to the default "load" function
