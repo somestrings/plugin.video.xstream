@@ -1,4 +1,5 @@
 3.5.22~nightly
+- [pureanime] fix hoster PureStream
 - [kinoger] fix serien erkennung
 - [netzkino] seite neu geschrieben
 - Implement My.JDownloader support TNX HPort-x
