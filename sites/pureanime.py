@@ -162,23 +162,23 @@ def showHosters():
 
 def Language(sLang):
     if 'gersub' in sLang:
-        return ' (Deutsche Untertitel) '
+        return ' (Deutsche Untertitel)'
     elif 'engsub' in sLang:
-        return ' (Englische Untertitel) '
+        return ' (Englische Untertitel)'
     elif 'espsub' in sLang:
-        return ' (Spanische Untertitel) '
+        return ' (Spanische Untertitel)'
     elif 'trsub' in sLang:
-        return ' (Türkische Untertitel) '
+        return ' (Türkische Untertitel)'
     elif 'de.png' in sLang:
-        return ' (Deutsch) '
+        return ' (Deutsch)'
     elif 'en.png' in sLang:
-        return ' (Englische) '
+        return ' (Englische)'
     else:
-        return ' '
+        return ''
 
 
 def getHosterUrl(sUrl=False):
-    if 'stream.pure-anime' in sUrl:
+    if 'pure' in sUrl:
         sUrl = PureStream(sUrl)
         return [{'streamUrl': sUrl, 'resolved': True}]
     elif 'gproxy.stream' in sUrl:
@@ -191,12 +191,14 @@ def getHosterUrl(sUrl=False):
 def PureStream(sUrl):
     from resources.lib import jsunpacker
     html = cRequestHandler(sUrl, caching=False, ignoreErrors=True).request()
-    isMatch, packed = cParser.parseSingleResult(html, 'eval.*0,')
+    isMatch, sUrl2 = cParser.parse(html, "src:[^>]'([^']+)")
+    if not isMatch:
+        isMatch, packed = cParser.parseSingleResult(html, 'eval.*0,')
+        if isMatch:
+            unpack = jsunpacker.unpack(packed)
+            isMatch, sUrl2 = cParser.parse(unpack, "file[^>]':[^>]'([^']+)")
     if isMatch:
-        unpack = jsunpacker.unpack(packed)
-        isMatch, sUrl2 = cParser.parse(unpack, "file[^>]':[^>]'([^']+)")
-    if isMatch:
-        return 'https://stream.pure-anime.net' + sUrl2[0] + '|Referer=' + sUrl
+        return 'https://' + cParser.urlparse(sUrl).lower() + sUrl2[0] + '|Referer=' + sUrl
 
 
 def decrypt(key, enc_text):
