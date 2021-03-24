@@ -196,14 +196,6 @@ msgctxt "#30075"
 msgid "Send to LinkGrabber only"
 msgstr ""
 
-msgctxt "#30076"
-msgid "JDownloader2"
-msgstr ""
-
-msgctxt "#30077"
-msgid "JDownloader2 on/off"
-msgstr ""
-
 msgctxt "#30080"
 msgid "Kodi-Download"
 msgstr ""
@@ -271,4 +263,3 @@ msgstr ""
 msgctxt "#30402"
 msgid "Countries"
 msgstr ""
-
