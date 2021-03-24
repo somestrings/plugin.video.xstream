@@ -39,10 +39,6 @@
     <setting default="true" id="plugin_filmpalast_to" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_filmpalast_to" label="30052" type="bool" />
     <setting type="sep" />
-    <setting label="Flimmerstube" type="lsep" />
-    <setting default="true" id="plugin_flimmerstube_com" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_flimmerstube_com" label="30052" type="bool" />
-    <setting type="sep" />
     <setting label="HD-Streams.org" type="lsep" />
     <setting default="true" id="plugin_hd-streams_org" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_hd-streams_org" label="30052" type="bool" />
@@ -83,17 +79,13 @@
     <setting default="true" id="plugin_movieking" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_movieking" label="30052" type="bool" />
     <setting type="sep" />
-    <setting label="MovieStream" type="lsep" />
-    <setting default="true" id="plugin_moviestream" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_moviestream" label="30052" type="bool" />
-    <setting type="sep" />
     <setting label="MovieTown" type="lsep" />
     <setting default="true" id="plugin_movietown_org" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_movietown_org" label="30052" type="bool" />
     <setting type="sep" />
     <setting label="NetzKino" type="lsep" />
-    <setting default="true" id="plugin_netzkino_de" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_netzkino_de" label="30052" type="bool" />
+    <setting default="true" id="plugin_netzkino" label="30050" type="bool" />
+    <setting default="true" enable="!eq(-1,false)" id="global_search_netzkino" label="30052" type="bool" />
     <setting type="sep" />
     <setting label="Pureanime" type="lsep" />
     <setting default="true" id="plugin_pureanime" label="30050" type="bool" />
@@ -107,9 +99,9 @@
     <setting default="" id="serienstream.user" label="30083" type="text" />
     <setting default="" id="serienstream.pass" label="30084" option="hidden" type="text" />
     <setting type="sep" />
-    <setting label="Topstreamfilm" type="lsep" />
-    <setting default="true" id="plugin_topstreamfilm" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_topstreamfilm" label="30052" type="bool" />
+    <setting label="Streamworld" type="lsep" />
+    <setting default="true" id="plugin_streamworld" label="30050" type="bool" />
+    <setting default="true" enable="!eq(-1,false)" id="global_search_streamworld" label="30052" type="bool" />
     <setting type="sep" />
 </category>
     <category label="TMDB">
@@ -142,7 +134,7 @@
     <setting default="10025" enable="!eq(-2,false)" id="jd_port" label="30073" type="number" />
     <setting default="true" enable="!eq(-3,false)" id="jd_automatic_start" label="30074" type="bool" />
     <setting default="false" enable="!eq(-4,false)" id="jd_grabber" label="30075" type="bool" />
-    <setting label="30076" type="sep" />
+    <setting type="sep" />
     <setting default="false" id="myjd_enabled" label="30091" type="bool" />
     <setting default="JDownloader@Device" enable="!eq(-1,false)" id="myjd_device" label="30092" type="text" />
     <setting default="example@example.com" enable="!eq(-2,false)" id="myjd_user" label="30083" type="text" />
