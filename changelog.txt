@@ -1,4 +1,5 @@
 3.5.22~nightly
+- jdownloader2Handler entfernt
 - [pureanime] fix hoster PureStream
 - [kinoger] fix serien erkennung
 - [netzkino] seite neu geschrieben
