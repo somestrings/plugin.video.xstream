@@ -4,7 +4,6 @@
 msgid ""
 msgstr ""
 
-
 msgctxt "#30001"
 msgid ""
 msgstr "Video-Player"
@@ -89,7 +88,6 @@ msgctxt "#30024"
 msgid ""
 msgstr "Konten"
 
-
 msgctxt "#30030"
 msgid ""
 msgstr "Update"
@@ -114,7 +112,6 @@ msgctxt "#30035"
 msgid ""
 msgstr "Netzwerk"
 
-
 msgctxt "#30040"
 msgid ""
 msgstr "Globale Suche"
@@ -135,7 +132,6 @@ msgctxt "#30044"
 msgid ""
 msgstr "Metahandler-Einstellungen"
 
-
 msgctxt "#30050"
 msgid ""
 msgstr "Site-Plugin verwenden"
@@ -147,7 +143,6 @@ msgstr "Domain auswählen"
 msgctxt "#30052"
 msgid ""
 msgstr "Für Globale Suche benutzen"
-
 
 msgctxt "#30060"
 msgid ""
@@ -173,7 +168,6 @@ msgctxt "#30065"
 msgid ""
 msgstr "Episoden-Ansicht"
 
-
 msgctxt "#30070"
 msgid ""
 msgstr "JDownloader"
@@ -197,14 +191,6 @@ msgstr "Download automatisch starten"
 msgctxt "#30075"
 msgid ""
 msgstr "Sende nur an LinkGrabber"
-
-msgctxt "#30076"
-msgid ""
-msgstr "JDownloader2"
-
-msgctxt "#30077"
-msgid ""
-msgstr "JDownloader2 an/aus"
 
 msgctxt "#30080"
 msgid ""
@@ -270,9 +256,6 @@ msgctxt "#30309"
 msgid ""
 msgstr "Bitte warte %s Sekunden"
 
-
 msgctxt "#30402"
 msgid ""
 msgstr "Länder"
-
-
