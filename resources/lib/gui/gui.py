@@ -140,6 +140,9 @@ class cGui:
             if cConfig().getSetting('jd_enabled') == 'true':
                 contextitem.setTitle("send to JDownloader")
                 contextmenus += [(contextitem.getTitle(), "RunPlugin(%s&playMode=jd)" % (sUrl,),)]
+            if cConfig().getSetting('jd2_enabled') == 'true':
+                contextitem.setTitle("send to JDownloader2")
+                contextmenus += [(contextitem.getTitle(), "RunPlugin(%s&playMode=jd2)" % (sUrl,),)]
             if cConfig().getSetting('myjd_enabled') == 'true':
                 contextitem.setTitle("send to My.JDownloader")
                 contextmenus += [(contextitem.getTitle(), "RunPlugin(%s&playMode=myjd)" % (sUrl,),)]
