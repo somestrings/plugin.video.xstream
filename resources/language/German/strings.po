@@ -192,6 +192,14 @@ msgctxt "#30075"
 msgid ""
 msgstr "Sende nur an LinkGrabber"
 
+msgctxt "#30076"
+msgid ""
+msgstr "JDownloader2"
+
+msgctxt "#30077"
+msgid ""
+msgstr "JDownloader2 an/aus"
+
 msgctxt "#30080"
 msgid ""
 msgstr "Kodi-Download"
