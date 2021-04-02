@@ -75,7 +75,10 @@ class cHosterGui:
             info['TVShowTitle'] = data['showTitle']
         list_item.setInfo(type="Video", infoLabels=info)
         list_item.setProperty('IsPlayable', 'true')
-        xbmcplugin.setResolvedUrl(cGui().pluginHandle, True, list_item)
+        if cGui().pluginHandle > 0:
+            xbmcplugin.setResolvedUrl(cGui().pluginHandle, True, list_item)
+        else:
+            xbmc.Player().play(data['link'], list_item)
         return cPlayer().startPlayer()
 
     def addToPlaylist(self, siteResult=False):
