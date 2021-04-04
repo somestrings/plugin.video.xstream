@@ -22,7 +22,7 @@ def load():
     params.setParam('sUrl', URL_MAIN % 'highlights')
     oGui.addFolder(cGuiElement('Highlights', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN % 'themenkino-frontpage')
-    oGui.addFolder(cGuiElement('Themenkino - Horrorkomödien', SITE_IDENTIFIER, 'showEntries'), params)
+    oGui.addFolder(cGuiElement('Themenkino', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN % 'beste-bewertung')
     oGui.addFolder(cGuiElement('Beste Bewertung', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN % 'kriegsfilme-frontpage')
