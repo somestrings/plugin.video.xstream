@@ -31,5 +31,26 @@ try:
     if xbmcaddon.Addon().getSetting('newSetting') == 'true':
         from resources.lib.handler.pluginHandler import cPluginHandler
         cPluginHandler().getAvailablePlugins()
-except:
+except Exception:
     pass
+
+
+def getdomain():
+    try:
+        import requests
+        from resources.lib.tools import cParser
+        from resources.lib.handler.requestHandler import cRequestHandler
+        url = 'https://serien.domains/'
+        r = cRequestHandler(url, caching=False).request()
+        pattern = 'ol class="links">(.*?)</ol'
+        isMatch, aResult = cParser.parse(r, pattern)
+        isMatch, links = cParser.parse(str(aResult), 'href="([^"]+)')
+        for link in links:
+            if requests.get(link).status_code == 200:
+                return xbmcaddon.Addon().setSetting('seriendomain', link)
+        return 'https://serienstream.to'
+    except Exception:
+        pass
+
+
+getdomain()
