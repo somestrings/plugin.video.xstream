@@ -7,31 +7,16 @@ from resources.lib.gui.gui import cGui
 from resources.lib.jsnprotect import cHelper
 from resources.lib.config import cConfig
 
-def getdomain():
-    import requests
-    url = 'https://serien.domains/'
-    r = cRequestHandler(url).request()
-    pattern = 'ol class="links">(.*?)</ol'
-    isMatch, aResult = cParser.parse(r, pattern)
-    isMatch, links = cParser.parse(str(aResult),'href="([^"]+)')
-    for link in links:
-        if requests.get(link).status_code == 200:
-            return link
-    return 'https://serienstream.to'
-
 
 SITE_IDENTIFIER = 'serienstream_to'
 SITE_NAME = 'SerienStream'
 SITE_ICON = 'serienstream.png'
 SITE_SETTINGS = '<setting id="serienstream.user" type="text" label="30083" default="" /><setting id="serienstream.pass" type="text" option="hidden" label="30084" default="" />'
-#URL_MAIN = 'https://serien.me'
-URL_MAIN = getdomain()
 
+URL_MAIN = cConfig().getSetting('seriendomain')
 URL_SERIES = URL_MAIN + '/serien'
 URL_POPULAR = URL_MAIN + '/beliebte-serien'
 URL_LOGIN = URL_MAIN + '/login'
-
-
 
 
 def load():
@@ -149,8 +134,6 @@ def showSeasons():
     if isThumbnail:
         if sThumbnail.startswith('/'):
             sThumbnail = URL_MAIN + sThumbnail
-        else:
-            sThumbnail = sThumbnail
 
     total = len(aResult)
     for sUrl, sName, sNr in aResult:
