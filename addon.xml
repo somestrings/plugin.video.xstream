@@ -20,6 +20,7 @@
    <platform>all</platform>
    <news>
 3.5.22~nightly8
+- [general] serienstream domain check bei kodistart
 - [serienstream] add domain check tnx kasi
 - [general] fix select hoster TNX kasi
 - [serienstream] update domain 28.3.21
