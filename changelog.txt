@@ -1,4 +1,6 @@
-3.5.22~nightly9
+3.5.22~nightly10
+- [kinobz] add site
+- [movieking] offline entfernt
 - [general] serienstream domain check bei kodistart TNX Kasi
 - [serienstream] add domain check TNX Kasi
 - [general] fix select hoster TNX kasi
