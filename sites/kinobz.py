@@ -13,6 +13,7 @@ URL_KINO = URL_MAIN + 'genre/kinofilme/'
 URL_FILME = URL_MAIN + 'movies/'
 URL_TOP = URL_MAIN + 'imdb/'
 URL_SEARCH = URL_MAIN + '?s=%s'
+SITE_GLOBAL_SEARCH = False
 
 
 def load():
