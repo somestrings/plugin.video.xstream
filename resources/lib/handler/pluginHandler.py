@@ -2,7 +2,7 @@
 from resources.lib.config import cConfig
 from resources.lib.tools import logger
 from resources.lib import common
-import json, os
+import json, os, sys
 
 
 class cPluginHandler:
@@ -33,7 +33,7 @@ class cPluginHandler:
             if fileName not in pluginDB or modTime > plugin['modified']:
                 logger.info('load plugin: ' + str(fileName))
                 # try to import plugin
-                pluginData = self.__getPluginData(fileName)
+                pluginData = self.__getPluginData(fileName, self.defaultFolder)
                 if pluginData:
                     pluginData['modified'] = modTime
                     pluginDB[fileName] = pluginData
@@ -138,7 +138,7 @@ class cPluginHandler:
                     customSettings = []
                     try:
                         customSettings = ET.XML(xmlString % plugin['settings']).findall('setting')
-                    except:
+                    except Exception:
                         logger.error('Parsing of custom settings for % failed.' % plugin['name'])
                     for setting in customSettings:
                         setting.tail = '\n    '
@@ -148,7 +148,7 @@ class cPluginHandler:
             pluginElements = pluginElem.findall('setting')[-1].tail = '\n'
             try:
                 ET.dump(pluginElem)
-            except:
+            except Exception:
                 logger.error('Settings update failed')
                 return
             tree.write(self.settingsFile)
@@ -162,8 +162,9 @@ class cPluginHandler:
                 aNameList.append(sItemName)
         return aNameList
 
-    def __getPluginData(self, fileName):
+    def __getPluginData(self, fileName, defaultFolder):
         pluginData = {}
+        if not defaultFolder in sys.path: sys.path.append(defaultFolder)
         try:
             plugin = __import__(fileName, globals(), locals())
             pluginData['name'] = plugin.SITE_NAME
@@ -172,15 +173,15 @@ class cPluginHandler:
             return False
         try:
             pluginData['icon'] = plugin.SITE_ICON
-        except:
+        except Exception:
             pass
         try:
             pluginData['settings'] = plugin.SITE_SETTINGS
-        except:
+        except Exception:
             pass
         try:
             pluginData['globalsearch'] = plugin.SITE_GLOBAL_SEARCH
-        except:
+        except Exception:
             pluginData['globalsearch'] = True
             pass
         return pluginData
