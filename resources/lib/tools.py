@@ -23,14 +23,15 @@ class cParser:
 
     @staticmethod
     def __replaceSpecialCharacters(s):
-        s = s.replace('\\/', '/').replace('&amp;', '&').replace('\\u00c4', 'Ä').replace('\\u00e4', 'ä')
-        s = s.replace('\\u00d6', 'Ö').replace('\\u00f6', 'ö').replace('\\u00dc', 'Ü').replace('\\u00fc', 'ü')
-        s = s.replace('\\u00df', 'ß').replace('\\u2013', '-').replace('\\u00b2', '²').replace('\\u00b3', '³')
-        s = s.replace('\\u00e9', 'é').replace('\\u2018', '‘').replace('\\u201e', '„').replace('\\u201c', '“')
-        s = s.replace('\\u00c9', 'É').replace('\\u2026', '...').replace('\\u202fh', 'h').replace('\\u2019', '’')
-        s = s.replace('\\u0308', '̈').replace('\\u00e8', 'è').replace('#038;', '').replace('\\u00f8', 'ø')
-        s = s.replace('／', '/').replace('\\u00e1', 'á').replace('&#8211;', '-').replace('&#8220;', '“').replace('&#8222;', '„')
-        s = s.replace('&#8217;', '’').replace('&#8230;', '…').replace('&#039;', "'")
+        for t in (('\\/', '/'), ('&amp;', '&'), ('\\u00c4', 'Ä'), ('\\u00e4', 'ä'),
+            ('\\u00d6', 'Ö'), ('\\u00f6', 'ö'), ('\\u00dc', 'Ü'), ('\\u00fc', 'ü'),
+            ('\\u00df', 'ß'), ('\\u2013', '-'), ('\\u00b2', '²'), ('\\u00b3', '³'),
+            ('\\u00e9', 'é'), ('\\u2018', '‘'), ('\\u201e', '„'), ('\\u201c', '“'),
+            ('\\u00c9', 'É'), ('\\u2026', '...'), ('\\u202fh', 'h'), ('\\u2019', '’'),
+            ('\\u0308', '̈'), ('\\u00e8', 'è'), ('#038;', ''), ('\\u00f8', 'ø'),
+            ('／', '/'), ('\\u00e1', 'á'), ('&#8211;', '-'), ('&#8220;', '“'), ('&#8222;', '„'),
+            ('&#8217;', '’'), ('&#8230;', '…'), ('&#039;', "'")):
+            s = s.replace(*t)
         return s
 
     @staticmethod
