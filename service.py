@@ -48,7 +48,7 @@ def getdomain():
         for link in links:
             if requests.get(link).status_code == 200:
                 return xbmcaddon.Addon().setSetting('seriendomain', link)
-        return 'https://serienstream.to'
+        return 'https://serien.pro'
     except Exception:
         pass
 
