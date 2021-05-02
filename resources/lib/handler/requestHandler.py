@@ -22,7 +22,7 @@ class cRequestHandler:
     def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True, jspost=False):
         self.__sUrl = sUrl
         self.__sRealUrl = ''
-        self.__USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'
+        self.__USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0'
         self.__aParameters = {}
         self.__aResponses = {}
         self.__headerEntries = {}
@@ -143,12 +143,13 @@ class cRequestHandler:
                     url3 = '%s://%s/%s' % (url3.scheme, url3.netloc, url2[0])
                     opener = build_opener(HTTPCookieProcessor(cookieJar))
                     opener.addheaders = [('User-agent', self.__USER_AGENT), ('Referer', self.__sUrl)]
-                    response = opener.open(url3)
-                    content = response.read()
+                    opener.open(url3).read()
                     opener = build_opener(HTTPCookieProcessor(cookieJar))
                     opener.addheaders = [('User-agent', self.__USER_AGENT), ('Referer', self.__sUrl)]
-                    oResponse = opener.open(self.__sUrl)
-
+                    if len(sParameters) > 0:
+                        oResponse = opener.open(self.__sUrl, sParameters)
+                    else:
+                        oResponse = opener.open(self.__sUrl)
                     if not oResponse:
                         if not self.ignoreErrors:
                             logger.error('Failed DDOS-GUARD Url: ' + self.__sUrl)
@@ -297,10 +298,9 @@ class cRequestHandler:
     @staticmethod
     def getFileAge(cacheFile):
         try:
-            fileAge = time.time() - os.stat(cacheFile).st_mtime
+            return time.time() - os.stat(cacheFile).st_mtime
         except Exception:
             return 0
-        return fileAge
 
     def clearCache(self):
         files = os.listdir(self.__cachePath)
