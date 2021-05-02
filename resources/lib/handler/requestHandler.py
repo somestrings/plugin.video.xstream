@@ -191,7 +191,10 @@ class cRequestHandler:
                 sContent = bf
             else:
                 logger.error('Failed BF Url: ' + self.__sUrl)
-        cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
+        try:
+            cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
+        except Exception as e:
+            logger.error('Failed save cookie: %s' % e)
         if self.__bRemoveNewLines:
             sContent = sContent.replace('\n', '')
             sContent = sContent.replace('\r\t', '')
@@ -215,7 +218,10 @@ class cRequestHandler:
         if not 'dummy' in self.__sUrl:
             cookieFile = os.path.join(cookieFile, urlparse(self.__sUrl).netloc.replace('.', '_') + '.txt')
             if not os.path.exists(cookieFile):
-                file = open(cookieFile, 'w')
+                if sys.version_info[0] == 2:
+                    file = open(cookieFile, 'w')
+                else:
+                    file = open(cookieFile, 'wb')
                 file.close()
             self._cookiePath = cookieFile
 
