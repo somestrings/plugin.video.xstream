@@ -218,10 +218,7 @@ class cRequestHandler:
         if not 'dummy' in self.__sUrl:
             cookieFile = os.path.join(cookieFile, urlparse(self.__sUrl).netloc.replace('.', '_') + '.txt')
             if not os.path.exists(cookieFile):
-                if sys.version_info[0] == 2:
-                    file = open(cookieFile, 'w')
-                else:
-                    file = open(cookieFile, 'wb')
+                file = open(cookieFile, 'w')
                 file.close()
             self._cookiePath = cookieFile
 
