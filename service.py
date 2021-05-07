@@ -33,24 +33,3 @@ try:
         cPluginHandler().getAvailablePlugins()
 except Exception:
     pass
-
-
-def getdomain():
-    try:
-        import requests
-        from resources.lib.tools import cParser
-        from resources.lib.handler.requestHandler import cRequestHandler
-        url = 'https://serien.domains/'
-        r = cRequestHandler(url, caching=False).request()
-        pattern = 'ol class="links">(.*?)</ol'
-        isMatch, aResult = cParser.parse(r, pattern)
-        isMatch, links = cParser.parse(str(aResult), 'href="([^"]+)')
-        for link in links:
-            if requests.get(link).status_code == 200:
-                return xbmcaddon.Addon().setSetting('seriendomain', link)
-        return 'https://serien.pro'
-    except Exception:
-        pass
-
-
-getdomain()
