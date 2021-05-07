@@ -13,7 +13,7 @@ SITE_NAME = 'SerienStream'
 SITE_ICON = 'serienstream.png'
 SITE_SETTINGS = '<setting id="serienstream.user" type="text" label="30083" default="" /><setting id="serienstream.pass" type="text" option="hidden" label="30084" default="" />'
 
-URL_MAIN = cConfig().getSetting('seriendomain')
+URL_MAIN = cConfig().getSetting('seriendomain', 'https://s.to')
 URL_SERIES = URL_MAIN + '/serien'
 URL_POPULAR = URL_MAIN + '/beliebte-serien'
 URL_LOGIN = URL_MAIN + '/login'
@@ -32,7 +32,32 @@ def load():
     params.setParam('sCont', 'homeContentGenresList')
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
+    cGui().addFolder(cGuiElement('[COLOR red]Bei Problemen hier Domain ändern[/COLOR]', SITE_IDENTIFIER, 'checkDomain'))
     cGui().setEndOfDirectory()
+
+
+def checkDomain():
+    import xbmcgui, xbmcaddon
+    r = cRequestHandler('https://serien.domains/', caching=False).request()
+    pattern = 'ol class="links">(.*?)</ol'
+    isMatch, aResult = cParser.parse(r, pattern)
+    isMatch, links = cParser.parse(str(aResult), 'href="([^"]+)')
+    url = []
+    for link in links:
+        url.append(link)
+    index = xbmcgui.Dialog().select('Serienstream', url)
+    if index > -1:
+        url = url[index]
+        Request = cRequestHandler(url, caching=False)
+        sHtmlContent = Request.request()
+        if not sHtmlContent:
+            xbmcgui.Dialog().ok('Serienstream', 'Fehler Domain funktioniert nicht')
+            return
+        if 'S.to, serien stream' in sHtmlContent:
+            xbmcgui.Dialog().ok('Serienstream', 'Serienstream müsste jetzt funktioniert ggf. ist ein Kodi Neustart erforderlich')
+            return xbmcaddon.Addon().setSetting('seriendomain', Request.getRealUrl())
+    else:
+        return False
 
 
 def showValue():
@@ -204,9 +229,6 @@ def showHosters():
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if isMatch:
         for sLang, sUrl, sName, sQualy in aResult:
-            sLanguage = cConfig().getSetting('prefLanguage')
-            if sLang is not '1' and sLanguage == '0':
-                continue
             if sLang == '1':
                 sLang = 'Deutsch'
             if sLang == '2':
