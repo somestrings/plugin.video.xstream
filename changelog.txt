@@ -1,4 +1,5 @@
-3.5.22~nightly10
+3.5.22~nightly11
+- [requestHandler] neue funktionen hinzugefügt, code cleanup
 - [kinobz] add site
 - [movieking] offline entfernt
 - [general] serienstream domain check bei kodistart TNX Kasi
