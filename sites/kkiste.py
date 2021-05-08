@@ -3,12 +3,13 @@ from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
 from resources.lib.gui.guiElement import cGuiElement
+from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 
 SITE_IDENTIFIER = 'kkiste'
 SITE_NAME = 'KKiste'
 SITE_ICON = 'kkiste.png'
-URL_MAIN = 'https://kkiste.movie/'
+URL_MAIN = cConfig().getSetting('kkisteurl', 'https://kkiste.co')
 
 
 def load():
@@ -53,6 +54,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oRequest.addParameters('subaction', 'search')
         oRequest.addParameters('story', sSearchText)
     sHtmlContent = oRequest.request()
+    if oRequest.getStatus() == '301':
+        cConfig().setSetting('kkisteurl', oRequest.getRealUrl())
     pattern = 'class="short">.*?href="([^"]+)">([^<]+).*?img src="([^"]+).*?desc">([^<]+).*?Jahr.*?([\d]+).*?s-red">([\d]+)'
     isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if not isMatch:
