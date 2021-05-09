@@ -1,4 +1,5 @@
-3.5.22~nightly13
+3.5.22~nightly14
+- [kinokiste] neue Seite hinzugefügt
 - [kkiste] fix search Problem
 - [Serienstream] Domaincheck Funktion überarbeitet
 - [requestHandler] neue funktionen hinzugefügt, code cleanup
