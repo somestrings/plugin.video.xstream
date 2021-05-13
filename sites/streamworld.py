@@ -8,9 +8,8 @@ from resources.lib.gui.gui import cGui
 SITE_IDENTIFIER = 'streamworld'
 SITE_NAME = 'Streamworld'
 SITE_ICON = 'streamworld.png'
-URL_MAIN = 'https://streamworld.in/'
-URL_ANI = URL_MAIN + 'animationfilm/'
-URL_SEARCH = URL_MAIN
+URL_MAIN = 'https://streamworld.in'
+URL_ANI = URL_MAIN + '/animationfilm/'
 
 
 def load():
@@ -24,6 +23,8 @@ def load():
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
     params.setParam('value', 'Jahre')
     cGui().addFolder(cGuiElement('Jahr', SITE_IDENTIFIER, 'showValue'), params)
+    params.setParam('value', 'Land')
+    cGui().addFolder(cGuiElement('Land', SITE_IDENTIFIER, 'showValue'), params)
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'), params)
     cGui().setEndOfDirectory()
 
@@ -118,4 +119,4 @@ def showSearch():
 
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH, oGui, sSearchText)
+    showEntries(URL_MAIN, oGui, sSearchText)
