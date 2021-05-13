@@ -20,6 +20,7 @@
    <platform>all</platform>
    <news>
 3.5.22~nightly14
+- [movie4k click] fix suche, episode
 - [kinokiste] neue Seite hinzugefügt
 - [kkiste] fix search Problem
 - [Serienstream] Domaincheck Funktion überarbeitet
