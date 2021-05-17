@@ -5,14 +5,14 @@ from resources.lib.tools import logger, cParser, cUtil
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
 
-SITE_IDENTIFIER = 'hd-streams_org'
-SITE_NAME = 'HD-Streams.org'
+SITE_IDENTIFIER = 'hd-streams'
+SITE_NAME = 'HD-Streams'
 SITE_ICON = 'hdstreams_org.png'
 URL_MAIN = 'https://hd-streams.org/'
 URL_FILME = URL_MAIN + 'movies?perPage=54'
 URL_SERIE = URL_MAIN + 'seasons?perPage=54'
 URL_POPULAR = URL_MAIN + 'popular'
-URL_SEARCH = URL_MAIN + 'search?q=%s&movies=true&seasons=true&actors=true&didyoumean=true&extended=true'
+URL_SEARCH = URL_MAIN + 'search?q=%s&movies=true&seasons=true&actors=false&didyoumean=false&extended=true'
 
 
 def load():
