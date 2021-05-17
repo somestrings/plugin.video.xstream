@@ -1,6 +1,7 @@
-3.5.22~nightly14
+3.5.22~nightly15
+- [kinofox] Seite hinzugefügt
 - [movie4k click] fix suche, episode
-- [kinokiste] neue Seite hinzugefügt
+- [kinokiste] Seite hinzugefügt
 - [kkiste] fix search Problem
 - [Serienstream] Domaincheck Funktion überarbeitet
 - [requestHandler] neue funktionen hinzugefügt, code cleanup
