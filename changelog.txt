@@ -1,4 +1,5 @@
 3.5.22~nightly15
+- fix Kodi-19-Favoriten-Thumbnails Problem
 - [kinofox] Seite hinzugefügt
 - [movie4k click] fix suche, episode
 - [kinokiste] Seite hinzugefügt
