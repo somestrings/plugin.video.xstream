@@ -458,7 +458,6 @@ def ajaxCall():
                 sTitle = aResult[1][0][1]
                 sLang = aEntry[0]
                 sUrl = URL_MAIN + str(aResult[1][0][0])
-                sUrl = sUrl
                 oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
                 oGuiElement.setYear(sYear)
                 oGuiElement.setLanguage(sLang)
@@ -481,7 +480,6 @@ def ajaxCall():
                     parms.setParam('page', iNextPage)
                     parms.setParam('character', sCharacter)
                     parms.setParam('mediaType', sMediaType)
-                    parms.setParam('securityCookie')
                 if iMediaTypePageId:
                     parms.setParam('mediaTypePageId', iMediaTypePageId)
                 oGui.addNextPage(SITE_IDENTIFIER, 'ajaxCall', parms)
