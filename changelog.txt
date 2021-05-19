@@ -1,4 +1,6 @@
-3.5.22~nightly16
+3.5.22~nightly18
+- [kinoag] entfernt
+- [kinoger] entfernt
 - fix Kodi-19-Favoriten-Thumbnails Problem
 - [kinofox] Seite hinzugefügt
 - [movie4k click] fix suche, episode
