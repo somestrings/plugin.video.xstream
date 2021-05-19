@@ -14,7 +14,7 @@ import base64, random
 SITE_IDENTIFIER = 'kinoger'
 SITE_NAME = 'Kinoger'
 SITE_ICON = 'kinoger.png'
-SITE_SETTINGS = '<setting default="kinoger.to" enable="!eq(-2,false)" id="kinoger-domain" label="30051" type="labelenum" values="kinoger.com|kinoger.to" />'
+SITE_SETTINGS = '<setting default="kinoger.com" enable="!eq(-2,false)" id="kinoger-domain" label="30051" type="labelenum" values="kinoger.com|kinoger.to" />'
 URL_MAIN = 'https://' + cConfig().getSetting('kinoger-domain')
 URL_SERIE = URL_MAIN + '/stream/serie/'
 
