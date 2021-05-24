@@ -182,26 +182,18 @@ def showEpisodes():
     if params.exist('L11'):
         L11 = params.getValue('L11')
         isMatch1, L11 = cParser.parse(L11, "(http[^']+)")
-        if isMatch1:
-            L11 = L11
     L22 = []
     if params.exist('L22'):
         L22 = params.getValue('L22')
         isMatch, L22 = cParser.parse(L22, "(http[^']+)")
-        if isMatch:
-            L22 = L22
     L33 = []
     if params.exist('L33'):
         L33 = params.getValue('L33')
         isMatch3, L33 = cParser.parse(L33, "(http[^']+)")
-        if isMatch3:
-            L33 = L33
     L44 = []
     if params.exist('L44'):
         L44 = params.getValue('L44')
         isMatch4, L44 = cParser.parse(L44, "(http[^']+)")
-        if isMatch4:
-            L44 = L44
     liste = ziplist(L11, L22, L33, L44)
     i = 0
     for sUrl in liste:
