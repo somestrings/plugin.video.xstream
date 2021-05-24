@@ -45,23 +45,14 @@ class ParameterHandler:
 
     def getParameterAsUri(self):
         outParams = dict()
-        # temp solution
-        try:
+        if 'params' in self.__params:
             del self.__params['params']
-        except:
-            pass
-        try:
+        if 'function' in self.__params:
             del self.__params['function']
-        except:
-            pass
-        try:
+        if 'title' in self.__params:
             del self.__params['title']
-        except:
-            pass
-        try:
+        if 'site' in self.__params:
             del self.__params['site']
-        except:
-            pass
 
         if len(self.__params) > 0:
             for param in self.__params:
