@@ -8,7 +8,7 @@ from resources.lib.gui.gui import cGui
 SITE_IDENTIFIER = 'kinokiste'
 SITE_NAME = 'KinoKiste'
 SITE_ICON = 'kinokiste.png'
-URL_MAIN = 'https://kinokiste.club/'
+URL_MAIN = 'https://movie2k.ag/'
 URL_KINO = URL_MAIN + 'featured'
 URL_FILME = URL_MAIN + 'movies/'
 URL_SEARCH = URL_MAIN + '?c=movie&m=filter&keyword=%s'
