@@ -1,4 +1,5 @@
-3.5.23~nightly
+3.5.23~nightly2
+- [flimmerstube] Seite hinzugefügt
 - [kinoger] wieder hinzugefügt
 
 3.5.22
