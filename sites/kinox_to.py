@@ -604,7 +604,7 @@ def getHosterUrl(sUrl=False):
             oRequest = cRequestHandler(sStreamUrl, caching=False)
             oRequest.request()
             sStreamUrl = oRequest.getRealUrl()
-        if 'thevideos.ga' in sStreamUrl:
+        if 'thevideo' in sStreamUrl:
             sStreamUrl = sStreamUrl.replace('embed-', 'stream').replace('html', 'mp4')
             sUrl = _redirectHoster(sStreamUrl)
             return [{'streamUrl': sUrl, 'resolved': True}]
