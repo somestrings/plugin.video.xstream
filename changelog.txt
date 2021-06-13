@@ -1,4 +1,5 @@
-3.5.23~nightly3
+3.5.23~nightly4
+- [kinox] fix thevideo
 - [movieking] Seite hinzugefügt
 - [flimmerstube] Seite hinzugefügt
 - [kinoger] wieder hinzugefügt
