@@ -226,15 +226,11 @@ def showHosters():
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
         for sUrl in aResult:
-            if 'protonvideo' in sUrl or 'sst' in sUrl:
+            if 'sst' in sUrl:
                 oRequest = cRequestHandler(sUrl, ignoreErrors=True)
                 oRequest.addHeaderEntry('Referer', URL_MAIN)
                 sHtmlContent = oRequest.request()
                 if sHtmlContent == '': continue
-                if 'api.protonvideo.to/api/v4/player' in sHtmlContent:
-                    oRequest = cRequestHandler('https://api.protonvideo.to/api/v4/player', ignoreErrors=True, jspost=True)
-                    oRequest.addParameters('idi', sUrl.split('/')[4])
-                    sHtmlContent = oRequest.request()
                 isMatch, sContainer = cParser.parse(sHtmlContent, 'file(?:":"|:")([^"]+)')
                 if isMatch:
                     isMatch, aResult = cParser.parse(sContainer[0], '(?:(\d+p)[^>])?((?:http|//)[^",]+)')
@@ -246,18 +242,37 @@ def showHosters():
                                 sUrl2 = sUrl2.split(' or ')[0]
                             hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl), 'resolveable': True}
                             hosters.append(hoster)
-            elif 'kinoger.re' in sUrl:
-                oRequest = cRequestHandler(sUrl.replace('/v/', '/api/source/'), ignoreErrors=True)
+            elif 'protonvideo' in sUrl:
+                oRequest = cRequestHandler('https://api.svh-api.ch/api/v4/player', ignoreErrors=True, jspost=True)
+                oRequest.addParameters('idi', sUrl.split('/')[4])
+                oRequest.addParameters('token', aes(sUrl.split('/')[4]))
+                sHtmlContent = oRequest.request()
+                isMatch, sContainer = cParser.parse(sHtmlContent, 'file(?:":"|:")([^"]+)')
+                if isMatch:
+                    isMatch, aResult = cParser.parse(sContainer[0], '(?:(\d+p)[^>])?((?:http|//)[^",]+)')
+                    if isMatch:
+                        for sQualy, sUrl2 in aResult:
+                            hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl), 'resolveable': True}
+                            hosters.append(hoster)
+            elif 'kinoger' in sUrl:
+                from resources.lib import jsunpacker
+                oRequest = cRequestHandler(sUrl.replace('/e/', '/play/'), ignoreErrors=True)
                 oRequest.addHeaderEntry('Referer', sUrl)
-                oRequest.addParameters('r', URL_MAIN)
-                oRequest.addParameters('d', 'kinoger.re')
                 sHtmlContent = oRequest.request()
                 if sHtmlContent == '': continue
-                pattern = 'file":"([^"]+)","label":"([^"]+)'
-                isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-                for sUrl, sQualy in aResult:
-                    hoster = {'link': sUrl, 'name': sQualy + ' Kinoger.re', 'resolveable': True}
-                    hosters.append(hoster)
+                if 'p,a,c,k,e,d' in sHtmlContent:
+                    sHtmlContent = jsunpacker.unpack(sHtmlContent)
+                    pattern = 'sources\s*:\s*\[{file:\s*"([^"]+)'
+                    isMatch, sUrl2 = cParser.parse(sHtmlContent, pattern)
+                    oRequest = cRequestHandler(sUrl2[0], ignoreErrors=True)
+                    oRequest.addHeaderEntry('Referer', 'https://kinoger.pw/')
+                    oRequest.addHeaderEntry('Origin', 'https://kinoger.pw')
+                    sHtmlContent = oRequest.request()
+                    pattern = 'RESOLUTION=\d+x(\d+).*?(http[^"]+)#'
+                    isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+                    for sQualy, sUrl in aResult:
+                        hoster = {'link': sUrl, 'name': sQualy + ' Kinoger', 'resolveable': True}
+                        hosters.append(hoster)
             elif 'start.u' in sUrl:
                 import json
                 t = sUrl.split('/')
@@ -389,3 +404,12 @@ def encodeUrl(e):
             elif n[i] in t1[ii]:
                 e = e + t0[ii]
     return encodeStr(e + str(a))
+
+
+def aes(txt):
+    import pyaes, base64
+    from binascii import unhexlify
+    key = unhexlify('0123456789abcdef0123456789abcdef')
+    iv = unhexlify('abcdef9876543210abcdef9876543210')
+    aes = pyaes.Encrypter(pyaes.AESModeOfOperationCBC(key, iv))
+    return base64.b64encode(aes.feed(txt) + aes.feed()).decode()
