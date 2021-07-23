@@ -1,4 +1,5 @@
-3.5.23~nightly5
+3.5.23~nightly6
+- [alleserien] entfernt
 - [kinoger] fix hoster protonvideo und kinoger
 - [kinox] fix thevideo
 - [movieking] Seite hinzugefügt
