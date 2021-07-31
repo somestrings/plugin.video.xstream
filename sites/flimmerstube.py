@@ -110,13 +110,15 @@ def showHosters():
     isMatch, sUrl = cParser().parse(sHtmlContent, 'class="link"[^>]href="([^"]+)')
     if isMatch:
         sHtmlContent2 = cRequestHandler(sUrl[0]).request()
-        isMatch, aResult = cParser().parse(sHtmlContent2, 'src="(http[^"]+)"[^>]w')
+        isMatch, aResult = cParser().parse(sHtmlContent2, 'src="(http|//[^"]+)"[^>]w')
     if not isMatch:
         isMatch, aResult = cParser().parse(sHtmlContent, "src=[^>]'([^']+)'\s")
     if not isMatch:
         isMatch, aResult = cParser().parse(sHtmlContent, 'src=[^>]"(http[^"]+)')
     if isMatch:
         for sUrl in aResult:
+            if sUrl.startswith('//'):
+                sUrl = 'https:' + sUrl
             hoster = {'link': sUrl, 'name': cParser.urlparse(sUrl)}
             hosters.append(hoster)
     if hosters:
