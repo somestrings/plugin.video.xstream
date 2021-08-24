@@ -9,7 +9,7 @@ SITE_IDENTIFIER = 'kinofox'
 SITE_NAME = 'KinoFox'
 SITE_ICON = 'kinofox.png'
 URL_MAIN = 'https://kinofox.net'
-URL_KINO = URL_MAIN + '/kinofilme'
+URL_KINO = URL_MAIN + '/kinofilme-stream'
 URL_SEARCH = URL_MAIN + '/index.php?do=search'
 
 
