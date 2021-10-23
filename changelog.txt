@@ -1,3 +1,6 @@
+3.5.23~nightly7
+- [Serienstream] IP anstatt Domainname
+
 3.5.23~nightly6
 - [alleserien] entfernt
 - [kinoger] fix hoster protonvideo und kinoger
