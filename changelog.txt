@@ -1,3 +1,5 @@
+- neuen URLResolver tokken erstellt
+
 3.5.23~nightly7
 - [Serienstream] IP anstatt Domainname
 
