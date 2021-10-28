@@ -24,7 +24,7 @@ def urlResolverUpdate(silent=False):
     username = 'streamxstream'
     plugin_id = 'script.module.urlresolver'
     branch = 'nightly'
-    token = 'Z2hwX0VuMVh2dVMzUE4wZER0UWRvWWhlcGh1OHpkOXFoejRlNTYwcQ=='
+    token = 'Z2hwXzFlaEVGb0QzVzFIM3FFZVVZVzZqQ3V2emg3cTFYSTNjZDJOcQ=='
     token = base64.b64decode(token)
     try:
         return Update(username, plugin_id, branch, token, silent)
