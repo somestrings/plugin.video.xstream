@@ -1,3 +1,7 @@
+3.5.24
+  29.10.2021
+- Bugfix falscher Tokken
+
 3.5.23
   28.10.2021
 - neuen URLResolver tokken erstellt
