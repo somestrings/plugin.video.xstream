@@ -1,3 +1,8 @@
+3.5.26
+  27.11.2021
+- fix thumbnails in Serienstream
+- edit GUI
+
 3.5.25
  02.11.2021
 - Versionsnumer für URLResolver in die addon.xml hinzugefügt
