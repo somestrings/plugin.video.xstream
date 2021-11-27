@@ -122,7 +122,7 @@ def showEntries(entryUrl=False, sGui=False):
 
     total = len(aResult)
     for sUrl, sThumbnail, sName in aResult:
-        sThumbnail = URL_MAIN + sThumbnail
+        #sThumbnail = URL_MAIN + sThumbnail
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons')
         oGuiElement.setThumbnail(sThumbnail)
         oGuiElement.setMediaType('tvshow')
