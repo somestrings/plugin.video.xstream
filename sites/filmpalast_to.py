@@ -20,9 +20,9 @@ def load():
     params = ParameterHandler()
     params.setParam('sUrl', URL_MAIN)
     cGui().addFolder(cGuiElement('Neues', SITE_IDENTIFIER, 'showEntries'), params)
-    cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showMovieMenu'))
-    cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showSeriesMenu'))
-    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
+    cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showMovieMenu'), params)
+    cGui().addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showSeriesMenu'), params)
+    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'), params)
     cGui().setEndOfDirectory()
 
 

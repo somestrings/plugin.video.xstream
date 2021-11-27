@@ -31,7 +31,7 @@ def load():
     cGui().addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showValue'), params)
     params.setParam('sCont', 'homeContentGenresList')
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showValue'), params)
-    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
+    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'), params)
     #cGui().addFolder(cGuiElement('[COLOR red]Bei Problemen hier Domain ändern[/COLOR]', SITE_IDENTIFIER, 'checkDomain'))
     cGui().setEndOfDirectory()
 

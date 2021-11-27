@@ -51,12 +51,6 @@ class cGui:
             else:
                 oGuiElement.getMeta(oGuiElement._mediaType, mode=self.metaMode)
         sUrl = self.__createItemUrl(oGuiElement, bIsFolder, params)
-#kasi
-        try:
-            if params.exist('trumb'): oGuiElement.setIcon(params.getValue('trumb'))
-        except:
-            pass
-
         listitem = self.createListItem(oGuiElement)
         if not bIsFolder and cConfig().getSetting('hosterSelect') == 'List':
             bIsFolder = True
@@ -86,11 +80,6 @@ class cGui:
         if infoString:
             infoString = '[I]%s[/I]' % infoString
         itemValues['title'] = itemTitle + infoString
-        try:
-            if not 'plot' in str(itemValues) or itemValues['plot'] == '':
-                itemValues['plot'] = ' ' #kasi Alt 255
-        except:
-            pass
         listitem = xbmcgui.ListItem(itemTitle + infoString, oGuiElement.getIcon(), oGuiElement.getThumbnail())
         listitem.setInfo(oGuiElement.getType(), itemValues)
         listitem.setProperty('fanart_image', oGuiElement.getFanart())
@@ -231,8 +220,7 @@ class cGui:
         if len(oGuiElement.getFunction()) == 0:
             sUrl = "%s?site=%s&title=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), quote_plus(oGuiElement.getTitle()), sParams)
         else:
-            #kasi
-            sUrl = "%s?site=%s&function=%s&title=%s&trumb=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), oGuiElement.getFunction(), quote_plus(oGuiElement.getTitle()), oGuiElement.getThumbnail(), sParams)
+            sUrl = "%s?site=%s&function=%s&title=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), oGuiElement.getFunction(), quote_plus(oGuiElement.getTitle()), sParams)
             if not bIsFolder:
                 sUrl += '&playMode=play'
         return sUrl
