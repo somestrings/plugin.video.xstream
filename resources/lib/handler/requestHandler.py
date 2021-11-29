@@ -105,7 +105,18 @@ class cRequestHandler:
             else:
                 sParameters = urlencode(self._aParameters, True).encode()
 
-        handlers = [HTTPHandler(), HTTPSHandler(), HTTPCookieProcessor(cookiejar=cookieJar), RedirectFilter()]
+        # urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] - kinoger fsst
+        # https://coderedirect.com/questions/515348/python-3-urllib-ignore-ssl-certificate-verification
+        # ssl._create_default_https_context = ssl._create_unverified_context
+        import ssl
+        if sys.version_info[0] == 2:
+            ssl_context = ssl.create_default_context()
+        else:
+            ssl_context = ssl.create_default_context()
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
+
+        handlers = [HTTPHandler(), HTTPSHandler(context=ssl_context), HTTPCookieProcessor(cookiejar=cookieJar), RedirectFilter()]
         opener = build_opener(*handlers)
         oRequest = Request(self._sUrl, sParameters if len(sParameters) > 0 else None)
 
