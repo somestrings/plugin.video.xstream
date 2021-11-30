@@ -81,8 +81,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             sName = name
             sYear = year
             break
-        isDesc, sDesc = cParser.parseSingleResult(sDummy, '</b>([^"]+)</div>')
-        isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\d]+)')
+        isDesc, sDesc = cParser.parseSingleResult(sDummy, '</b>([^<]+)')
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, '(?:Laufzeit|Spielzeit).*?(\d[^<]+)')
+        if ':' in sDuration:
+            sDuration = time2minutes(sDuration)
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
         if isYear:
@@ -413,3 +415,12 @@ def aes(txt):
     iv = unhexlify('abcdef9876543210abcdef9876543210')
     aes = pyaes.Encrypter(pyaes.AESModeOfOperationCBC(key, iv))
     return base64.b64encode(aes.feed(txt) + aes.feed()).decode()
+
+
+def time2minutes(time):
+    if type(time) == bytes:
+        time = time.decode()
+    t = time.split(":")
+    minutes = float(t[0])*60 + float(t[1]) + float(t[2]) *0.05/3
+    minutes = str(minutes).split(".")[0] if '.' in str(minutes) else str(minutes)
+    return  minutes
