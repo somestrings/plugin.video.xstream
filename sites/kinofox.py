@@ -9,15 +9,15 @@ SITE_IDENTIFIER = 'kinofox'
 SITE_NAME = 'KinoFox'
 SITE_ICON = 'kinofox.png'
 URL_MAIN = 'https://kinofox.net'
-URL_KINO = URL_MAIN + '/kinofilme-stream'
+#URL_KINO = URL_MAIN + '/kinofilme-stream'
 URL_SEARCH = URL_MAIN + '/index.php?do=search'
 
 
 def load():
     logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
-    params.setParam('sUrl', URL_KINO)
-    cGui().addFolder(cGuiElement('Kino', SITE_IDENTIFIER, 'showEntries'), params)
+    #params.setParam('sUrl', URL_KINO)
+    #cGui().addFolder(cGuiElement('Kino', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN)
     cGui().addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sCont', 'Genre')
