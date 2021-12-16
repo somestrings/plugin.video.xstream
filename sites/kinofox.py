@@ -8,7 +8,7 @@ from resources.lib.gui.gui import cGui
 SITE_IDENTIFIER = 'kinofox'
 SITE_NAME = 'KinoFox'
 SITE_ICON = 'kinofox.png'
-URL_MAIN = 'https://kinofox.net'
+URL_MAIN = 'https://kinofox.de'
 #URL_KINO = URL_MAIN + '/kinofilme-stream'
 URL_SEARCH = URL_MAIN + '/index.php?do=search'
 
@@ -62,6 +62,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oRequest.addParameters('full_search', '1')
         oRequest.addParameters('result_from', '1')
         oRequest.addParameters('story', sSearchText)
+        oRequest.addParameters('titleonly', '3')
     sHtmlContent = oRequest.request()
     pattern = 'short clearfix.*?href="([^"]+).*?title">([^<]+).*? src="([^"]+)'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
@@ -77,7 +78,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             continue
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showHosters')
         oGuiElement.setMediaType('movie')
-        oGuiElement.setThumbnail(URL_MAIN + sThumbnail)
+        if sThumbnail.startswith('/'):
+            oGuiElement.setThumbnail(URL_MAIN + sThumbnail)
+        else:
+            oGuiElement.setThumbnail(sThumbnail)
         params.setParam('entryUrl', sUrl)
         oGui.addFolder(oGuiElement, params, False, total)
     if not sGui:
