@@ -1,3 +1,7 @@
+3.5.27~nightly4
+  26.12.2021
+ - Vorbereitung UrlResolver durch ResolveUrl ersetzen
+
 3.5.26
   27.11.2021
 - fix thumbnails in Serienstream
