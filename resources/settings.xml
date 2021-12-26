@@ -2,14 +2,16 @@
   <category label="30020">
     <setting label="30030" type="lsep" />
     <setting default="true" id="DevUpdateAuto" label="Nightly Update (automatisch)" type="bool" />
+    <!--
     <setting default="true" id="githubUpdateXstream" label="30010" type="bool" visible="eq(-1,true)" />
     <setting default="true" id="githubUpdateUrlResolver" label="30015" type="bool" visible="eq(-2,true)" />
+    -->
     <setting default="false" id="enforceUpdate" label="[B][COLOR red]Aktualisierung einmalig erzwingen[/COLOR][/B] (Nightly Update)" type="bool" />
     <setting default="true" id="newSetting" label="newSetting" type="bool" visible="false" />
     <setting type="sep" />
     <setting label="30031" type="lsep" />
     <setting default="true" id="GlobalSearchPosition" label="30011" type="bool" />
-    <setting default="true" id="SettingsFolder" label="30012" type="bool" />
+    <!--<setting default="true" id="SettingsFolder" label="30012" type="bool" />-->
     <setting default="true" id="replacefanart" label="30019" type="bool" />
     <setting type="sep" />
     <setting label="30032" type="lsep" />
@@ -27,10 +29,6 @@
     <setting default="10" id="requestTimeout" label="30014" option="int" range="1,1,60" type="slider" />
   </category> 
   <category label="Indexseiten 1">
-    <setting label="Alleserien" type="lsep" />
-    <setting default="true" id="plugin_alleserien_com" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_alleserien_com" label="30052" type="bool" />
-    <setting type="sep" />
     <setting label="Dokus4" type="lsep" />
     <setting default="true" id="plugin_dokus4" label="30050" type="bool" />
     <setting default="false" enable="!eq(-1,false)" id="global_search_dokus4" label="30052" type="bool" />
@@ -39,30 +37,44 @@
     <setting default="true" id="plugin_filmpalast_to" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_filmpalast_to" label="30052" type="bool" />
     <setting type="sep" />
-    <setting label="HD-Streams.org" type="lsep" />
-    <setting default="true" id="plugin_hd-streams_org" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_hd-streams_org" label="30052" type="bool" />
+    <setting label="Flimmerstube" type="lsep" />
+    <setting default="true" id="plugin_flimmerstube" label="30050" type="bool" />
+    <setting default="false" enable="!eq(-1,false)" id="global_search_flimmerstube" label="30052" type="bool" />
+    <setting default="" id="flimmerstube.user" label="30083" type="text" />
+    <setting default="" id="flimmerstube.pass" label="30084" option="hidden" type="text" />
+    <setting type="sep" />
+    <setting label="HD-Streams" type="lsep" />
+    <setting default="true" id="plugin_hd-streams" label="30050" type="bool" />
+    <setting default="true" enable="!eq(-1,false)" id="global_search_hd-streams" label="30052" type="bool" />
     <setting type="sep" />
     <setting label="HDfilme" type="lsep" />
     <setting default="true" id="plugin_hdfilme" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_hdfilme" label="30052" type="bool" />
     <setting type="sep" />
-    <setting label="Kino AG" type="lsep" />
-    <setting default="true" id="plugin_kinoag" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_kinoag" label="30052" type="bool" />
+    <setting label="Kino BZ" type="lsep" />
+    <setting default="true" id="plugin_kinobz" label="30050" type="bool" />
+    <setting default="false" enable="!eq(-1,false)" id="global_search_kinobz" label="30052" type="bool" />
+    <setting type="sep" />
+    <setting label="KinoFox" type="lsep" />
+    <setting default="true" id="plugin_kinofox" label="30050" type="bool" />
+    <setting default="true" enable="!eq(-1,false)" id="global_search_kinofox" label="30052" type="bool" />
     <setting type="sep" />
     <setting label="Kinoger" type="lsep" />
     <setting default="true" id="plugin_kinoger" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_kinoger" label="30052" type="bool" />
-    <setting default="kinoger.to" enable="!eq(-2,false)" id="kinoger-domain" label="30051" type="labelenum" values="kinoger.com|kinoger.to" />
+    <setting default="kinoger.com" enable="!eq(-2,false)" id="kinoger-domain" label="30051" type="labelenum" values="kinoger.com|kinoger.to" />
     <setting type="sep" />
-    <setting label="KinoX" type="lsep" />
-    <setting default="true" id="plugin_kinox_to" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_kinox_to" label="30052" type="bool" />
-    <setting default="kinos.to" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="kinos.to|kinox.ai|kinox.am|kinox.bz|kinox.click|kinox.cloud|kinox.club|kinox.digital|kinox.direct|kinox.express|kinox.fun|kinox.fyi|kinox.gratis|kinox.io|kinox.lol|kinox.me|kinox.mobi|kinox.nu|kinox.party|kinox.pub|kinox.sg|kinox.sh|kinox.space|kinox.sx|kinox.to|kinox.tube|kinox.tv|kinox.wtf|kinoz.to" />
+    <setting label="KinoKiste" type="lsep" />
+    <setting default="true" id="plugin_kinokiste" label="30050" type="bool" />
+    <setting default="false" enable="!eq(-1,false)" id="global_search_kinokiste" label="30052" type="bool" />
     <setting type="sep" />
 </category> 
   <category label="Indexseiten 2">
+    <setting label="KinoX" type="lsep" />
+    <setting default="true" id="plugin_kinox_to" label="30050" type="bool" />
+    <setting default="true" enable="!eq(-1,false)" id="global_search_kinox_to" label="30052" type="bool" />
+    <setting default="kinox.bz" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="kinos.to|kinox.ai|kinox.am|kinox.bz|kinox.click|kinox.cloud|kinox.club|kinox.digital|kinox.direct|kinox.express|kinox.fun|kinox.fyi|kinox.gratis|kinox.io|kinox.lol|kinox.me|kinox.mobi|kinox.nu|kinox.party|kinox.pub|kinox.sg|kinox.sh|kinox.space|kinox.sx|kinox.to|kinox.tube|kinox.tv|kinox.wtf|kinoz.to" />
+    <setting type="sep" />
     <setting label="KKiste" type="lsep" />
     <setting default="true" id="plugin_kkiste" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_kkiste" label="30052" type="bool" />
@@ -85,7 +97,7 @@
     <setting type="sep" />
     <setting label="NetzKino" type="lsep" />
     <setting default="true" id="plugin_netzkino" label="30050" type="bool" />
-    <setting default="true" enable="!eq(-1,false)" id="global_search_netzkino" label="30052" type="bool" />
+    <setting default="false" enable="!eq(-1,false)" id="global_search_netzkino" label="30052" type="bool" />
     <setting type="sep" />
     <setting label="Pureanime" type="lsep" />
     <setting default="true" id="plugin_pureanime" label="30050" type="bool" />

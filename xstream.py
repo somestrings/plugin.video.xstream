@@ -140,25 +140,29 @@ def showMainMenu(sFunction):
             oGui.addFolder(oGuiElement)
         if cConfig().getSetting('GlobalSearchPosition') == 'false':
             oGui.addFolder(globalSearchGuiElement())
-    if cConfig().getSetting('SettingsFolder') == 'true':
-        # Create a gui element for Settingsfolder
-        oGuiElement = cGuiElement()
-        oGuiElement.setTitle(cConfig().getLocalizedString(30041))
-        oGuiElement.setSiteName('settings')
-        oGuiElement.setFunction('showSettingsFolder')
-        oGuiElement.setThumbnail('DefaultAddonService.png')
-        oGui.addFolder(oGuiElement)
-    else:
-        for folder in settingsGuiElements():
-            oGui.addFolder(folder)
-    # ka add - Create a gui element for updateManager
-    if cConfig().getSetting('DevUpdateAuto') == 'false':
-        oGuiElement = cGuiElement()
-        oGuiElement.setTitle('Nightly Update')
-        oGuiElement.setSiteName('devUpdates')
-        oGuiElement.setFunction(sFunction)
-        oGuiElement.setThumbnail('DefaultAddonProgram.png')
-        oGui.addFolder(oGuiElement)
+
+        oGui.addFolder(settingsGuiElements())
+
+    #TODO
+    # if cConfig().getSetting('SettingsFolder') == 'true':
+    #     # Create a gui element for Settingsfolder
+    #     oGuiElement = cGuiElement()
+    #     oGuiElement.setTitle(cConfig().getLocalizedString(30041))
+    #     oGuiElement.setSiteName('settings')
+    #     oGuiElement.setFunction('showSettingsFolder')
+    #     oGuiElement.setThumbnail('DefaultAddonService.png')
+    #     oGui.addFolder(oGuiElement)
+    # else:
+    #     for folder in settingsGuiElements():
+    #         oGui.addFolder(folder)
+    # # ka add - Create a gui element for updateManager
+    # if cConfig().getSetting('DevUpdateAuto') == 'false':
+    #     oGuiElement = cGuiElement()
+    #     oGuiElement.setTitle('Nightly Update')
+    #     oGuiElement.setSiteName('devUpdates')
+    #     oGuiElement.setFunction(sFunction)
+    #     oGuiElement.setThumbnail('DefaultAddonProgram.png')
+    #     oGui.addFolder(oGuiElement)
     oGui.setEndOfDirectory()
 
 
@@ -170,15 +174,16 @@ def settingsGuiElements():
     oGuiElement.setFunction('display_settings')
     oGuiElement.setThumbnail('DefaultAddonProgram.png')
     xStreamSettings = oGuiElement
+    return xStreamSettings
 
-    # Create a gui element for urlresolver settings
-    oGuiElement = cGuiElement()
-    oGuiElement.setTitle(cConfig().getLocalizedString(30043))
-    oGuiElement.setSiteName('urlresolver')
-    oGuiElement.setFunction('display_settings')
-    oGuiElement.setThumbnail('DefaultAddonRepository.png')
-    urlResolverSettings = oGuiElement
-    return xStreamSettings, urlResolverSettings
+    # # Create a gui element for urlresolver settings
+    # oGuiElement = cGuiElement()
+    # oGuiElement.setTitle(cConfig().getLocalizedString(30043))
+    # oGuiElement.setSiteName('urlresolver')
+    # oGuiElement.setFunction('display_settings')
+    # oGuiElement.setThumbnail('DefaultAddonRepository.png')
+    # urlResolverSettings = oGuiElement
+    # return xStreamSettings, urlResolverSettings
 
 
 def globalSearchGuiElement():
