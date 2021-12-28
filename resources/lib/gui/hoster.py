@@ -7,6 +7,10 @@ from resources.lib.player import cPlayer
 from resources.lib.tools import logger
 import xbmc, xbmcgui, xbmcplugin
 
+try:
+    import resolveurl as resolver
+except:
+    import urlresolver as resolver
 
 class cHosterGui:
     SITE_NAME = 'cHosterGui'
@@ -23,27 +27,27 @@ class cHosterGui:
         mediaUrl = params.getValue('sMediaUrl')
         fileName = params.getValue('MovieTitle')
         try:
-            import urlresolver
+            #import urlresolver as resolver
             # resolve
             if siteResult:
                 mediaUrl = siteResult.get('streamUrl', False)
                 mediaId = siteResult.get('streamID', False)
                 if mediaUrl:
                     logger.info('resolve: ' + mediaUrl)
-                    link = mediaUrl if siteResult['resolved'] else urlresolver.resolve(mediaUrl)
+                    link = mediaUrl if siteResult['resolved'] else resolver.resolve(mediaUrl)
                 elif mediaId:
                     logger.info('resolve: hoster: %s - mediaID: %s' % (siteResult['host'], mediaId))
-                    link = urlresolver.HostedMediaFile(host=siteResult['host'].lower(), media_id=mediaId).resolve()
+                    link = resolver.HostedMediaFile(host=siteResult['host'].lower(), media_id=mediaId).resolve()
                 else:
                     oGui.showError('xStream', 'kein Hosterlink übergeben', 5)
                     return False
             elif mediaUrl:
                 logger.info('resolve: ' + mediaUrl)
-                link = urlresolver.resolve(mediaUrl)
+                link = resolver.resolve(mediaUrl)
             else:
                 oGui.showError('xStream', 'kein Hosterlink übergeben', 5)
                 return False
-        except urlresolver.resolver.ResolverError as e:
+        except resolver.resolver.ResolverError as e:
             logger.error('ResolverError: %s' % e)
             oGui.showError('xStream', 'Stream nicht mehr verfügbar oder Link fehlerhaft', 7)
             return False
@@ -163,7 +167,7 @@ class cHosterGui:
 
     def __getPriorities(self, hosterList, filter=True):
         # Sort hosters based on their resolvers priority.
-        import urlresolver
+        #import urlresolver as resolver
         ranking = []
         # handles multihosters but is about 10 times slower
         for hoster in hosterList:
@@ -172,9 +176,9 @@ class cHosterGui:
                 ranking.append([0, hoster])
                 continue
 
-            hmf = urlresolver.HostedMediaFile(url=hoster['link'])
+            hmf = resolver.HostedMediaFile(url=hoster['link'])
             if not hmf.valid_url():
-                hmf = urlresolver.HostedMediaFile(host=hoster['name'].lower(), media_id='dummy')
+                hmf = resolver.HostedMediaFile(host=hoster['name'].lower(), media_id='dummy')
 
             if len(hmf.get_resolvers()):
                 priority = False

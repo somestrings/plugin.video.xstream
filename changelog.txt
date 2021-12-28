@@ -1,6 +1,10 @@
+3.5.27~nightly7
+  27.12.2021
+ - wechsel von UrlResolver zu resolveUrl
+
 3.5.27~nightly6
   27.12.2021
-   - remove hdfilme & hdstreams.org
+ - remove hdfilme & hdstreams.org
 
 3.5.27~nightly5
   27.12.2021

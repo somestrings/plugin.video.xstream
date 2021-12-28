@@ -19,13 +19,12 @@ else:
 PLUGIN_NAME = addon().getAddonInfo('name')  # ist z.B. 'xstream'
 
 
-# URLRESOLVER
-def urlResolverUpdate(silent=False):
-    username = 'streamxstream'
-    plugin_id = 'script.module.urlresolver'
-    branch = 'nightly'
-    token = 'Z2hwXzFlaEVGb0QzVzFIM3FFZVVZVzZqQ3V2emg3cTFYSTNjZDJOcQ=='
-    token = base64.b64decode(token)
+# resolver
+def resolverUpdate(silent=False):
+    username = 'jsergio123'
+    plugin_id = 'script.module.resolveurl'
+    branch = 'master'
+    token =''
     try:
         return Update(username, plugin_id, branch, token, silent)
     except Exception as e:
@@ -55,9 +54,9 @@ def Update(username, plugin_id, branch, token, silent):
     log('%s - Search for update ' % plugin_id, LOGNOTICE)
     try:
         if sys.version_info[0] == 2:
-            ADDON_DIR = translatePath(addon(plugin_id).getAddonInfo('profile')).decode('utf-8')
+            ADDON_DIR = translatePath(os.path.join('special://userdata/addon_data/', '%s') % plugin_id).decode('utf-8')
         else:
-            ADDON_DIR = translatePath(addon(plugin_id).getAddonInfo('profile'))
+            ADDON_DIR = translatePath(os.path.join('special://userdata/addon_data/', '%s') % plugin_id)
 
         LOCAL_PLUGIN_VERSION = os.path.join(ADDON_DIR, "update_sha")
         LOCAL_FILE_NAME_PLUGIN = os.path.join(ADDON_DIR, 'update-' + plugin_id + '.zip')
@@ -66,7 +65,7 @@ def Update(username, plugin_id, branch, token, silent):
         if addon().getSetting('enforceUpdate') == 'true':
             if os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
 
-        path = addon(plugin_id).getAddonInfo('Path')
+        path = translatePath(os.path.join('special://home/addons/', '%s') % plugin_id)
         commitXML = _getXmlString(REMOTE_PLUGIN_COMMITS, auth)
         if commitXML:
             isTrue = commitUpdate(commitXML, LOCAL_PLUGIN_VERSION, REMOTE_PLUGIN_DOWNLOADS, path, plugin_id,
@@ -182,8 +181,8 @@ def devAutoUpdates(silent=False):
         status1 = status2 = None
         if addon().getSetting('githubUpdateXstream') == 'true' or addon().getSetting('enforceUpdate') == 'true':
             status1 = xStreamUpdate(silent)
-        if addon().getSetting('githubUpdateUrlResolver') == 'true' or addon().getSetting('enforceUpdate') == 'true':
-            status2 = urlResolverUpdate(silent)
+        if addon().getSetting('githubUpdateResolver') == 'true' or addon().getSetting('enforceUpdate') == 'true':
+            status2 = resolverUpdate(silent)
         if status1 == status2:
             return status1
         elif status1 is False or status2 is False:
@@ -199,7 +198,7 @@ def devUpdates():  # für manuelles Updates vorgesehen
         resolverupdate = False
         pluginupdate = False
 
-        options = ['Beide', PLUGIN_NAME, 'URL Resolver']
+        options = ['Beide', PLUGIN_NAME, 'ResolveUrl']
         result = Dialog().select('Welches Update ausführen?', options)
 
         if result == 0:
@@ -217,7 +216,7 @@ def devUpdates():  # für manuelles Updates vorgesehen
                 pass
         if resolverupdate is True:
             try:
-                urlResolverUpdate(False)
+                resolverUpdate(False)
             except:
                 pass
         # ka - reset enforce Update

@@ -8,6 +8,11 @@ from resources.lib.gui.gui import cGui
 from resources.lib.config import cConfig
 import sys, xbmc, xbmcgui
 
+try:
+    import resolveurl as resolver
+except:
+    import urlresolver as resolver
+
 
 def run():
     parseUrl()
@@ -50,14 +55,14 @@ def parseUrl():
             return
     elif params.exist('remoteplayurl'):
         try:
-            import urlresolver
+            #import urlresolver as resolver
             remotePlayUrl = params.getValue('remoteplayurl')
-            sLink = urlresolver.resolve(remotePlayUrl)
+            sLink = resolver.resolve(remotePlayUrl)
             if sLink:
                 xbmc.executebuiltin('PlayMedia(' + sLink + ')')
             else:
                 logger.info("Could not play remote url '%s'" % sLink)
-        except urlresolver.resolver.ResolverError as e:
+        except resolver.resolver.ResolverError as e:
             logger.error('ResolverError: %s' % e)
         return
     else:
@@ -97,10 +102,10 @@ def parseUrl():
         oGui = cGui()
         oGui.openSettings()
         oGui.updateDirectory()
-    # If the urlresolver settings are called
-    elif sSiteName == 'urlresolver':
-        import urlresolver
-        urlresolver.display_settings()
+    # If the resolver settings are called
+    elif sSiteName == 'resolver':
+        #import urlresolver as resolver
+        resolver.display_settings()
     # If UpdateManager are called (manual update)
     elif sSiteName == 'devUpdates':
         from resources.lib import updateManager
@@ -141,28 +146,25 @@ def showMainMenu(sFunction):
         if cConfig().getSetting('GlobalSearchPosition') == 'false':
             oGui.addFolder(globalSearchGuiElement())
 
-        oGui.addFolder(settingsGuiElements())
-
-    #TODO
-    # if cConfig().getSetting('SettingsFolder') == 'true':
-    #     # Create a gui element for Settingsfolder
-    #     oGuiElement = cGuiElement()
-    #     oGuiElement.setTitle(cConfig().getLocalizedString(30041))
-    #     oGuiElement.setSiteName('settings')
-    #     oGuiElement.setFunction('showSettingsFolder')
-    #     oGuiElement.setThumbnail('DefaultAddonService.png')
-    #     oGui.addFolder(oGuiElement)
-    # else:
-    #     for folder in settingsGuiElements():
-    #         oGui.addFolder(folder)
-    # # ka add - Create a gui element for updateManager
-    # if cConfig().getSetting('DevUpdateAuto') == 'false':
-    #     oGuiElement = cGuiElement()
-    #     oGuiElement.setTitle('Nightly Update')
-    #     oGuiElement.setSiteName('devUpdates')
-    #     oGuiElement.setFunction(sFunction)
-    #     oGuiElement.setThumbnail('DefaultAddonProgram.png')
-    #     oGui.addFolder(oGuiElement)
+    if cConfig().getSetting('SettingsFolder') == 'true':
+        # Create a gui element for Settingsfolder
+        oGuiElement = cGuiElement()
+        oGuiElement.setTitle(cConfig().getLocalizedString(30041))
+        oGuiElement.setSiteName('settings')
+        oGuiElement.setFunction('showSettingsFolder')
+        oGuiElement.setThumbnail('DefaultAddonService.png')
+        oGui.addFolder(oGuiElement)
+    else:
+        for folder in settingsGuiElements():
+            oGui.addFolder(folder)
+    # ka add - Create a gui element for updateManager
+    if cConfig().getSetting('DevUpdateAuto') == 'false':
+        oGuiElement = cGuiElement()
+        oGuiElement.setTitle('Nightly Update')
+        oGuiElement.setSiteName('devUpdates')
+        oGuiElement.setFunction(sFunction)
+        oGuiElement.setThumbnail('DefaultAddonProgram.png')
+        oGui.addFolder(oGuiElement)
     oGui.setEndOfDirectory()
 
 
@@ -174,16 +176,15 @@ def settingsGuiElements():
     oGuiElement.setFunction('display_settings')
     oGuiElement.setThumbnail('DefaultAddonProgram.png')
     xStreamSettings = oGuiElement
-    return xStreamSettings
 
-    # # Create a gui element for urlresolver settings
-    # oGuiElement = cGuiElement()
-    # oGuiElement.setTitle(cConfig().getLocalizedString(30043))
-    # oGuiElement.setSiteName('urlresolver')
-    # oGuiElement.setFunction('display_settings')
-    # oGuiElement.setThumbnail('DefaultAddonRepository.png')
-    # urlResolverSettings = oGuiElement
-    # return xStreamSettings, urlResolverSettings
+    # Create a gui element for resolver settings
+    oGuiElement = cGuiElement()
+    oGuiElement.setTitle(cConfig().getLocalizedString(30043))
+    oGuiElement.setSiteName('resolver')
+    oGuiElement.setFunction('display_settings')
+    oGuiElement.setThumbnail('DefaultAddonRepository.png')
+    resolveurlSettings = oGuiElement
+    return xStreamSettings, resolveurlSettings
 
 
 def globalSearchGuiElement():

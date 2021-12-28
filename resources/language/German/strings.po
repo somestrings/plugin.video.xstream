@@ -62,7 +62,7 @@ msgstr "Timeout für HTTP-Anfragen in Sekunden"
 
 msgctxt "#30015"
 msgid ""
-msgstr "Auto-Update für URLResolver"
+msgstr "Auto-Update für Resolver"
 
 msgctxt "#30019"
 msgid ""
@@ -126,7 +126,7 @@ msgstr "xStream-Einstellungen"
 
 msgctxt "#30043"
 msgid ""
-msgstr "URLResolver-Einstellungen"
+msgstr "Resolver-Einstellungen"
 
 msgctxt "#30044"
 msgid ""
