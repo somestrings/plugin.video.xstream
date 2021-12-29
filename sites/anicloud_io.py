@@ -249,9 +249,6 @@ def showHosters():
 def getHosterUrl(sUrl=False):
     username = cConfig().getSetting('anicloud.user')
     password = cConfig().getSetting('anicloud.pass')
-    if username == '' or password == '':
-        username = cHelper.UserName
-        password = cHelper.PassWord
     Handler = cRequestHandler(URL_LOGIN, caching=False)
     Handler.addHeaderEntry('Upgrade-Insecure-Requests', '1')
     Handler.addHeaderEntry('Referer', ParameterHandler().getValue('entryUrl'))
