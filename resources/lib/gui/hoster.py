@@ -304,8 +304,6 @@ class cHosterGui:
             self.sendToPyLoad(siteResult)
 
     def streamAuto(self, playMode, siteName, function):
-        import pydevd
-        #pydevd.settrace('localhost', port=12345, stdoutToServer=True, stderrToServer=True)
         logger.info('auto stream initiated')
         self.dialog = xbmcgui.DialogProgress()
         self.dialog.create('xStream', 'get stream/hoster')
