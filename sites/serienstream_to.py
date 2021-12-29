@@ -11,7 +11,7 @@ from resources.lib.config import cConfig
 SITE_IDENTIFIER = 'serienstream_to'
 SITE_NAME = 'SerienStream'
 SITE_ICON = 'serienstream.png'
-SITE_SETTINGS = '<setting id="serienstream.user" type="text" label="30083" default="" /><setting id="serienstream.pass" type="text" option="hidden" label="30084" default="" />'
+#SITE_SETTINGS = '<setting id="serienstream.user" type="text" label="30083" default="" /><setting id="serienstream.pass" type="text" option="hidden" label="30084" default="" />'
 
 URL_MAIN = 'http://190.115.18.20/'
 URL_SERIES = URL_MAIN + '/serien'

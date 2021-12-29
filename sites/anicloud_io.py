@@ -11,7 +11,7 @@ from resources.lib.config import cConfig
 SITE_IDENTIFIER = 'anicloud_io'
 SITE_NAME = 'AniCloud'
 SITE_ICON = 'anicloud.png'
-SITE_SETTINGS = '<setting id="anicloud.user" type="text" label="30083" default="" /><setting id="anicloud.pass" type="text" option="hidden" label="30084" default="" />'
+#SITE_SETTINGS = '<setting id="anicloud.user" type="text" label="30083" default="" /><setting id="anicloud.pass" type="text" option="hidden" label="30084" default="" />'
 
 URL_MAIN = 'https://anicloud.io/'
 URL_SERIES = URL_MAIN + '/animes'
