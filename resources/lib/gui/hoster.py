@@ -7,10 +7,10 @@ from resources.lib.player import cPlayer
 from resources.lib.tools import logger
 import xbmc, xbmcgui, xbmcplugin
 
-try:
-    import resolveurl as resolver
-except:
-    import urlresolver as resolver
+# try:
+#     import resolveurl as resolver
+# except:
+#     import urlresolver as resolver
 
 class cHosterGui:
     SITE_NAME = 'cHosterGui'
@@ -27,7 +27,10 @@ class cHosterGui:
         mediaUrl = params.getValue('sMediaUrl')
         fileName = params.getValue('MovieTitle')
         try:
-            #import urlresolver as resolver
+            try:
+                import resolveurl as resolver
+            except:
+                import urlresolver as resolver
             # resolve
             if siteResult:
                 mediaUrl = siteResult.get('streamUrl', False)
@@ -166,8 +169,12 @@ class cHosterGui:
         cMyJDownloaderHandler().sendToMyJDownloader(sMediaUrl, sMovieTitle)
 
     def __getPriorities(self, hosterList, filter=True):
+
         # Sort hosters based on their resolvers priority.
-        #import urlresolver as resolver
+        try:
+            import resolveurl as resolver
+        except:
+            import urlresolver as resolver
         ranking = []
         # handles multihosters but is about 10 times slower
         for hoster in hosterList:
@@ -176,7 +183,10 @@ class cHosterGui:
                 ranking.append([0, hoster])
                 continue
 
-            hmf = resolver.HostedMediaFile(url=hoster['link'])
+            try:
+                hmf = resolver.HostedMediaFile(url=hoster['link'])
+            except:
+                continue
             if not hmf.valid_url():
                 hmf = resolver.HostedMediaFile(host=hoster['name'].lower(), media_id='dummy')
 
@@ -294,6 +304,8 @@ class cHosterGui:
             self.sendToPyLoad(siteResult)
 
     def streamAuto(self, playMode, siteName, function):
+        import pydevd
+        #pydevd.settrace('localhost', port=12345, stdoutToServer=True, stderrToServer=True)
         logger.info('auto stream initiated')
         self.dialog = xbmcgui.DialogProgress()
         self.dialog.create('xStream', 'get stream/hoster')
