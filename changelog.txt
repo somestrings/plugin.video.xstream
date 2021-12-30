@@ -1,18 +1,8 @@
-3.5.27~nightly7
-  27.12.2021
+3.5.27
+  30.12.2021
  - wechsel von UrlResolver zu resolveUrl
-
-3.5.27~nightly6
-  27.12.2021
  - remove hdfilme & hdstreams.org
-
-3.5.27~nightly5
-  27.12.2021
  - add anicloud
-
-3.5.27~nightly4
-  26.12.2021
- - Vorbereitung UrlResolver durch ResolveUrl ersetzen
 
 3.5.26
   27.11.2021
