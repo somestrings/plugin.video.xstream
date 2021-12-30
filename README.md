@@ -1,3 +1,5 @@
+## Mit der Version 3.5.27 wird die Entwicklung von xStream vorläufig eingestellt!
+
 ![xStream logo](https://raw.githubusercontent.com/streamxstream/plugin.video.xstream//nightly/icon.png)
 
 
