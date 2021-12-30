@@ -35,31 +35,6 @@ def load():
     #cGui().addFolder(cGuiElement('[COLOR red]Bei Problemen hier Domain ändern[/COLOR]', SITE_IDENTIFIER, 'checkDomain'))
     cGui().setEndOfDirectory()
 
-
-#def checkDomain():
-#    import xbmcgui, xbmcaddon
-#    r = cRequestHandler('https://serien.domains/', caching=False).request()
-#    pattern = 'ol class="links">(.*?)</ol'
-#    isMatch, aResult = cParser.parse(r, pattern)
-#    isMatch, links = cParser.parse(str(aResult), 'href="([^"]+)')
-#    url = []
-#    for link in links:
-#        url.append(link)
-#    index = xbmcgui.Dialog().select('Serienstream', url)
-#    if index > -1:
-#        url = url[index]
-#        Request = cRequestHandler(url, caching=False)
-#        sHtmlContent = Request.request()
-#        if not sHtmlContent:
-#            xbmcgui.Dialog().ok('Serienstream', 'Fehler Domain funktioniert nicht')
-#            return
-#        if 'S.to, serien stream' in sHtmlContent:
-#            xbmcgui.Dialog().ok('Serienstream', 'Serienstream müsste jetzt funktioniert ggf. ist #ein Kodi Neustart erforderlich')
-#            return xbmcaddon.Addon().setSetting('seriendomain', Request.getRealUrl())
-#    else:
-#        return False
-
-
 def showValue():
     params = ParameterHandler()
     sUrl = params.getValue('sUrl')
@@ -249,6 +224,10 @@ def showHosters():
 def getHosterUrl(sUrl=False):
     username = cConfig().getSetting('anicloud.user')
     password = cConfig().getSetting('anicloud.pass')
+    if username == '' or password == '':
+        import xbmcgui
+        xbmcgui.Dialog().ok('xStream Anicloud', 'Unter Einstellungen / Konten für Anicloud die eigenen Kontendaten  eintragen!')
+        return
     Handler = cRequestHandler(URL_LOGIN, caching=False)
     Handler.addHeaderEntry('Upgrade-Insecure-Requests', '1')
     Handler.addHeaderEntry('Referer', ParameterHandler().getValue('entryUrl'))

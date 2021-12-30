@@ -4,9 +4,8 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
-from resources.lib.jsnprotect import cHelper
+#from resources.lib.jsnprotect import cHelper
 from resources.lib.config import cConfig
-
 
 SITE_IDENTIFIER = 'serienstream_to'
 SITE_NAME = 'SerienStream'
@@ -250,8 +249,11 @@ def getHosterUrl(sUrl=False):
     username = cConfig().getSetting('serienstream.user')
     password = cConfig().getSetting('serienstream.pass')
     if username == '' or password == '':
-        username = cHelper.UserName
-        password = cHelper.PassWord
+        # username = cHelper.UserName
+        # password = cHelper.PassWord
+        import xbmcgui
+        xbmcgui.Dialog().ok('xStream Serienstream', 'Unter Einstellungen / Konten für Serienstream die eigenen Kontendaten  eintragen!')
+        return
     Handler = cRequestHandler(URL_LOGIN, caching=False)
     Handler.addHeaderEntry('Upgrade-Insecure-Requests', '1')
     Handler.addHeaderEntry('Referer', ParameterHandler().getValue('entryUrl'))
