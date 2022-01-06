@@ -155,6 +155,8 @@ class cRequestHandler:
                         if not self.ignoreErrors:
                             logger.error('Failed DDOS-GUARD Url: ' + self._sUrl)
                             return ''
+                else:
+                    return
             elif not self.ignoreErrors:
                 xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url: {0} {1}'.format(self._sUrl, str(e)))
                 logger.error('HTTPError ' + str(e) + ' Url: ' + self._sUrl)
