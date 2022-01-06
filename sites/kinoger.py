@@ -228,70 +228,74 @@ def showHosters():
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
         for sUrl in aResult:
-            if 'sst' in sUrl:
-                oRequest = cRequestHandler(sUrl, ignoreErrors=True)
-                oRequest.addHeaderEntry('Referer', URL_MAIN)
-                sHtmlContent = oRequest.request()
-                if sHtmlContent == '': continue
-                isMatch, sContainer = cParser.parse(sHtmlContent, 'file(?:":"|:")([^"]+)')
-                if isMatch:
-                    isMatch, aResult = cParser.parse(sContainer[0], '(?:(\d+p)[^>])?((?:http|//)[^",]+)')
-                    if isMatch:
-                        for sQualy, sUrl2 in aResult:
-                            if not sQualy:
-                                sQualy = Qualy(sUrl2)
-                            if ' or ' in sUrl2:
-                                sUrl2 = sUrl2.split(' or ')[0]
-                            hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl), 'resolveable': True}
-                            hosters.append(hoster)
-            elif 'protonvideo' in sUrl:
-                oRequest = cRequestHandler('https://api.svh-api.ch/api/v4/player', ignoreErrors=True, jspost=True)
-                oRequest.addParameters('idi', sUrl.split('/')[4])
-                oRequest.addParameters('token', aes(sUrl.split('/')[4]))
-                sHtmlContent = oRequest.request()
-                isMatch, sContainer = cParser.parse(sHtmlContent, 'file(?:":"|:")([^"]+)')
-                if isMatch:
-                    isMatch, aResult = cParser.parse(sContainer[0], '(?:(\d+p)[^>])?((?:http|//)[^",]+)')
-                    if isMatch:
-                        for sQualy, sUrl2 in aResult:
-                            hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl), 'resolveable': True}
-                            hosters.append(hoster)
-            elif 'kinoger' in sUrl:
-                from resources.lib import jsunpacker
-                oRequest = cRequestHandler(sUrl.replace('/e/', '/play/'), ignoreErrors=True)
-                oRequest.addHeaderEntry('Referer', sUrl)
-                sHtmlContent = oRequest.request()
-                if sHtmlContent == '': continue
-                if 'p,a,c,k,e,d' in sHtmlContent:
-                    sHtmlContent = jsunpacker.unpack(sHtmlContent)
-                    pattern = 'sources\s*:\s*\[{file:\s*"([^"]+)'
-                    isMatch, sUrl2 = cParser.parse(sHtmlContent, pattern)
-                    oRequest = cRequestHandler(sUrl2[0], ignoreErrors=True)
-                    oRequest.addHeaderEntry('Referer', 'https://kinoger.pw/')
-                    oRequest.addHeaderEntry('Origin', 'https://kinoger.pw')
+            try:
+                if 'sst' in sUrl:
+                    oRequest = cRequestHandler(sUrl, ignoreErrors=True)
+                    oRequest.addHeaderEntry('Referer', URL_MAIN)
                     sHtmlContent = oRequest.request()
-                    pattern = 'RESOLUTION=\d+x(\d+).*?(http[^"]+)#'
-                    isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-                    for sQualy, sUrl in aResult:
-                        hoster = {'link': sUrl, 'name': sQualy + ' Kinoger', 'resolveable': True}
-                        hosters.append(hoster)
-            elif 'start.u' in sUrl:
-                import json
-                t = sUrl.split('/')
-                token = encodeUrl(t[4] + ':' + t[5])
-                url2 = 'http://start.u-stream.in/ustGet.php?id=' + t[5] + '&token=' + token
-                oRequest = cRequestHandler(url2, ignoreErrors=True)
-                oRequest.addHeaderEntry('Referer', sUrl)
-                content = oRequest.request()
-                t = json.loads(content)
-                if 'url' in t and t['url']:
-                    for u in t['url']:
-                        a = decodeStr(u)
-                        hoster = {'link': a, 'name': Qualy2(a) + cParser.urlparse(sUrl), 'resolveable': True}
-                        hosters.append(hoster)
-            else:
-                hoster = {'link': sUrl + 'DIREKT', 'name': cParser.urlparse(sUrl)}
-                hosters.append(hoster)
+                    if sHtmlContent == '': continue
+                    isMatch, sContainer = cParser.parse(sHtmlContent, 'file(?:":"|:")([^"]+)')
+                    if isMatch:
+                        isMatch, aResult = cParser.parse(sContainer[0], '(?:(\d+p)[^>])?((?:http|//)[^",]+)')
+                        if isMatch:
+                            for sQualy, sUrl2 in aResult:
+                                if not sQualy:
+                                    sQualy = Qualy(sUrl2)
+                                if ' or ' in sUrl2:
+                                    sUrl2 = sUrl2.split(' or ')[0]
+                                hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl), 'resolveable': True}
+                                hosters.append(hoster)
+                elif 'protonvideo' in sUrl:
+                    oRequest = cRequestHandler('https://api.svh-api.ch/api/v4/player', ignoreErrors=True, jspost=True)
+                    oRequest.addParameters('idi', sUrl.split('/')[4])
+                    oRequest.addParameters('token', aes(sUrl.split('/')[4]))
+                    sHtmlContent = oRequest.request()
+                    isMatch, sContainer = cParser.parse(sHtmlContent, 'file(?:":"|:")([^"]+)')
+                    if isMatch:
+                        isMatch, aResult = cParser.parse(sContainer[0], '(?:(\d+p)[^>])?((?:http|//)[^",]+)')
+                        if isMatch:
+                            for sQualy, sUrl2 in aResult:
+                                hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl), 'resolveable': True}
+                                hosters.append(hoster)
+
+                elif 'kinoger' in sUrl:
+                    from resources.lib import jsunpacker
+                    oRequest = cRequestHandler(sUrl.replace('/e/', '/play/'), ignoreErrors=True)
+                    oRequest.addHeaderEntry('Referer', sUrl)
+                    sHtmlContent = oRequest.request()
+                    if sHtmlContent == '': continue
+                    if 'p,a,c,k,e,d' in sHtmlContent:
+                        sHtmlContent = jsunpacker.unpack(sHtmlContent)
+                        pattern = 'sources\s*:\s*\[{file:\s*"([^"]+)'
+                        isMatch, sUrl2 = cParser.parse(sHtmlContent, pattern)
+                        oRequest = cRequestHandler(sUrl2[0], ignoreErrors=True)
+                        oRequest.addHeaderEntry('Referer', 'https://kinoger.pw/')
+                        oRequest.addHeaderEntry('Origin', 'https://kinoger.pw')
+                        sHtmlContent = oRequest.request()
+                        pattern = 'RESOLUTION=\d+x(\d+).*?(http[^"]+)#'
+                        isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+                        for sQualy, sUrl in aResult:
+                            hoster = {'link': sUrl, 'name': sQualy + ' Kinoger', 'resolveable': True}
+                            hosters.append(hoster)
+                elif 'start.u' in sUrl:
+                    import json
+                    t = sUrl.split('/')
+                    token = encodeUrl(t[4] + ':' + t[5])
+                    url2 = 'http://start.u-stream.in/ustGet.php?id=' + t[5] + '&token=' + token
+                    oRequest = cRequestHandler(url2, ignoreErrors=True)
+                    oRequest.addHeaderEntry('Referer', sUrl)
+                    content = oRequest.request()
+                    t = json.loads(content)
+                    if 'url' in t and t['url']:
+                        for u in t['url']:
+                            a = decodeStr(u)
+                            hoster = {'link': a, 'name': Qualy2(a) + cParser.urlparse(sUrl), 'resolveable': True}
+                            hosters.append(hoster)
+                else:
+                    hoster = {'link': sUrl + 'DIREKT', 'name': cParser.urlparse(sUrl)}
+                    hosters.append(hoster)
+            except:
+                pass
         if hosters:
             hosters.append('getHosterUrl')
         return hosters
