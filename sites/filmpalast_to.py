@@ -79,7 +79,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '"><a[^>]href="([^"]+)"[^>]title="([^"]+)"><img[^>]src="([^"]+)(.*?)</span></li>'
+    pattern = '</cite>(.*?)<a[^>]*href="([^"]*)"[^>]*title="([^"]*)"[^>]*>[^<]*<img[^>]*src=["\']([^"\']*)["\'][^>]*>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         pattern = '</div><a[^>]href="([^"]+)"[^>]title="([^"]+)">.*?src="([^"]+)(.*?)alt'
@@ -87,9 +87,9 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
-
+    
     total = len(aResult)
-    for sUrl, sName, sThumbnail, sDummy in aResult:
+    for sDummy, sUrl, sName, sThumbnail in aResult:
         isTvshow, aResult = cParser.parse(sName, 'S\d\dE\d\d')
         isShow, name = cParser.parseSingleResult(sName, '(.*?)S\d\dE\d\d')
         if isShow:
@@ -163,7 +163,7 @@ def showEpisodes():
     sSeason = params.getValue('season')
     sShowName = params.getValue('TVShowTitle')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '<div[^>]*class="staffelWrapperLoop[^"]*"[^>]*data-sid="%s">(.*?)</div></li></ul></div>' % sSeason
+    pattern = '<div[^>]*class="staffelWrapperLoop[^"]*"[^>]*data-sid="%s">(.*?)</ul></div>' % sSeason
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if not isMatch:
         cGui().showInfo()
