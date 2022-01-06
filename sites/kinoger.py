@@ -14,7 +14,7 @@ import base64, random
 SITE_IDENTIFIER = 'kinoger'
 SITE_NAME = 'Kinoger'
 SITE_ICON = 'kinoger.png'
-SITE_SETTINGS = '<setting default="kinoger.to" enable="!eq(-2,false)" id="kinoger-domain" label="30051" type="labelenum" values="kinoger.com|kinoger.to" />'
+SITE_SETTINGS = '<setting default="kinoger.com" enable="!eq(-2,false)" id="kinoger-domain" label="30051" type="labelenum" values="kinoger.com|kinoger.to" />'
 URL_MAIN = 'https://' + cConfig().getSetting('kinoger-domain')
 URL_SERIE = URL_MAIN + '/stream/serie/'
 
@@ -75,14 +75,16 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for sUrl, sName, sThumbnail, sDummy in aResult:
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
-        isTvshow = True if 'staffel' in sName.lower() or 'serie' in entryUrl else False
+        isTvshow = True if 'staffel' in sName.lower() or 'serie' in entryUrl or ';">S0' in sDummy else False
         isYear, sYear = cParser.parse(sName, '(.*?)\((\d*)\)')
         for name, year in sYear:
             sName = name
             sYear = year
             break
-        isDesc, sDesc = cParser.parseSingleResult(sDummy, '</b>([^"]+)</div>')
-        isDuration, sDuration = cParser.parseSingleResult(sDummy, '[Laufzeit][Spielzeit]:[^>]([\d]+)')
+        isDesc, sDesc = cParser.parseSingleResult(sDummy, '</b>([^<]+)')
+        isDuration, sDuration = cParser.parseSingleResult(sDummy, '(?:Laufzeit|Spielzeit).*?(\d[^<]+)')
+        if ':' in sDuration:
+            sDuration = time2minutes(sDuration)
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons' if isTvshow else 'showHosters')
         oGuiElement.setThumbnail(sThumbnail)
         if isYear:
@@ -182,26 +184,18 @@ def showEpisodes():
     if params.exist('L11'):
         L11 = params.getValue('L11')
         isMatch1, L11 = cParser.parse(L11, "(http[^']+)")
-        if isMatch1:
-            L11 = L11
     L22 = []
     if params.exist('L22'):
         L22 = params.getValue('L22')
         isMatch, L22 = cParser.parse(L22, "(http[^']+)")
-        if isMatch:
-            L22 = L22
     L33 = []
     if params.exist('L33'):
         L33 = params.getValue('L33')
         isMatch3, L33 = cParser.parse(L33, "(http[^']+)")
-        if isMatch3:
-            L33 = L33
     L44 = []
     if params.exist('L44'):
         L44 = params.getValue('L44')
         isMatch4, L44 = cParser.parse(L44, "(http[^']+)")
-        if isMatch4:
-            L44 = L44
     liste = ziplist(L11, L22, L33, L44)
     i = 0
     for sUrl in liste:
@@ -234,15 +228,11 @@ def showHosters():
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if isMatch:
         for sUrl in aResult:
-            if 'protonvideo' in sUrl or 'sst' in sUrl:
+            if 'sst' in sUrl:
                 oRequest = cRequestHandler(sUrl, ignoreErrors=True)
                 oRequest.addHeaderEntry('Referer', URL_MAIN)
                 sHtmlContent = oRequest.request()
                 if sHtmlContent == '': continue
-                if 'api.protonvideo.to/api/v4/player' in sHtmlContent:
-                    oRequest = cRequestHandler('https://api.protonvideo.to/api/v4/player', ignoreErrors=True, jspost=True)
-                    oRequest.addParameters('idi', sUrl.split('/')[4])
-                    sHtmlContent = oRequest.request()
                 isMatch, sContainer = cParser.parse(sHtmlContent, 'file(?:":"|:")([^"]+)')
                 if isMatch:
                     isMatch, aResult = cParser.parse(sContainer[0], '(?:(\d+p)[^>])?((?:http|//)[^",]+)')
@@ -252,20 +242,39 @@ def showHosters():
                                 sQualy = Qualy(sUrl2)
                             if ' or ' in sUrl2:
                                 sUrl2 = sUrl2.split(' or ')[0]
-                            hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl)}
+                            hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl), 'resolveable': True}
                             hosters.append(hoster)
-            elif 'kinoger.re' in sUrl:
-                oRequest = cRequestHandler(sUrl.replace('/v/', '/api/source/'), ignoreErrors=True)
+            elif 'protonvideo' in sUrl:
+                oRequest = cRequestHandler('https://api.svh-api.ch/api/v4/player', ignoreErrors=True, jspost=True)
+                oRequest.addParameters('idi', sUrl.split('/')[4])
+                oRequest.addParameters('token', aes(sUrl.split('/')[4]))
+                sHtmlContent = oRequest.request()
+                isMatch, sContainer = cParser.parse(sHtmlContent, 'file(?:":"|:")([^"]+)')
+                if isMatch:
+                    isMatch, aResult = cParser.parse(sContainer[0], '(?:(\d+p)[^>])?((?:http|//)[^",]+)')
+                    if isMatch:
+                        for sQualy, sUrl2 in aResult:
+                            hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl), 'resolveable': True}
+                            hosters.append(hoster)
+            elif 'kinoger' in sUrl:
+                from resources.lib import jsunpacker
+                oRequest = cRequestHandler(sUrl.replace('/e/', '/play/'), ignoreErrors=True)
                 oRequest.addHeaderEntry('Referer', sUrl)
-                oRequest.addParameters('r', URL_MAIN)
-                oRequest.addParameters('d', 'kinoger.re')
                 sHtmlContent = oRequest.request()
                 if sHtmlContent == '': continue
-                pattern = 'file":"([^"]+)","label":"([^"]+)'
-                isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-                for sUrl, sQualy in aResult:
-                    hoster = {'link': sUrl, 'name': sQualy + ' Kinoger.re'}
-                    hosters.append(hoster)
+                if 'p,a,c,k,e,d' in sHtmlContent:
+                    sHtmlContent = jsunpacker.unpack(sHtmlContent)
+                    pattern = 'sources\s*:\s*\[{file:\s*"([^"]+)'
+                    isMatch, sUrl2 = cParser.parse(sHtmlContent, pattern)
+                    oRequest = cRequestHandler(sUrl2[0], ignoreErrors=True)
+                    oRequest.addHeaderEntry('Referer', 'https://kinoger.pw/')
+                    oRequest.addHeaderEntry('Origin', 'https://kinoger.pw')
+                    sHtmlContent = oRequest.request()
+                    pattern = 'RESOLUTION=\d+x(\d+).*?(http[^"]+)#'
+                    isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+                    for sQualy, sUrl in aResult:
+                        hoster = {'link': sUrl, 'name': sQualy + ' Kinoger', 'resolveable': True}
+                        hosters.append(hoster)
             elif 'start.u' in sUrl:
                 import json
                 t = sUrl.split('/')
@@ -278,7 +287,7 @@ def showHosters():
                 if 'url' in t and t['url']:
                     for u in t['url']:
                         a = decodeStr(u)
-                        hoster = {'link': a, 'name': Qualy2(a) + cParser.urlparse(sUrl)}
+                        hoster = {'link': a, 'name': Qualy2(a) + cParser.urlparse(sUrl), 'resolveable': True}
                         hosters.append(hoster)
             else:
                 hoster = {'link': sUrl + 'DIREKT', 'name': cParser.urlparse(sUrl)}
@@ -331,7 +340,7 @@ def _search(oGui, sSearchText):
 
 
 def toString(number, base):
-    string = "0123456789abcdefghijklmnopqrstuvwxyz"
+    string = '0123456789abcdefghijklmnopqrstuvwxyz'
     if number < base:
         return string[number]
     else:
@@ -397,3 +406,21 @@ def encodeUrl(e):
             elif n[i] in t1[ii]:
                 e = e + t0[ii]
     return encodeStr(e + str(a))
+
+
+def aes(txt):
+    import pyaes, base64
+    from binascii import unhexlify
+    key = unhexlify('0123456789abcdef0123456789abcdef')
+    iv = unhexlify('abcdef9876543210abcdef9876543210')
+    aes = pyaes.Encrypter(pyaes.AESModeOfOperationCBC(key, iv))
+    return base64.b64encode(aes.feed(txt) + aes.feed()).decode()
+
+
+def time2minutes(time):
+    if type(time) == bytes:
+        time = time.decode()
+    t = time.split(":")
+    minutes = float(t[0])*60 + float(t[1]) + float(t[2]) *0.05/3
+    minutes = str(minutes).split(".")[0] if '.' in str(minutes) else str(minutes)
+    return  minutes
