@@ -259,24 +259,39 @@ def showHosters():
                                 hosters.append(hoster)
 
                 elif 'kinoger' in sUrl:
-                    from resources.lib import jsunpacker
-                    oRequest = cRequestHandler(sUrl.replace('/e/', '/play/'), ignoreErrors=True)
-                    oRequest.addHeaderEntry('Referer', sUrl)
-                    sHtmlContent = oRequest.request()
-                    if sHtmlContent == '': continue
-                    if 'p,a,c,k,e,d' in sHtmlContent:
-                        sHtmlContent = jsunpacker.unpack(sHtmlContent)
-                        pattern = 'sources\s*:\s*\[{file:\s*"([^"]+)'
-                        isMatch, sUrl2 = cParser.parse(sHtmlContent, pattern)
-                        oRequest = cRequestHandler(sUrl2[0], ignoreErrors=True)
-                        oRequest.addHeaderEntry('Referer', 'https://kinoger.pw/')
-                        oRequest.addHeaderEntry('Origin', 'https://kinoger.pw')
+                    if '/e/' in sUrl:
+                        from resources.lib import jsunpacker
+                        oRequest = cRequestHandler(sUrl.replace('/e/', '/play/'), ignoreErrors=True)
+                        oRequest.addHeaderEntry('Referer', sUrl)
                         sHtmlContent = oRequest.request()
-                        pattern = 'RESOLUTION=\d+x(\d+).*?(http[^"]+)#'
+                        if sHtmlContent == '': continue
+                        if 'p,a,c,k,e,d' in sHtmlContent:
+                            sHtmlContent = jsunpacker.unpack(sHtmlContent)
+                            pattern = 'sources\s*:\s*\[{file:\s*"([^"]+)'
+                            isMatch, sUrl2 = cParser.parse(sHtmlContent, pattern)
+                            oRequest = cRequestHandler(sUrl2[0], ignoreErrors=True)
+                            oRequest.addHeaderEntry('Referer', 'https://kinoger.pw/')
+                            oRequest.addHeaderEntry('Origin', 'https://kinoger.pw')
+                            sHtmlContent = oRequest.request()
+                            pattern = 'RESOLUTION=\d+x(\d+).*?(http[^"]+)#'
+                            isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+                            for sQualy, sUrl in aResult:
+                                hoster = {'link': sUrl, 'name': sQualy + ' Kinoger', 'resolveable': True}
+                                hosters.append(hoster)
+                    else:   # u'https://kinoger.re/v/elz45t-z8ymj7p8'
+                        mediaId = sUrl.split("/")[-1:][0]
+                        apiurl = 'https://kinoger.re/api/source/' + mediaId
+                        oRequest = cRequestHandler(apiurl)
+                        oRequest.addHeaderEntry('Referer', sUrl)
+                        oRequest.addParameters('r', 'https://kinoger.com/')
+                        oRequest.addParameters('d', 'kinoger.re')
+                        sHtmlContent = oRequest.request()
+                        pattern = '{"file":"(.+?)","label.+?([0-9px]+)"'
                         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
-                        for sQualy, sUrl in aResult:
+                        for sUrl, sQualy in aResult:
                             hoster = {'link': sUrl, 'name': sQualy + ' Kinoger', 'resolveable': True}
                             hosters.append(hoster)
+
                 elif 'start.u' in sUrl:
                     import json
                     t = sUrl.split('/')
