@@ -1,3 +1,7 @@
+3.5.28~nightly1
+  08.01.2022
+ - add xCine
+
 3.5.27
   30.12.2021
  - wechsel von UrlResolver zu resolveUrl
