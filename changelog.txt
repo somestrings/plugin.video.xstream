@@ -1,6 +1,10 @@
+3.5.28~nightly2
+  2022.01.10
+ - add megakino - thx betegeuse46
+
 3.5.28~nightly1
   08.01.2022
- - add xCine
+ - add xCine - thx Heptamer
 
 3.5.27
   30.12.2021
