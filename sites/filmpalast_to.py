@@ -79,21 +79,26 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
     sHtmlContent = oRequest.request()
-    pattern = '</cite>(.*?)<a[^>]*href="([^"]*)"[^>]*title="([^"]*)"[^>]*>[^<]*<img[^>]*src=["\']([^"\']*)["\'][^>]*>'
+    # will match movies from first page (filmpalast.to)
+    pattern = '<article[^>]*>\s*<a href="([^"]+)" title="([^"]+)">\s*<img src=["\']([^"\']+)["\'][^>]*>(.*?)</article>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
+        # will match movies from specific pages (filmpalast.to/movies/new)
+        # last match is just a dummy!
+        pattern = '<a[^>]*href="([^"]*)"[^>]*title="([^"]*)"[^>]*>[^<]*<img[^>]*src=["\']([^"\']*)["\'][^>]*>\s*</a>(\s*)</article>'
+        isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+    if not isMatch:
+        # not needed anymore???
         pattern = '</div><a[^>]href="([^"]+)"[^>]title="([^"]+)">.*?src="([^"]+)(.*?)alt'
         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
-    
+
     total = len(aResult)
-    for sDummy, sUrl, sName, sThumbnail in aResult:
+    for sUrl, sName, sThumbnail, sDummy in aResult:
         isTvshow, aResult = cParser.parse(sName, 'S\d\dE\d\d')
-        isShow, name = cParser.parseSingleResult(sName, '(.*?)S\d\dE\d\d')
-        if isShow:
-            sName = name
+        # seriesname should not be crippled here!
         if sSearchText and not cParser().search(sSearchText, sName):
             continue
         if sThumbnail.startswith('/'):
@@ -118,7 +123,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui and not sSearchText:
-        pattern = "class=[^<]pageing.*?href='([^']+)'>[^>]v"
+        pattern = '<a class="pageing[^"]*" href=(/page/\d+)>[^\+]+\+</a>'
         isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, pattern)
         if isMatchNextPage:
             if sNextUrl.startswith('/'):
