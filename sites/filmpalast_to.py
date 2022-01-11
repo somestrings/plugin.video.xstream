@@ -123,12 +123,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         params.setParam('sThumbnail', sThumbnail)
         oGui.addFolder(oGuiElement, params, isTvshow, total)
     if not sGui and not sSearchText:
-        pattern = '<a class="pageing[^"]*" href=(/page/\d+)>[^\+]+\+</a>'
+        pattern = '<a class="pageing[^"]*"\s*href=([^>]+)>[^\+]+\+</a>\s*</div>'
         isMatchNextPage, sNextUrl = cParser.parseSingleResult(sHtmlContent, pattern)
         if isMatchNextPage:
+            sNextUrl = sNextUrl.replace("'", "").replace('"', '')
             if sNextUrl.startswith('/'):
                 sNextUrl = URL_MAIN + sNextUrl
-            params.setParam('sUrl', sNextUrl.replace("'", "").replace('"', ''))
+            params.setParam('sUrl', sNextUrl)
             oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
         oGui.setView('tvshows' if isTvshow else 'movies')
         oGui.setEndOfDirectory()
