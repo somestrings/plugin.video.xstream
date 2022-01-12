@@ -63,6 +63,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         oRequest.addParameters('story', sSearchText)
         oRequest.addParameters('do', 'search')
         oRequest.addParameters('subaction', 'search')
+        oRequest.addParameters('submit', 'submit')
     sHtmlContent = oRequest.request()
     pattern = '<a class=[^>]*href="([^"]+)">\s*<div class="[^"]+">\s*<img data-src="([^"]+)" src="[^"]+" alt="([^"]+)">\s*<div class="poster__label">(.*?</div>)\s*</div>\s*</a>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
@@ -80,12 +81,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             if sDesc[-1] != '.':
                 sDesc += '...'
             oGuiElement.setDescription(sDesc)
-        sThumbnail = URL_MAIN + sThumbnail
-        oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showEpisodes' if isTvshow else 'showHosters')
-        oGuiElement.setDescription(sInfo)
+        oGuiElement.setThumbnail(URL_MAIN + sThumbnail)
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
-        oGuiElement.setThumbnail(sThumbnail)
         params.setParam('entryUrl', sUrl)
+        params.setParam('sName', sName)
         params.setParam('sThumbnail', sThumbnail)
 
         oGui.addFolder(oGuiElement, params, isTvshow, total)
