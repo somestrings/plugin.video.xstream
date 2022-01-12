@@ -1,7 +1,7 @@
 ## Mit der Version 3.5.27 wird die Entwicklung durch Team xStream vorläufig Eingestellt!
 
 Wird ein Patch zu einer Seite eingereicht oder ein Scrapper zu einer neuen Seite so wird dies (insofern es sinnvoll ist) weiterhin eingepflegt.
-Fixes an Seiten bzw. neue Seiten am besten als PullRequest eingereicht (oder auf Gitter)
+Fixes an Seiten bzw. neue Seiten am besten als PullRequest eingereichen (oder auf Gitter)
 
 ![xStream logo](https://raw.githubusercontent.com/streamxstream/plugin.video.xstream//nightly/icon.png)
 
