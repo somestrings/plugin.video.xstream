@@ -15,7 +15,6 @@ URL_SERIEN = URL_MAIN + 'serials/'
 URL_ANIMATION = URL_MAIN + 'multfilm/'
 SITE_GLOBAL_SEARCH = False
 
-
 def load():
     logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
@@ -31,6 +30,8 @@ def load():
     cGui().addFolder(cGuiElement('Animation', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN)
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
+    params.setParam('sUrl', URL_MAIN)
+    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'), params)
     cGui().setEndOfDirectory()
 
 
@@ -58,6 +59,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
+    if sSearchText:
+        oRequest.addParameters('story', sSearchText)
+        oRequest.addParameters('do', 'search')
+        oRequest.addParameters('subaction', 'search')
     sHtmlContent = oRequest.request()
     pattern = '<a class=[^>]*href="([^"]+)">\s*<div class="[^"]+">\s*<img data-src="([^"]+)" src="[^"]+" alt="([^"]+)">\s*<div class="poster__label">(.*?</div>)\s*</div>\s*</a>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
@@ -75,10 +80,12 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             if sDesc[-1] != '.':
                 sDesc += '...'
             oGuiElement.setDescription(sDesc)
-        oGuiElement.setThumbnail(URL_MAIN + sThumbnail)
+        sThumbnail = URL_MAIN + sThumbnail
+        oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showEpisodes' if isTvshow else 'showHosters')
+        oGuiElement.setDescription(sInfo)
         oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
+        oGuiElement.setThumbnail(sThumbnail)
         params.setParam('entryUrl', sUrl)
-        params.setParam('sName', sName)
         params.setParam('sThumbnail', sThumbnail)
 
         oGui.addFolder(oGuiElement, params, isTvshow, total)
@@ -166,4 +173,4 @@ def showSearch():
 
 
 def _search(oGui, sSearchText):
-    showEntries(URL_SEARCH % cParser.quotePlus(sSearchText), oGui, sSearchText)
+    showEntries(URL_MAIN, oGui, sSearchText)
