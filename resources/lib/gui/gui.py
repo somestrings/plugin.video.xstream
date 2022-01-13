@@ -75,14 +75,16 @@ class cGui:
         itemValues = oGuiElement.getItemValues()
         itemTitle = oGuiElement.getTitle()
         infoString = ''
+        if self.globalSearch:
+            infoString += ' %s' % oGuiElement.getSiteName()
         if oGuiElement._sLanguage != '':
             infoString += ' (%s)' % oGuiElement._sLanguage
         if oGuiElement._sSubLanguage != '':
             infoString += ' *Sub: %s*' % oGuiElement._sSubLanguage
         if oGuiElement._sQuality != '':
             infoString += ' [%s]' % oGuiElement._sQuality
-        if self.globalSearch:
-            infoString += ' %s' % oGuiElement.getSiteName()
+        # if self.globalSearch:
+        #     infoString += ' %s' % oGuiElement.getSiteName()
         if infoString:
             infoString = '[I]%s[/I]' % infoString
         itemValues['title'] = itemTitle + infoString
