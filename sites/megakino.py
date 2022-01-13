@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# 2022-01-13
+
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
@@ -13,7 +16,8 @@ URL_KINO = URL_MAIN + 'kinofilme/'
 URL_FILME = URL_MAIN + 'films/'
 URL_SERIEN = URL_MAIN + 'serials/'
 URL_ANIMATION = URL_MAIN + 'multfilm/'
-SITE_GLOBAL_SEARCH = False
+URL_SEARCH = URL_MAIN + '?do=search&subaction=search&story=%s'
+
 
 def load():
     logger.info('Load %s' % SITE_NAME)
@@ -30,8 +34,7 @@ def load():
     cGui().addFolder(cGuiElement('Animation', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN)
     cGui().addFolder(cGuiElement('Genre', SITE_IDENTIFIER, 'showGenre'), params)
-    params.setParam('sUrl', URL_MAIN)
-    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'), params)
+    cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     cGui().setEndOfDirectory()
 
 
@@ -39,7 +42,7 @@ def showGenre():
     params = ParameterHandler()
     entryUrl = params.getValue('sUrl')
     sHtmlContent = cRequestHandler(entryUrl).request()
-    pattern = '<div class="side-block__title">Genres</div>(.*?)</ul>\s*</div>'
+    pattern = '<div\s+class="side-block__title">Genres</div>(.*?)</ul>\s*</div>'
     isMatch, sHtmlContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
         pattern = 'href="([^"]+)">([^<]+)</a>'
@@ -57,15 +60,11 @@ def showGenre():
 def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
+    isTvshow = False
     if not entryUrl: entryUrl = params.getValue('sUrl')
     oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
-    if sSearchText:
-        oRequest.addParameters('story', sSearchText)
-        oRequest.addParameters('do', 'search')
-        oRequest.addParameters('subaction', 'search')
-        oRequest.addParameters('submit', 'submit')
     sHtmlContent = oRequest.request()
-    pattern = '<a class=[^>]*href="([^"]+)">\s*<div class="[^"]+">\s*<img data-src="([^"]+)" src="[^"]+" alt="([^"]+)">\s*<div class="poster__label">(.*?</div>)\s*</div>\s*</a>'
+    pattern = '<a\s+class=[^>]*href="([^"]+)">\s*<div\s+class="[^"]+">\s*<img\s+data-src="([^"]+)"\s+src="[^"]+"\s+alt="([^"]+)">\s*<div\s+class="poster__label">(.*?</div>)\s*</div>\s*</a>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
 
     if not isMatch:
@@ -74,27 +73,30 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     total = len(aResult)
     for sUrl, sThumbnail, sName, sInfo in aResult:
-        isTvshow, aResult = cParser.parse(sName, ' - Staffel \d+')
+        if sSearchText and not cParser.search(sSearchText, sName):
+            continue
+
+        isTvshow, aResult = cParser.parse(sName, '\s+-\s+Staffel\s+\d+')
         oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showEpisodes' if isTvshow else 'showHosters')
-        isDesc, sDesc = cParser.parseSingleResult(sInfo, '<div class="poster__text[^"]+">([^<]+)</div>')
+        isDesc, sDesc = cParser.parseSingleResult(sInfo, '<div\s+class="poster__text[^"]+">([^<]+)</div>')
         if isDesc:
             if sDesc[-1] != '.':
                 sDesc += '...'
             oGuiElement.setDescription(sDesc)
         oGuiElement.setThumbnail(URL_MAIN + sThumbnail)
-        oGuiElement.setMediaType('tvshow' if isTvshow else 'movie')
+        oGuiElement.setMediaType('season' if isTvshow else 'movie')
         params.setParam('entryUrl', sUrl)
         params.setParam('sName', sName)
         params.setParam('sThumbnail', sThumbnail)
 
         oGui.addFolder(oGuiElement, params, isTvshow, total)
-
-    isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, '">\s*<a href="([^"]+)">\D')
-    if isMatchNextPage:
-        params.setParam('sUrl', sNextUrl)
-        oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
-    oGui.setView('tvshows' if isTvshow else 'movies')
-    oGui.setEndOfDirectory()
+    if not sGui and not sSearchText:
+        isMatchNextPage, sNextUrl = cParser().parseSingleResult(sHtmlContent, '">\s*<a\s+href="([^"]+)">\D')
+        if isMatchNextPage:
+            params.setParam('sUrl', sNextUrl)
+            oGui.addNextPage(SITE_IDENTIFIER, 'showEntries', params)
+        oGui.setView('tvshows' if isTvshow else 'movies')
+        oGui.setEndOfDirectory()
 
 
 def showEpisodes():
@@ -102,23 +104,25 @@ def showEpisodes():
     sUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue("sThumbnail")
     sName = params.getValue('sName')
-    isMatch, sShowName = cParser.parseSingleResult(sName, '(.*?) - Staffel \d+')
+    isMatch, sShowName = cParser.parseSingleResult(sName, '(.*?)\s+-\s+Staffel\s+\d+')
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
-    isMatch, sSeason = cParser.parseSingleResult(sName, ' - Staffel (\d+)')
+    isMatch, sSeason = cParser.parseSingleResult(sName, '\s+-\s+Staffel\s+(\d+)')
     if not isMatch:
         if not sGui: oGui.showInfo()
         return
 
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '<option value="ep([^"]+)">([^<]+)</option>'
+    pattern = '<option\s+value="ep([^"]+)">([^<]+)</option>'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     total = len(aResult)
     for episode, episodeName in aResult:
         params.setParam('episodeId', episode)
         oGuiElement = cGuiElement(str(episodeName), SITE_IDENTIFIER, 'showEpisodeHosters')
         oGuiElement.setThumbnail(URL_MAIN + sThumbnail)
+        oGuiElement.setTVShowTitle(sName)
+        oGuiElement.setSeason(sSeason)
         oGuiElement.setEpisode(episode)
         oGuiElement.setMediaType('episode')
         cGui().addFolder(oGuiElement, params, False, total)
@@ -130,7 +134,7 @@ def showHosters():
     hosters = []
     sUrl = ParameterHandler().getValue('entryUrl')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '<iframe id="film_main" data-src="([^"]+)"'
+    pattern = '<iframe\s+id="film_main"\s+data-src="([^"]+)"'
     isMatch, aResult = cParser.parse(sHtmlContent, pattern)
     if isMatch:
         for sUrl in aResult:
@@ -146,10 +150,10 @@ def showEpisodeHosters():
     sUrl = ParameterHandler().getValue('entryUrl')
     episodeId = 'ep' + ParameterHandler().getValue('episodeId')
     sHtmlContent = cRequestHandler(sUrl).request()
-    pattern = '<select name="pmovie__select-items" class="[^"]+" style="[^"]+" id="%s">\s*(.*?)\s*</select>' % episodeId
+    pattern = '<select\s+name="pmovie__select-items"\s+class="[^"]+"\s+style="[^"]+"\s+id="%s">\s*(.*?)\s*</select>' % episodeId
     isMatch, sContainer = cParser.parseSingleResult(sHtmlContent, pattern)
     if isMatch:
-        pattern = '<option value="([^"]+)">'
+        pattern = '<option\s+value="([^"]+)">'
         isMatch, aResult = cParser.parse(sContainer, pattern)
         if isMatch:
             for sUrl in aResult:
@@ -172,4 +176,4 @@ def showSearch():
 
 
 def _search(oGui, sSearchText):
-    showEntries(URL_MAIN, oGui, sSearchText)
+    showEntries(URL_SEARCH % cParser.quotePlus(sSearchText), oGui, sSearchText)
