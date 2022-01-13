@@ -1,3 +1,12 @@
+3.5.28~nightly4
+  12.01.2022
+ - xcine deaktiviert (SITE_GLOBAL_SEARCH)
+ - fix megakino  - thx betegeuse46
+ - add kinokiste.tech  - thx betegeuse46
+ - guiElements extended -  thx betegeuse46
+ - edit gui.py
+ - Update README.md
+
 3.5.28~nightly3
   12.01.2022
  - movie4k_click
