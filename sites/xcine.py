@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# 2022-01-13
+
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
@@ -12,7 +15,7 @@ URL_MAIN = 'https://xcine.me/'
 URL_MOVIES = URL_MAIN + 'filme1?'
 URL_SHOWS = URL_MAIN + 'serien1?'
 URL_SEARCH = URL_MAIN + 'search?key=%s'
-
+SITE_GLOBAL_SEARCH = False # ka temp.
 
 def load():
     logger.info('Load %s' % SITE_NAME)
