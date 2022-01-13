@@ -134,6 +134,12 @@ class cGuiElement:
             logger.error('Year given for %s must be greater than 0' % self.getTitle())
             return False
 
+    def setQuality(self, quality):
+        self._sQuality = quality
+        
+    def getQuality(self):
+        return self._sQuality
+    
     def setTitleSecond(self, sTitleSecond):
         self.__sTitleSecond = cUtil.cleanse_text(str(sTitleSecond))
 
