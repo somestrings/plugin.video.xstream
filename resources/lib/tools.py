@@ -35,6 +35,14 @@ class cParser:
                 s = s.replace(*t)
             except:
                 pass
+        try:
+            re.sub(u'é', 'é', s)
+            re.sub(u'É', 'É', s)
+            # kill all other unicode chars
+            r = re.compile(r'[^\W\d_]', re.U)
+            r.sub('', s)
+        except:
+            pass
         return s
 
     @staticmethod
