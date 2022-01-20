@@ -10,49 +10,74 @@ from json import loads
 SITE_IDENTIFIER = 'kinox_to'
 SITE_NAME = 'KinoX'
 SITE_ICON = 'kinox.png'
-SITE_SETTINGS = '<setting default="kinox.bz" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="kinos.to|kinox.ai|kinox.am|kinox.bz|kinox.click|kinox.cloud|kinox.club|kinox.digital|kinox.direct|kinox.express|kinox.fun|kinox.fyi|kinox.gratis|kinox.io|kinox.lol|kinox.me|kinox.mobi|kinox.nu|kinox.party|kinox.pub|kinox.sg|kinox.sh|kinox.space|kinox.sx|kinox.to|kinox.tube|kinox.tv|kinox.wtf|kinoz.to" />'
-domain = cConfig().getSetting('kinox_to-domain')
+SITE_SETTINGS = '<setting default="kinox.bz" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="kinos.to|kinox.am|kinox.bz|kinox.click|kinox.cloud|kinox.club|kinox.digital|kinox.direct|kinox.express|kinox.fun|kinox.fyi|kinox.gratis|kinox.io|kinox.lol|kinox.me|kinox.mobi|kinox.pub|kinox.sh|kinox.space|kinox.sx|kinox.to|kinox.tube|kinox.tv|kinox.wtf|kinoz.to" />'
 
-URL_MAIN = 'https://' + domain
-URL_NEWS = URL_MAIN + '/index.php'
-URL_CINEMA_PAGE = URL_MAIN + '/Kino-Filme.html'
-URL_GENRE_PAGE = URL_MAIN + '/Genre.html'
-URL_MOVIE_PAGE = URL_MAIN + '/Movies.html'
-URL_SERIE_PAGE = URL_MAIN + '/Series.html'
-URL_DOCU_PAGE = URL_MAIN + '/Documentations.html'
-URL_FAVOURITE_MOVIE_PAGE = URL_MAIN + '/Popular-Movies.html'
-URL_FAVOURITE_SERIE_PAGE = URL_MAIN + '/Popular-Series.html'
-URL_FAVOURITE_DOCU_PAGE = URL_MAIN + '/Popular-Documentations.html'
-URL_LATEST_SERIE_PAGE = URL_MAIN + '/Latest-Series.html'
-URL_LATEST_DOCU_PAGE = URL_MAIN + '/Latest-Documentations.html'
-URL_SEARCH = URL_MAIN + '/Search.html?q=%s'
-URL_MIRROR = URL_MAIN + '/aGET/Mirror/'
-URL_EPISODE_URL = URL_MAIN + '/aGET/MirrorByEpisode/'
-URL_AJAX = URL_MAIN + '/aGET/List/'
-URL_LANGUAGE = URL_MAIN + '/aSET/PageLang/1'
+domain = cConfig().getSetting('kinox_to-domain')
+URL_MAIN = 'https://%s'
+URL_NEWS = 'https://%s/index.php'
+URL_CINEMA_PAGE = 'https://%s/Kino-Filme.html'
+URL_GENRE_PAGE = 'https://%s/Genre.html'
+URL_MOVIE_PAGE = 'https://%s/Movies.html'
+URL_SERIE_PAGE = 'https://%s/Series.html'
+URL_DOCU_PAGE = 'https://%s/Documentations.html'
+URL_FAVOURITE_MOVIE_PAGE = 'https://%s/Popular-Movies.html'
+URL_FAVOURITE_SERIE_PAGE = 'https://%s/Popular-Series.html'
+URL_FAVOURITE_DOCU_PAGE = 'https://%s/Popular-Documentations.html'
+URL_LATEST_SERIE_PAGE = 'https://%s/Latest-Series.html'
+URL_LATEST_DOCU_PAGE = 'https://%s/Latest-Documentations.html'
+URL_SEARCH = 'https://%s/Search.html?q=%s'
+URL_MIRROR = 'https://%s/aGET/Mirror/'
+URL_EPISODE_URL = 'https://%s/aGET/MirrorByEpisode/'
+URL_AJAX = 'https://%s/aGET/List/'
+URL_LANGUAGE = 'https://%s/aSET/PageLang/1'
 
 
 def load():
     logger.info('Load %s' % SITE_NAME)
     parms = ParameterHandler()
     oGui = cGui()
-    parms.setParam('sUrl', URL_NEWS)
+    checkDomains()
+    logger.info('DOMAIN USED: %s' % domain)
+    parms.setParam('sUrl', URL_NEWS % domain)
     parms.setParam('page', 1)
     parms.setParam('mediaType', 'news')
     oGui.addFolder(cGuiElement('Neues von Heute', SITE_IDENTIFIER, 'showNews'), parms)
-    parms.setParam('sUrl', URL_MOVIE_PAGE)
+    parms.setParam('sUrl', URL_MOVIE_PAGE % domain)
     parms.setParam('mediaType', 'movie')
     oGui.addFolder(cGuiElement('Filme', SITE_IDENTIFIER, 'showMovieMenu'), parms)
-    parms.setParam('sUrl', URL_SERIE_PAGE)
+    parms.setParam('sUrl', URL_SERIE_PAGE % domain)
     parms.setParam('mediaType', 'series')
     oGui.addFolder(cGuiElement('Serien', SITE_IDENTIFIER, 'showSeriesMenu'), parms)
-    parms.setParam('sUrl', URL_DOCU_PAGE)
+    parms.setParam('sUrl', URL_DOCU_PAGE % domain)
     parms.setParam('mediaType', 'documentation')
     oGui.addFolder(cGuiElement('Dokumentationen', SITE_IDENTIFIER, 'showDocuMenu'), parms)
     parms.setParam('sUrl', URL_SEARCH)
     parms.setParam('mediaType', '')
     oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'), parms)
     oGui.setEndOfDirectory()
+
+
+def checkDomains():
+    global domain
+
+    oRequest = cRequestHandler(URL_MAIN % domain, ignoreErrors=True)
+    sHtmlContent = oRequest.request()
+
+    if (not sHtmlContent or sHtmlContent == ''):
+        isMatch, sDomains = cParser.parseSingleResult(SITE_SETTINGS, 'values="([^"]+)"')
+        if isMatch:
+            for sDomain in sDomains.split('|'):
+                if sDomain == domain:
+                    continue
+                try:
+                    oRequest = cRequestHandler(URL_MAIN % sDomain, ignoreErrors=True)
+                    sHtmlContent = oRequest.request()
+                except:
+                    pass
+                if (sHtmlContent and sHtmlContent != ''):
+                    domain = sDomain
+                    cConfig().setSetting('kinox_to-domain', sDomain)
+                    break
 
 
 def __createMenuEntry(oGui, sFunction, sLabel, dOutputParameter):
@@ -75,7 +100,7 @@ def showMovieMenu():
     oGui.addFolder(cGuiElement('Kinofilme', SITE_IDENTIFIER, 'showCinemaMovies'), parms)
     oGui.addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showCharacters'), parms)
     oGui.addFolder(cGuiElement('Genres', SITE_IDENTIFIER, 'showGenres'), parms)
-    parms.setParam('sUrl', URL_FAVOURITE_MOVIE_PAGE)
+    parms.setParam('sUrl', URL_FAVOURITE_MOVIE_PAGE % domain)
     oGui.addFolder(cGuiElement('Beliebteste Filme', SITE_IDENTIFIER, 'showFavItems'), parms)
     oGui.setEndOfDirectory()
 
@@ -84,9 +109,9 @@ def showSeriesMenu():
     oGui = cGui()
     parms = ParameterHandler()
     oGui.addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showCharacters'), parms)
-    parms.setParam('sUrl', URL_FAVOURITE_SERIE_PAGE)
+    parms.setParam('sUrl', URL_FAVOURITE_SERIE_PAGE % domain)
     oGui.addFolder(cGuiElement('Beliebteste Serien', SITE_IDENTIFIER, 'showFavItems'), parms)
-    parms.setParam('sUrl', URL_LATEST_SERIE_PAGE)
+    parms.setParam('sUrl', URL_LATEST_SERIE_PAGE % domain)
     oGui.addFolder(cGuiElement('Neuste Serien', SITE_IDENTIFIER, 'showFavItems'), parms)
     oGui.setEndOfDirectory()
 
@@ -95,9 +120,9 @@ def showDocuMenu():
     oGui = cGui()
     parms = ParameterHandler()
     oGui.addFolder(cGuiElement('A-Z', SITE_IDENTIFIER, 'showCharacters'), parms)
-    parms.setParam('sUrl', URL_FAVOURITE_DOCU_PAGE)
+    parms.setParam('sUrl', URL_FAVOURITE_DOCU_PAGE % domain)
     oGui.addFolder(cGuiElement('Beliebteste Dokumentationen', SITE_IDENTIFIER, 'showFavItems'), parms)
-    parms.setParam('sUrl', URL_LATEST_DOCU_PAGE)
+    parms.setParam('sUrl', URL_LATEST_DOCU_PAGE % domain)
     oGui.addFolder(cGuiElement('Neuste Dokumentationen', SITE_IDENTIFIER, 'showFavItems'), parms)
     oGui.setEndOfDirectory()
 
@@ -128,7 +153,7 @@ def __getHtmlContent(sUrl=None, ignoreErrors=False):
     sPrefLang = __getPreferredLanguage()
     oRequest = cRequestHandler(sUrl, ignoreErrors=ignoreErrors)
     oRequest.addHeaderEntry('Cookie', sPrefLang + 'ListDisplayYears=Always;')
-    oRequest.addHeaderEntry('Referer', URL_MAIN)
+    oRequest.addHeaderEntry('Referer', URL_MAIN % domain)
     oRequest.addHeaderEntry('Accept', '*/*')
     oRequest.addHeaderEntry('Host', domain)
     return oRequest.request()
@@ -159,7 +184,7 @@ def __displayItems(sGui, sHtmlContent):
         sTitle = aEntry[3]
         sTitle, subLang = __checkSubLanguage(sTitle)
         sLang = __createLanguage(aEntry[0])
-        sUrl = URL_MAIN + aEntry[2]
+        sUrl = (URL_MAIN % domain) + aEntry[2]
         if aEntry[1] == 'movie' or aEntry[1] == 'cinema':
             mediaType = 'movie'
         elif aEntry[1] == 'series':
@@ -200,7 +225,7 @@ def showNews():
         for aEntry in aResult[1]:
             sTitle = str(aEntry[0]) + ' (' + str(aEntry[1]) + ')'
             oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER, 'parseNews')
-            parms.addParams({'sUrl': URL_NEWS, 'page': 1, 'mediaType': 'news', 'sNewsTitle': aEntry[0]})
+            parms.addParams({'sUrl': URL_NEWS % domain, 'page': 1, 'mediaType': 'news', 'sNewsTitle': aEntry[0]})
             cGui().addFolder(oGuiElement, parms)
     cGui().setEndOfDirectory()
 
@@ -248,8 +273,8 @@ def parseNews():
             oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
             oGuiElement.setLanguage(sLang)
             oGuiElement.setSubLanguage(subLang)
-            oGuiElement.setThumbnail(URL_MAIN + str(aEntry[1]))
-            parms.setParam('sUrl', URL_MAIN + sUrl)
+            oGuiElement.setThumbnail((URL_MAIN % domain) + str(aEntry[1]))
+            parms.setParam('sUrl', (URL_MAIN % domain) + sUrl)
             parms.setParam('mediaType', mediaType)
             if mediaType == 'series':
                 oGuiElement.setMediaType('tvshow')
@@ -285,13 +310,13 @@ def showCharacters():
 def showGenres():
     logger.info('load displayGenreSite')
     pattern = '<td class="Title"><a.*?href="/Genre/([^"]+)">([^<]+)</a>.*?Tipp-([0-9]+).html">'
-    sHtmlContent = __getHtmlContent(URL_GENRE_PAGE)
+    sHtmlContent = __getHtmlContent(URL_GENRE_PAGE % domain)
     aResult = cParser().parse(sHtmlContent, pattern)
     oGui = cGui()
     if aResult[0]:
         for aEntry in aResult[1]:
             iGenreId = aEntry[2]
-            __createMenuEntry(oGui, 'showCharacters', aEntry[1], {'page': 1, 'mediaType': 'fGenre', 'mediaTypePageId': iGenreId, 'sUrl': URL_MOVIE_PAGE})
+            __createMenuEntry(oGui, 'showCharacters', aEntry[1], {'page': 1, 'mediaType': 'fGenre', 'mediaTypePageId': iGenreId, 'sUrl': URL_MOVIE_PAGE % domain})
     oGui.setEndOfDirectory()
 
 
@@ -306,7 +331,7 @@ def showCinemaMovies():
 def _cinema(oGui):
     pattern = '<div class="Opt leftOpt Headlne"><a title="(.*?)" href="(.*?)">.*?src="(.*?)".*?class="Descriptor">(.*?)</div.*?/lng/([0-9]+).png".*?IMDb:</b> (.*?) /'
     parms = ParameterHandler()
-    sHtmlContent = __getHtmlContent(URL_CINEMA_PAGE)
+    sHtmlContent = __getHtmlContent(URL_CINEMA_PAGE % domain)
     aResult = cParser().parse(sHtmlContent, pattern)
     if not aResult[0]: return
     total = len(aResult[1])
@@ -321,9 +346,9 @@ def _cinema(oGui):
         oGuiElement.setTitle(sMovieTitle)
         oGuiElement.setDescription(aEntry[3])
         oGuiElement.setMediaType('movie')
-        oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]))
+        oGuiElement.setThumbnail((URL_MAIN % domain) + str(aEntry[2]))
         oGuiElement.addItemValue('rating', rating)
-        parms.setParam('sUrl', URL_MAIN + str(aEntry[1]))
+        parms.setParam('sUrl', (URL_MAIN % domain) + str(aEntry[1]))
         oGui.addFolder(oGuiElement, parms, False, total)
 
 
@@ -334,7 +359,7 @@ def parseMovieEntrySite():
         sHtmlContent = __getHtmlContent(sUrl)
         sMovieTitle = __createMovieTitle(sHtmlContent)
         result = cParser().parse(sHtmlContent, '<div class="Grahpics">.*?<img src="([^"]+)"')
-        thumbnail = URL_MAIN + str(result[1][0]) if result[0] else False
+        thumbnail = (URL_MAIN % domain) + str(result[1][0]) if result[0] else False
         bIsSerie = __isSerie(sHtmlContent)
         if bIsSerie:
             oGui = cGui()
@@ -367,7 +392,7 @@ def showEpisodes():
     sHtmlContent = __getHtmlContent(sUrl)
     sMovieTitle = __createMovieTitle(sHtmlContent)
     result = cParser().parse(sHtmlContent, '<div class="Grahpics">.*?<img src="([^"]+)"')
-    thumbnail = URL_MAIN + str(result[1][0]) if result[0] else False
+    thumbnail = (URL_MAIN % domain) + str(result[1][0]) if result[0] else False
     aSeriesItems = parseSerieEpisodes(sHtmlContent, seasonNum)
     if not aSeriesItems[0]: return
     for item in aSeriesItems:
@@ -413,7 +438,7 @@ def parseSerieEpisodes(sHtmlContent, seasonNum):
             aSeries = {}
             iEpisodeNum = iSeriesIds
             sTitel = 'Folge ' + str(iEpisodeNum)
-            sUrl = URL_EPISODE_URL + sSeriesUrl + '&Season=' + str(seasonNum) + '&Episode=' + str(iEpisodeNum)
+            sUrl = (URL_EPISODE_URL % domain) + sSeriesUrl + '&Season=' + str(seasonNum) + '&Episode=' + str(iEpisodeNum)
             aSeries['title'] = sTitel
             aSeries['url'] = sUrl
             aSeries['season'] = seasonNum
@@ -457,7 +482,7 @@ def ajaxCall():
                 sYear = str(aResult[1][0][2]).strip()
                 sTitle = aResult[1][0][1]
                 sLang = aEntry[0]
-                sUrl = URL_MAIN + str(aResult[1][0][0])
+                sUrl = (URL_MAIN % domain) + str(aResult[1][0][0])
                 oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
                 oGuiElement.setYear(sYear)
                 oGuiElement.setLanguage(sLang)
@@ -495,10 +520,10 @@ def ajaxCall():
                 lang = __createLanguage(aEntry[4])
                 oGuiElement = cGuiElement(sMovieTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
                 oGuiElement.setDescription(aEntry[3])
-                oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]))
+                oGuiElement.setThumbnail((URL_MAIN % domain) + str(aEntry[2]))
                 oGuiElement.setLanguage(lang)
                 oGuiElement.setSubLanguage(subLang)
-                parms.setParam('sUrl', URL_MAIN + str(aEntry[1]))
+                parms.setParam('sUrl', (URL_MAIN % domain) + str(aEntry[1]))
                 if sMediaType == 'series':
                     oGui.addFolder(oGuiElement, parms, total)
                 else:
@@ -525,7 +550,7 @@ def __createDisplayStart(iPage):
 def __getAjaxContent(sMediaType, iPage, iMediaTypePageId, metaOn, sCharacter=''):
     iDisplayStart = __createDisplayStart(iPage)
     sPrefLang = __getPreferredLanguage()
-    oRequest = cRequestHandler(URL_AJAX)
+    oRequest = cRequestHandler(URL_AJAX % domain)
     if not iMediaTypePageId:
         oRequest.addParameters('additional', '{"fType":"' + str(sMediaType) + '","fLetter":"' + str(sCharacter) + '"}')
     else:
@@ -555,7 +580,7 @@ def __getAjaxContent(sMediaType, iPage, iMediaTypePageId, metaOn, sCharacter='')
         oRequest.addParameters('Per_Page', '30')
         oRequest.addParameters('dir', 'desc')
     oRequest.addHeaderEntry('Cookie', sPrefLang + 'ListDisplayYears=Always;')
-    oRequest.addHeaderEntry('Referer', URL_MAIN)
+    oRequest.addHeaderEntry('Referer', (URL_MAIN % domain))
     oRequest.addHeaderEntry('Accept', '*/*')
     oRequest.addHeaderEntry('Host', domain)
     return oRequest.request()
@@ -578,7 +603,7 @@ def showHosters():
             if aResult[0]:
                 mirrors = int(aResult[1][0])
             for i in range(1, mirrors + 1):
-                sUrl = URL_MIRROR + cParser().unquotePlus(aEntry[0])
+                sUrl = (URL_MIRROR % domain) + cParser().unquotePlus(aEntry[0])
                 mirrorName = ''
                 if mirrors > 1:
                     mirrorName = ' Mirror ' + str(i)
@@ -592,7 +617,7 @@ def showHosters():
 def getHosterUrl(sUrl=False):
     sHtmlContent = cRequestHandler(sUrl).request()
     oRequest = cRequestHandler(sUrl)
-    oRequest.addHeaderEntry('Referer', URL_MAIN)
+    oRequest.addHeaderEntry('Referer', (URL_MAIN % domain))
     sHtmlContent = oRequest.request()
     isMatch, sStreamUrl = cParser.parseSingleResult(sHtmlContent, 'a\shref=\\\\".*?(https?:.*?)\\\\"')
     if not isMatch:
@@ -640,5 +665,5 @@ def showSearch():
 
 
 def _search(oGui, sSearchText):
-    sHtmlContent = __getHtmlContent(URL_SEARCH % cParser().quotePlus(sSearchText), ignoreErrors=(oGui is not False))
+    sHtmlContent = __getHtmlContent(URL_SEARCH % (domain, cParser().quotePlus(sSearchText)), ignoreErrors=(oGui is not False))
     __displayItems(oGui, sHtmlContent)
