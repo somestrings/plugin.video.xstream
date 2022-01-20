@@ -84,6 +84,7 @@ class cRequestHandler:
             self.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
 
     def request(self):
+        sContent = ''
         self._sUrl = self._sUrl.replace(' ', '+')
         if self.caching and self.cacheTime > 0:
             sContent = self.readCache(self.getRequestUri())
