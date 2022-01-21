@@ -14,6 +14,8 @@ SITE_ICON = 'serienstream.png'
 
 URL_MAIN = 'http://190.115.18.20/'
 URL_SERIES = URL_MAIN + '/serien'
+URL_NEW_SERIES = URL_MAIN + '/neu'
+URL_NEW_EPISODES = URL_MAIN + '/neue-episoden'
 URL_POPULAR = URL_MAIN + '/beliebte-serien'
 URL_LOGIN = URL_MAIN + '/login'
 
@@ -23,6 +25,10 @@ def load():
     params = ParameterHandler()
     params.setParam('sUrl', URL_SERIES)
     cGui().addFolder(cGuiElement('Alle Serien', SITE_IDENTIFIER, 'showAllSeries'), params)
+    params.setParam('sUrl', URL_NEW_SERIES)
+    cGui().addFolder(cGuiElement('Neue Serien', SITE_IDENTIFIER, 'showEntries'), params)
+    params.setParam('sUrl', URL_NEW_EPISODES)
+    cGui().addFolder(cGuiElement('Neue Episoden', SITE_IDENTIFIER, 'showNewEpisodes'), params)
     params.setParam('sUrl', URL_POPULAR)
     cGui().addFolder(cGuiElement('Populär', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_MAIN)
@@ -96,6 +102,34 @@ def showAllSeries(entryUrl=False, sGui=False, sSearchText=False):
         oGuiElement.setMediaType('tvshow')
         params.setParam('sUrl', URL_MAIN + sUrl)
         params.setParam('TVShowTitle', sName)
+        oGui.addFolder(oGuiElement, params, True, total)
+    if not sGui:
+        oGui.setView('tvshows')
+        oGui.setEndOfDirectory()
+
+
+def showNewEpisodes(entryUrl=False, sGui=False):
+    oGui = sGui if sGui else cGui()
+    params = ParameterHandler()
+    if not entryUrl:
+        entryUrl = params.getValue('sUrl')
+    oRequest = cRequestHandler(entryUrl, ignoreErrors=(sGui is not False))
+    sHtmlContent = oRequest.request()
+    pattern = '<div[^>]*class="col-md-[^"]*"[^>]*>\s*<a[^>]*href="([^"]*)"[^>]*>\s*<strong>([^<]+)</strong>\s*<span[^>]*>([^<]+)</span>'
+    isMatch, aResult = cParser.parse(sHtmlContent, pattern)
+    if not isMatch:
+        if not sGui: oGui.showInfo()
+        return
+
+    total = len(aResult)
+    for sUrl, sName, sInfo in aResult:
+        sMovieTitle = sName + ' ' + sInfo
+        oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons')
+        oGuiElement.setMediaType('tvshow')
+        oGuiElement.setTitle(sMovieTitle)
+        params.setParam('sUrl', URL_MAIN + sUrl)
+        params.setParam('TVShowTitle', sMovieTitle)
+
         oGui.addFolder(oGuiElement, params, True, total)
     if not sGui:
         oGui.setView('tvshows')
