@@ -6,6 +6,7 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
 from resources.lib.config import cConfig
 from json import loads
+import re
 
 
 SITE_IDENTIFIER = 'kinokiste'
@@ -35,6 +36,16 @@ def load():
     cGui().addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'), params)
     cGui().setEndOfDirectory()
 
+
+def _cleanTitle(sTitle):
+    sTitle = re.sub("[\xE4]", 'ae', sTitle)
+    sTitle = re.sub("[\xFC]", 'ue', sTitle)
+    sTitle = re.sub("[\xF6]", 'oe', sTitle)
+    sTitle = re.sub("[\xC4]", 'Ae', sTitle)
+    sTitle = re.sub("[\xDC]", 'Ue', sTitle)
+    sTitle = re.sub("[\xD6]", 'Oe', sTitle)
+    sTitle = re.sub("[\x00-\x1F\x80-\xFF]", '', sTitle)
+    return sTitle
 
 def showMovieMenu():
     params = ParameterHandler()
@@ -102,7 +113,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for movie in aJson['movies']:
         if 'streams' not in movie:
             continue
-        sTitle = cParser._cParser__replaceSpecialCharacters(movie['title'])
+        sTitle = _cleanTitle(movie['title']) 
         if sSearchText and not cParser().search(sSearchText, sTitle):
             continue
         if (('tv' in movie) and (movie['tv'] == 1)):
@@ -116,13 +127,15 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             sThumbnail = URL_THUMBNAIL % movie['backdrop_path']
         oGuiElement.setThumbnail(sThumbnail)
         if 'storyline' in movie:
-            oGuiElement.setDescription(cParser._cParser__replaceSpecialCharacters(movie['storyline']))
+            #oGuiElement.setDescription(cParser._cParser__replaceSpecialCharacters(movie['storyline']))
+            oGuiElement.setDescription(movie['storyline'])
         elif 'overview' in movie:
-            oGuiElement.setDescription(cParser._cParser__replaceSpecialCharacters(movie['overview']))
+            #oGuiElement.setDescription(cParser._cParser__replaceSpecialCharacters(movie['overview']))
+            oGuiElement.setDescription(movie['overview'])
         if 'year' in movie:
             oGuiElement.setYear(movie['year'])
-        if 'quality' in movie:
-            oGuiElement.setQuality(movie['quality'])
+        #if 'quality' in movie:
+        #    oGuiElement.setQuality(movie['quality'])
         if 'rating' in movie:
             oGuiElement.addItemValue('rating', movie['rating'].replace(',', '.'))
         if 'lang' in movie:

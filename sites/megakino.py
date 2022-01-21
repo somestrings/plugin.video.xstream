@@ -106,11 +106,11 @@ def showEpisodes():
     sName = params.getValue('sName')
     isMatch, sShowName = cParser.parseSingleResult(sName, '(.*?)\s+-\s+Staffel\s+\d+')
     if not isMatch:
-        if not sGui: oGui.showInfo()
+        cGui().showInfo()
         return
     isMatch, sSeason = cParser.parseSingleResult(sName, '\s+-\s+Staffel\s+(\d+)')
     if not isMatch:
-        if not sGui: oGui.showInfo()
+        cGui().showInfo()
         return
 
     sHtmlContent = cRequestHandler(sUrl).request()
