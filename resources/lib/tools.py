@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# 2022-01-21
+
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib import common
 from resources.lib import pyaes
@@ -19,12 +22,12 @@ class cParser:
         if sHtmlContent:
             aMatches = re.compile(pattern).findall(sHtmlContent)
             if len(aMatches) == 1:
-                aMatches[0] = cParser.__replaceSpecialCharacters(aMatches[0])
+                aMatches[0] = cParser.replaceSpecialCharacters(aMatches[0])
                 return True, aMatches[0]
         return False, aMatches
 
     @staticmethod
-    def __replaceSpecialCharacters(s):
+    def replaceSpecialCharacters(s):
         for t in (('\\/', '/'), ('&amp;', '&'), ('\\u00c4', 'Ä'), ('\\u00e4', 'ä'),
             ('\\u00d6', 'Ö'), ('\\u00f6', 'ö'), ('\\u00dc', 'Ü'), ('\\u00fc', 'ü'),
             ('\\u00df', 'ß'), ('\\u2013', '-'), ('\\u00b2', '²'), ('\\u00b3', '³'),
@@ -51,7 +54,7 @@ class cParser:
     def parse(sHtmlContent, pattern, iMinFoundValue=1, ignoreCase=False):
         aMatches = None
         if sHtmlContent:
-            sHtmlContent = cParser.__replaceSpecialCharacters(sHtmlContent)
+            sHtmlContent = cParser.replaceSpecialCharacters(sHtmlContent)
             if ignoreCase:
                 aMatches = re.compile(pattern, re.DOTALL | re.I).findall(sHtmlContent)
             else:

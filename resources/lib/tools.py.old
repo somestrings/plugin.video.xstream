@@ -15,10 +15,12 @@ except ImportError:
 class cParser:
     @staticmethod
     def parseSingleResult(sHtmlContent, pattern):
-        aMatches = re.compile(pattern).findall(sHtmlContent)
-        if len(aMatches) == 1:
-            aMatches[0] = cParser.__replaceSpecialCharacters(aMatches[0])
-            return True, aMatches[0]
+        aMatches = None
+        if sHtmlContent:
+            aMatches = re.compile(pattern).findall(sHtmlContent)
+            if len(aMatches) == 1:
+                aMatches[0] = cParser.__replaceSpecialCharacters(aMatches[0])
+                return True, aMatches[0]
         return False, aMatches
 
     @staticmethod
@@ -31,18 +33,31 @@ class cParser:
             ('\\u0308', '̈'), ('\\u00e8', 'è'), ('#038;', ''), ('\\u00f8', 'ø'),
             ('／', '/'), ('\\u00e1', 'á'), ('&#8211;', '-'), ('&#8220;', '“'), ('&#8222;', '„'),
             ('&#8217;', '’'), ('&#8230;', '…'), ('&#039;', "'")):
-            s = s.replace(*t)
+            try:
+                s = s.replace(*t)
+            except:
+                pass
+        try:
+            re.sub(u'é', 'é', s)
+            re.sub(u'É', 'É', s)
+            # kill all other unicode chars
+            r = re.compile(r'[^\W\d_]', re.U)
+            r.sub('', s)
+        except:
+            pass
         return s
 
     @staticmethod
     def parse(sHtmlContent, pattern, iMinFoundValue=1, ignoreCase=False):
-        sHtmlContent = cParser.__replaceSpecialCharacters(sHtmlContent)
-        if ignoreCase:
-            aMatches = re.compile(pattern, re.DOTALL | re.I).findall(sHtmlContent)
-        else:
-            aMatches = re.compile(pattern, re.DOTALL).findall(sHtmlContent)
-        if len(aMatches) >= iMinFoundValue:
-            return True, aMatches
+        aMatches = None
+        if sHtmlContent:
+            sHtmlContent = cParser.__replaceSpecialCharacters(sHtmlContent)
+            if ignoreCase:
+                aMatches = re.compile(pattern, re.DOTALL | re.I).findall(sHtmlContent)
+            else:
+                aMatches = re.compile(pattern, re.DOTALL).findall(sHtmlContent)
+            if len(aMatches) >= iMinFoundValue:
+                return True, aMatches
         return False, aMatches
 
     @staticmethod

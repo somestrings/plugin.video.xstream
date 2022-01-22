@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# 2022-01-21 / 1
+
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
@@ -6,7 +9,7 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
 from resources.lib.config import cConfig
 from json import loads
-import re
+import re, sys
 
 
 SITE_IDENTIFIER = 'kinokiste'
@@ -96,11 +99,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     sThumbnail = ''
     sLanguage = params.getValue('sLanguage')
     if not entryUrl: entryUrl = params.getValue('sUrl')
-    sJson = cRequestHandler(entryUrl, ignoreErrors=sGui is not False).request()
-    if not sJson:
+    try:
+        sJson = cRequestHandler(entryUrl, ignoreErrors=sGui is not False).request()
+        aJson = loads(sJson)
+    except:
         if not sGui: oGui.showInfo()
         return
-    aJson = loads(sJson)
+
     if 'movies' not in aJson or len(aJson['movies']) == 0:
         if not sGui: oGui.showInfo()
         return
@@ -127,10 +132,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             sThumbnail = URL_THUMBNAIL % movie['backdrop_path']
         oGuiElement.setThumbnail(sThumbnail)
         if 'storyline' in movie:
-            #oGuiElement.setDescription(cParser._cParser__replaceSpecialCharacters(movie['storyline']))
+            #oGuiElement.setDescription(cParser.replaceSpecialCharacters(movie['storyline']))
             oGuiElement.setDescription(movie['storyline'])
         elif 'overview' in movie:
-            #oGuiElement.setDescription(cParser._cParser__replaceSpecialCharacters(movie['overview']))
+            #oGuiElement.setDescription(cParser.replaceSpecialCharacters(movie['overview']))
             oGuiElement.setDescription(movie['overview'])
         if 'year' in movie:
             oGuiElement.setYear(movie['year'])
@@ -168,11 +173,13 @@ def showEpisodes():
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue("sThumbnail")
-    sJson = cRequestHandler(sUrl, ignoreErrors=True).request()
-    if not sJson:
+    try:
+        sJson = cRequestHandler(sUrl, ignoreErrors=True).request()
+        aJson = loads(sJson)
+    except:
         cGui().showInfo()
         return
-    aJson = loads(sJson)
+
     if 'streams' not in aJson or len(aJson['streams']) == 0:
         cGui().showInfo()
         return
@@ -210,7 +217,7 @@ def showHosters():
             for stream in aJson['streams']:
                 if (('e' not in stream) or (str(sEpisode) == str(stream['e']))):
                     sHoster = str(i) + ':'
-                    isMatch, sName = cParser.parseSingleResult(stream['stream'], '://([^/]+)/')
+                    isMatch, sName = cParser.parseSingleResult(stream['stream'], '//([^/]+)/')
                     if isMatch:
                         sName = sName[:sName.rindex('.')]
                         sHoster = sHoster + ' ' + sName
