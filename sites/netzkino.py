@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# 2022-01-24
+
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
@@ -85,34 +88,39 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     oGui = sGui if sGui else cGui()
     params = ParameterHandler()
     if not entryUrl: entryUrl = params.getValue('sUrl')
-    sJson = cRequestHandler(entryUrl, ignoreErrors=sGui is not False).request()
-    if not sJson:
+    try:
+        sJson = cRequestHandler(entryUrl, ignoreErrors=sGui is not False).request()
+        aJson = json.loads(sJson)
+    except:
         if not sGui: oGui.showInfo()
         return
-    aJson = json.loads(sJson)
+
     if 'posts' not in aJson or len(aJson['posts']) == 0:
         if not sGui: oGui.showInfo()
         return
 
     total = len(aJson['posts'])
     for item in aJson['posts']:
-        if sSearchText and not cParser().search(sSearchText, item['title']):
+        try:
+            if sSearchText and not cParser().search(sSearchText, item['title']):
+                continue
+            oGuiElement = cGuiElement(item['title'], SITE_IDENTIFIER, 'showHosters')
+            oGuiElement.setThumbnail(item['thumbnail'])
+            oGuiElement.setDescription(item['content'])
+            oGuiElement.setFanart(item['custom_fields']['featured_img_all'][0])
+            oGuiElement.setYear(item['custom_fields']['Jahr'][0])
+            oGuiElement.setMediaType('movie')
+            if 'Duration' in item['custom_fields'] and item['custom_fields']['Duration'][0]:
+                oGuiElement.addItemValue('duration', item['custom_fields']['Duration'][0])
+            urls = ''
+            if 'Streaming' in item['custom_fields'] and item['custom_fields']['Streaming'][0]:
+                urls += 'http://netzkino_and-vh.akamaihd.net/i/%s.mp4/master.m3u8' % item['custom_fields']['Streaming'][0]
+            if 'Youtube_Delivery_Id' in item['custom_fields'] and item['custom_fields']['Youtube_Delivery_Id'][0]:
+                urls += '#' + 'plugin://plugin.video.youtube/play/?video_id=%s' % item['custom_fields']['Youtube_Delivery_Id'][0]
+            params.setParam('entryUrl', urls)
+            oGui.addFolder(oGuiElement, params, False, total)
+        except:
             continue
-        oGuiElement = cGuiElement(item['title'], SITE_IDENTIFIER, 'showHosters')
-        oGuiElement.setThumbnail(item['thumbnail'])
-        oGuiElement.setDescription(item['content'])
-        oGuiElement.setFanart(item['custom_fields']['featured_img_all'][0])
-        oGuiElement.setYear(item['custom_fields']['Jahr'][0])
-        oGuiElement.setMediaType('movie')
-        if 'Duration' in item['custom_fields'] and item['custom_fields']['Duration'][0]:
-            oGuiElement.addItemValue('duration', item['custom_fields']['Duration'][0])
-        urls = ''
-        if 'Streaming' in item['custom_fields'] and item['custom_fields']['Streaming'][0]:
-            urls += 'http://netzkino_and-vh.akamaihd.net/i/%s.mp4/master.m3u8' % item['custom_fields']['Streaming'][0]
-        if 'Youtube_Delivery_Id' in item['custom_fields'] and item['custom_fields']['Youtube_Delivery_Id'][0]:
-            urls += '#' + 'plugin://plugin.video.youtube/play/?video_id=%s' % item['custom_fields']['Youtube_Delivery_Id'][0]
-        params.setParam('entryUrl', urls)
-        oGui.addFolder(oGuiElement, params, False, total)
 
     if not sGui:
         oGui.setView('movies')
