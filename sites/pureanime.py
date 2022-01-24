@@ -62,7 +62,8 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
         pattern = 'alt="([^"]+).*? href="([^"]+)"><div class="see">'
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if not isMatch:
-        pattern = 'result-item.*?alt="([^"]+).*?href="([^"]+)">'
+        #pattern = 'result-item.*?alt="([^"]+).*?href="([^"]+)">'
+        pattern = 'poster.*?alt="([^"]+).*?href="([^"]+)">'
         isMatch, aResult = cParser().parse(sHtmlContent, pattern)
     if not isMatch:
         if not sGui: oGui.showInfo()
