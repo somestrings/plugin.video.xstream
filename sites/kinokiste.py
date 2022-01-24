@@ -19,6 +19,8 @@ URL_MAIN = 'https://api.tmdb.club/data/browse/?lang=%s&type=%s&order_by=%s&page=
 URL_SEARCH = 'https://api.tmdb.club/data/browse/?lang=%s&keyword=%s&page=%s'
 URL_THUMBNAIL = 'https://image.tmdb.org/t/p/w300%s'
 URL_WATCH = 'https://api.tmdb.club/data/watch/?_id=%s'
+ORIGIN = 'https://movie2k.ag'
+REFERER = ORIGIN + '/'
 SITE_GLOBAL_SEARCH = False
 
 
@@ -49,6 +51,15 @@ def _cleanTitle(sTitle):
     sTitle = re.sub("[\xD6]", 'Oe', sTitle)
     sTitle = re.sub("[\x00-\x1F\x80-\xFF]", '', sTitle)
     return sTitle
+
+
+def _getQuality(sQuality):
+    isMatch, aResult = cParser.parse(sQuality, '(HDCAM|HD|WEB|BLUERAY|BRRIP|DVD|TS|SD|CAM)', 1, True)
+    if isMatch:
+        return aResult[0]
+    else:
+        return sQuality
+
 
 def showMovieMenu():
     params = ParameterHandler()
@@ -100,7 +111,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     sLanguage = params.getValue('sLanguage')
     if not entryUrl: entryUrl = params.getValue('sUrl')
     try:
-        sJson = cRequestHandler(entryUrl, ignoreErrors=sGui is not False).request()
+        oRequest = cRequestHandler(entryUrl)
+        oRequest.addHeaderEntry('Referer', REFERER)
+        oRequest.addHeaderEntry('Origin', ORIGIN)
+        sJson = oRequest.request()
         aJson = loads(sJson)
     except:
         if not sGui: oGui.showInfo()
@@ -118,7 +132,10 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
     for movie in aJson['movies']:
         if 'streams' not in movie:
             continue
-        sTitle = _cleanTitle(movie['title']) 
+        if sys.version_info[0] == 2:
+            sTitle = _cleanTitle(movie['title'])
+        else:
+            sTitle = movie['title']
         if sSearchText and not cParser().search(sSearchText, sTitle):
             continue
         if (('tv' in movie) and (movie['tv'] == 1)):
@@ -132,15 +149,13 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
             sThumbnail = URL_THUMBNAIL % movie['backdrop_path']
         oGuiElement.setThumbnail(sThumbnail)
         if 'storyline' in movie:
-            #oGuiElement.setDescription(cParser.replaceSpecialCharacters(movie['storyline']))
             oGuiElement.setDescription(movie['storyline'])
         elif 'overview' in movie:
-            #oGuiElement.setDescription(cParser.replaceSpecialCharacters(movie['overview']))
             oGuiElement.setDescription(movie['overview'])
         if 'year' in movie:
             oGuiElement.setYear(movie['year'])
-        #if 'quality' in movie:
-        #    oGuiElement.setQuality(movie['quality'])
+        if 'quality' in movie:
+            oGuiElement.setQuality(_getQuality(movie['quality']))
         if 'rating' in movie:
             oGuiElement.addItemValue('rating', movie['rating'].replace(',', '.'))
         if 'lang' in movie:
@@ -174,7 +189,10 @@ def showEpisodes():
     sUrl = params.getValue('entryUrl')
     sThumbnail = params.getValue("sThumbnail")
     try:
-        sJson = cRequestHandler(sUrl, ignoreErrors=True).request()
+        oRequest = cRequestHandler(sUrl)
+        oRequest.addHeaderEntry('Referer', REFERER)
+        oRequest.addHeaderEntry('Origin', ORIGIN)
+        sJson = oRequest.request()
         aJson = loads(sJson)
     except:
         cGui().showInfo()
@@ -209,7 +227,13 @@ def showHosters():
     params = ParameterHandler()
     sUrl = params.getValue('entryUrl')
     sEpisode = params.getValue('episode')
-    sJson = cRequestHandler(sUrl, ignoreErrors=True).request()
+    try:
+        oRequest = cRequestHandler(sUrl)
+        oRequest.addHeaderEntry('Referer', REFERER)
+        oRequest.addHeaderEntry('Origin', ORIGIN)
+        sJson = oRequest.request()
+    except:
+        return hosters
     if sJson:
         aJson = loads(sJson)
         if 'streams' in aJson:
@@ -217,12 +241,12 @@ def showHosters():
             for stream in aJson['streams']:
                 if (('e' not in stream) or (str(sEpisode) == str(stream['e']))):
                     sHoster = str(i) + ':'
-                    isMatch, sName = cParser.parseSingleResult(stream['stream'], '//([^/]+)/')
+                    isMatch, aName = cParser.parse(stream['stream'], '//([^/]+)/')
                     if isMatch:
-                        sName = sName[:sName.rindex('.')]
+                        sName = aName[0][:aName[0].rindex('.')]
                         sHoster = sHoster + ' ' + sName
                     if 'release' in stream:
-                        sHoster = sHoster + ' [' + stream['release'] + ']'
+                        sHoster = sHoster + ' [' + _getQuality(stream['release']) + ']'
                     hoster = {'link': stream['stream'], 'name': sHoster}
                     hosters.append(hoster)
                     i += 1
