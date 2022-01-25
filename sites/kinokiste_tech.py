@@ -121,7 +121,10 @@ def showEpisodes():
         oGuiElement.setThumbnail(URL_MAIN + sThumbnail)
         oGuiElement.setTVShowTitle(sShowName)
         oGuiElement.setSeason(sSeason)
-        oGuiElement.setEpisode(episode)
+        if '_' in episode:
+            oGuiElement.setEpisode(episode.partition('_')[2])
+        else:
+            oGuiElement.setEpisode(episode)
         oGuiElement.setMediaType('episode')
         cGui().addFolder(oGuiElement, params, False, total)
     cGui().setView('episodes')
