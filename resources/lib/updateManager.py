@@ -26,7 +26,8 @@ def resolverUpdate(silent=False):
     branch = 'master'
     token =''
     try:
-        return Update(username, plugin_id, branch, token, silent)
+        #return Update(username, plugin_id, branch, token, silent)
+        return True
     except Exception as e:
         log('Exception Raised: %s' % str(e), LOGERROR)
         Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
