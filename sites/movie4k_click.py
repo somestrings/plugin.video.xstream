@@ -9,7 +9,7 @@ SITE_IDENTIFIER = 'movie4k_click'
 SITE_NAME = 'Movie4k Click'
 SITE_ICON = 'movie4k_click.png'
 
-URL_MAIN = 'https://movie4k.tech'
+URL_MAIN = 'https://movie4k.network/'
 URL_KINO = URL_MAIN + '/aktuelle-kinofilme-im-kino'
 URL_FILME = URL_MAIN + '/kinofilme-online'
 URL_SERIE = URL_MAIN + '/serienstream-deutsch'
