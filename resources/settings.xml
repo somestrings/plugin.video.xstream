@@ -67,7 +67,7 @@
     <setting label="KinoX" type="lsep" />
     <setting default="true" id="plugin_kinox_to" label="30050" type="bool" />
     <setting default="true" enable="!eq(-1,false)" id="global_search_kinox_to" label="30052" type="bool" />
-    <setting default="" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="ww11.kinox.to|www.12.kinos.to|www12.kinox.to|www12.kinoz.to|kinox.bz" />
+    <setting default="www12.kinoz.to" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="ww11.kinox.to|www.12.kinos.to|www12.kinox.to|www12.kinoz.to|kinox.bz" />
     <setting type="sep" />
 </category> 
   <category label="Indexseiten 2">
