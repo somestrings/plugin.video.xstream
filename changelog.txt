@@ -1,3 +1,7 @@
+3.5.28~nightly5
+  28.03.2022
+- Update kinox
+
 3.5.28~nightly4
   12.01.2022
  - xcine deaktiviert (SITE_GLOBAL_SEARCH)
