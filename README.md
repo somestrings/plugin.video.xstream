@@ -1,4 +1,4 @@
-## Mit der Version 3.5.27 wird die Entwicklung durch Team xStream vorläufig Eingestellt!
+## Mit der Version 3.5.27 wird die Entwicklung durch Team xStream vorläufig eingestellt!
 
 Wird ein Patch zu einer Seite eingereicht oder ein Scrapper zu einer neuen Seite so wird dies (insofern es sinnvoll ist) weiterhin eingepflegt.
 Fixes an Seiten bzw. neue Seiten am besten als PullRequest einreichen (oder auf Gitter)
