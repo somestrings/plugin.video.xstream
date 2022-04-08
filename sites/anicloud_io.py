@@ -13,7 +13,7 @@ SITE_NAME = 'AniCloud'
 SITE_ICON = 'anicloud.png'
 #SITE_SETTINGS = '<setting id="anicloud.user" type="text" label="30083" default="" /><setting id="anicloud.pass" type="text" option="hidden" label="30084" default="" />'
 
-URL_MAIN = 'https://anicloud.io/'
+URL_MAIN = 'https://aniworld.to/'
 URL_SERIES = URL_MAIN + '/animes'
 URL_POPULAR = URL_MAIN + '/beliebte-animes'
 URL_LOGIN = URL_MAIN + '/login'
