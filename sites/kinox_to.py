@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+#2022-03-28 DWH
+
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
