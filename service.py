@@ -68,7 +68,18 @@ def checkDependence(ADDONID):
 
 if os.path.isfile(NIGHTLY_VERSION_CONTROL) == False or xbmcaddon.Addon().getSetting('DevUpdateAuto') == 'true' or xbmcaddon.Addon().getSetting('enforceUpdate') == 'true':
     from resources.lib import updateManager
-    status = updateManager.devAutoUpdates(True)
+
+    silent = True
+    username = 'discovert'
+    plugin_id = "plugin.video.xstream"
+    branch = 'master'
+    token = xbmcaddon.Addon().getSetting('update.token')
+    if token == '':
+        token = 'Z2hwX1VHUnEzQUh4T29JQUhHVGtlYWdUb0JYYmc3NXFaWTNSbXZEYQ=='
+        xbmcaddon.Addon().setSetting('update.token', token)
+
+    status = updateManager.Update(username, plugin_id, branch, token, silent)
+
     if status == True: infoDialog("Auto Update abgeschlossen", sound=False, icon='INFO', time=3000)
     if status == False: infoDialog("Auto Update mit Fehler beendet", sound=True, icon='ERROR')
     # if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon='INFO', time=3000)
