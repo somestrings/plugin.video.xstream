@@ -35,10 +35,10 @@ def resolverUpdate(silent=False):
 
 
 def xStreamUpdate(silent=False):
-    username = 'streamxstream'
+    username = 'discovert'
     plugin_id = 'plugin.video.xstream'
-    branch = 'nightly'
-    token = ''
+    branch = 'master'
+    token = 'Z2hwX1VHUnEzQUh4T29JQUhHVGtlYWdUb0JYYmc3NXFaWTNSbXZEYQ=='
     try:
         return Update(username, plugin_id, branch, token, silent)
     except Exception as e:
