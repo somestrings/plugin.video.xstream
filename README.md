@@ -1,5 +1,7 @@
 ## Mit der Version 3.5.29 wird um Unterstützung gebeten
 
+## Addon im Wiederaufbau!! Bis diese zeile hier steht bitt noch nicht wieder installieren, da noch anpassungen gemacht werden!!
+
 Jeder der mithelfen kann, wird gebeten seine fertigen Fixes einzureichen
 Wird ein Patch zu einer Seite eingereicht oder ein Scrapper zu einer neuen Seite, so werden diese (insofern es sinnvoll ist) weiterhin eingepflegt
 Fixes an Seiten bzw. neue Seiten am besten als PullRequest einreichen (oder auf Gitter)
