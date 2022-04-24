@@ -3,6 +3,7 @@
  - Update kinox settings.xml
  - Update movie4k domain
  - movie4k.space entfernt
+ - xCine deaktiviert
 
 3.5.32~nightly1
   24.04.2022
