@@ -1,3 +1,7 @@
+3.5.32~nightly1
+  24.04.2022
+ - Update kinox
+
 3.5.31
 - Restart nach xStream Shut Down
 - xStream Stand 3.5.29
