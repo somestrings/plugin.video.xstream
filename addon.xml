@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.xstream" name="xStream" version="3.5.32~nightly1" provider-name="xStream-Team">
+<addon id="plugin.video.xstream" name="xStream" version="3.5.32~nightly2" provider-name="xStream-Team">
  <requires>
     <import addon="script.module.requests"/>
     <import addon="script.module.resolveurl" version="5.1.54"/>
@@ -21,24 +21,13 @@
    <license>GNU GPLv3</license>
    <platform>all</platform>
    <news>
-3.5.31
+Repository Release 3.5.31
+
 - Restart nach xStream Shut Down
 - xStream Stand 3.5.29
 
-3.5.29
-- Update kinox
-
-3.5.28
- - xcine deaktiviert (SITE_GLOBAL_SEARCH)
- - fix megakino  - thx betegeuse46
- - add kinokiste.tech  - thx betegeuse46
- - guiElements extended -  thx betegeuse46
- - edit gui.py
- - Update README.md
- - movie4k_click
- - megakino
- - add megakino - thx betegeuse46
- - add xCine - thx Heptamer
+Nightly Version
+- siehe Changlog
    </news>
    <assets>
      <icon>icon.png</icon>

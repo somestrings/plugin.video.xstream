@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 2022.04.24 DWH-WFC
+
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
@@ -9,7 +11,7 @@ SITE_IDENTIFIER = 'movie4k_click'
 SITE_NAME = 'Movie4k Click'
 SITE_ICON = 'movie4k_click.png'
 
-URL_MAIN = 'https://movie4k.network/'
+URL_MAIN = 'https://www.movie4k.bond'
 URL_KINO = URL_MAIN + '/aktuelle-kinofilme-im-kino'
 URL_FILME = URL_MAIN + '/kinofilme-online'
 URL_SERIE = URL_MAIN + '/serienstream-deutsch'
