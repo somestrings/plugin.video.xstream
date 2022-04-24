@@ -106,7 +106,7 @@
     <setting default="true" type="bool" id="global_search_streamworld" label="30052" enable="!eq(-1,false)" />
     <setting type="sep" />
     <setting type="lsep" label="XCine" />
-    <setting default="true" type="bool" id="plugin_xcine" label="30050" />
+    <setting default="false" type="bool" id="plugin_xcine" label="30050" />
     <setting default="false" type="bool" id="global_search_xcine" label="30052" enable="!eq(-1,false)" />
     <setting type="sep" />
 </category>
