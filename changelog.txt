@@ -1,3 +1,7 @@
+3.5.32~nightly3
+  25.04.2022
+ - Update kkiste
+ 
 3.5.32~nightly2
   24.04.2022
  - Update kinox settings.xml
