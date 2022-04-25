@@ -9,7 +9,7 @@ from resources.lib.gui.gui import cGui
 SITE_IDENTIFIER = 'kkiste'
 SITE_NAME = 'KKiste'
 SITE_ICON = 'kkiste.png'
-URL_MAIN = 'https://kkiste.rest/'
+URL_MAIN = 'https://kkiste.cx/'
 
 
 def load():
