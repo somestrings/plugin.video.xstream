@@ -1,6 +1,9 @@
 3.5.32~nightly3
   25.04.2022
- - Update kkiste
+ - Update kkiste domian  thx @heptamer
+ - SSL Fix thx @heptamer
+ - HD Filme.top thx @heptamer
+ - settings.xml update
  
 3.5.32~nightly2
   24.04.2022

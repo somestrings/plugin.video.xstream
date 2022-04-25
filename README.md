@@ -18,3 +18,23 @@ Bei xStream handelt es sich um ein Video-Addon für Kodi, welches das streamen v
 
 ### | [FAQ](https://github.com/streamxstream/xStream-FAQ/blob/master/xStream_Anleitung_FAQ.md)
 
+Derzeit unterstützt die Version folgende Site Plugins:
+
+|  Site Plugin                       | Enthalten | Funktioniert | Login |
+|------------------------------------|:---------:|:------------:|:-----:|
+| Aniworld                     		 | [x]       | [x]          | [x]   |
+| Dokus4me                     		 | [x]       | [x]          |       |
+| Filmpalast                     	 | [x]       | [x]          |       |
+| Flimerstube                     	 | [x]       | [x]          | [x]   |
+| HD Filme.top                     	 | [x]       | [x]          |       |
+| Kinofox                     	     | [x]       | [x]          |       |
+| KinoGer                     	     | [x]       | [x]          |       |
+| KinoKiste.tech                  	 | [x]       | [x]          |       |
+| Kinox                     	     | [x]       | [x]          |       |
+| MegaKino                       	 | [x]       | [x]          |       |
+| Movie4k                        	 | [x]       | [x]          |       |
+| Movieking                     	 | [x]       | [x]          |       |
+| Movietown                     	 | [x]       | [x]          |       |
+| Netzkino                       	 | [x]       | [x]          |       |
+| Serienstream                     	 | [x]       | [x]          | [x]   |
+| Streamworld                     	 | [x]       | [x]          |       |
