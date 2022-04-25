@@ -1,4 +1,4 @@
-## Mit der Version 3.5.29 wird um Unterstützung gebeten
+## Mit der Version 3.5.31 wird um Unterstützung gebeten
 
 ## Addon im Wiederaufbau!! Bis diese zeile hier steht bitt noch nicht wieder installieren, da noch anpassungen gemacht werden!!
 
