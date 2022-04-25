@@ -45,6 +45,10 @@
     <setting id="flimmerstube.user" type="text" label="30083" default="" />
     <setting id="flimmerstube.pass" type="text" option="hidden" label="30084" default="" />
     <setting type="sep" />
+    <setting type="lsep" label="HD Filme Top" />
+    <setting default="true" type="bool" id="plugin_hdfilme_top" label="30050" />
+    <setting default="true" type="bool" id="global_search_hdfilme_top" label="30052" enable="!eq(-1,false)" />
+    <setting type="sep" />
     <setting type="lsep" label="KinoFox" />
     <setting default="true" type="bool" id="plugin_kinofox" label="30050" />
     <setting default="true" type="bool" id="global_search_kinofox" label="30052" enable="!eq(-1,false)" />
@@ -106,7 +110,7 @@
     <setting default="true" type="bool" id="global_search_streamworld" label="30052" enable="!eq(-1,false)" />
     <setting type="sep" />
     <setting type="lsep" label="XCine" />
-    <setting default="false" type="bool" id="plugin_xcine" label="30050" />
+    <setting default="true" type="bool" id="plugin_xcine" label="30050" />
     <setting default="false" type="bool" id="global_search_xcine" label="30052" enable="!eq(-1,false)" />
     <setting type="sep" />
 </category>
