@@ -26,7 +26,7 @@ Derzeit unterstützt die Version folgende Site Plugins:
 | Flimerstube                     	 | [x]       | [x]          | [x]   |        				|
 | HD Filme.top                     	 | [x]       | [x]          |       |        				|
 | Kinofox                     	     | [x]       | [x]          |       |        				|
-| KinoGer                     	     | [x]       | [x]          |       | Streamlare        	|
+| KinoGer                     	     | [x]       | [x]          |       |						|
 | KKiste                     	     | [x]       | [x]          |       | Cloudflare ab und zu  |
 | KinoKiste.tech                  	 | [x]       | [x]          |       |       			    |
 | Kinox                     	     | [x]       | [x]          |       | UTF8        			|

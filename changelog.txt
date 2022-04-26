@@ -3,6 +3,7 @@
  - Flimmerstube Info update
  - settings.xml update
  - Netzkino Globale Suche
+ - Fix Hosterlist Kinoger (Streamlare) thx @heptamer
 
 3.5.32~nightly3
   25.04.2022
