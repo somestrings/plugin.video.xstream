@@ -1,3 +1,9 @@
+3.5.32~nightly4
+  26.04.2022
+ - Flimmerstube Info update
+ - settings.xml update
+ - Netzkino Globale Suche
+
 3.5.32~nightly3
   25.04.2022
  - Update kkiste domian  thx @heptamer

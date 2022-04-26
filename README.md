@@ -12,29 +12,33 @@ Fixes an Seiten bzw. neue Seiten am besten als PullRequest einreichen (oder auf 
 ## Willkommen bei xStream für Kodi!
 
 Bei xStream handelt es sich um ein Video-Addon für Kodi, welches das streamen von Filmen und Serien über eine intuitive und optisch ansprechende Benutzeroberfläche ermöglicht. Sowohl der Funktionsumfang von xStream als auch das Angebot an Streaming-Inhalten wird von den beteiligten Entwicklern stetig weiterentwickelt bzw. um neue Webseiten erweitert. Diese werden auch als Site-Plugins bezeichnet, welche auf die eigentlichen Quellen verweisen die für das bereitgestellte Angebot verantworlich sind! 
+
+***
+
+
+Derzeit unterstützt die Version folgende Site Plugins:
+
+|  Site Plugin                       | Enthalten | Funktioniert | Login | Fehler Beschreibung   |
+|------------------------------------|:---------:|:------------:|:-----:|        				|
+| Aniworld                     		 | [x]       | [x]          | [x]   |        				|
+| Dokus4me                     		 | [x]       | [x]          |       |        				|
+| Filmpalast                     	 | [x]       | [x]          |       |        				|
+| Flimerstube                     	 | [x]       | [x]          | [x]   |        				|
+| HD Filme.top                     	 | [x]       | [x]          |       |        				|
+| Kinofox                     	     | [x]       | [x]          |       |        				|
+| KinoGer                     	     | [x]       | [x]          |       | Streamlare        	|
+| KKiste                     	     | [x]       | [x]          |       | Cloudflare ab und zu  |
+| KinoKiste.tech                  	 | [x]       | [x]          |       |       			    |
+| Kinox                     	     | [x]       | [x]          |       | UTF8        			|
+| MegaKino                       	 | [x]       | [x]          |       |        				|
+| Movie4k                        	 | [x]       | [x]          |       | Serien        		|
+| Movieking                     	 | [x]       | [x]          |       |        				|
+| Netzkino                       	 | [x]       | [x]          |       |        				|
+| Serienstream                     	 | [x]       | [x]          | [x]   |        				|
+| Streamworld                     	 | [x]       | [x]          |       |        				|
+
 ***
 
 [![Join the chat at https://gitter.im/Lastship_Chat/xStream](https://badges.gitter.im/Lastship_Chat/xStream.svg)](https://gitter.im/Lastship_Chat/xStream?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### | [FAQ](https://github.com/streamxstream/xStream-FAQ/blob/master/xStream_Anleitung_FAQ.md)
-
-Derzeit unterstützt die Version folgende Site Plugins:
-
-|  Site Plugin                       | Enthalten | Funktioniert | Login |
-|------------------------------------|:---------:|:------------:|:-----:|
-| Aniworld                     		 | [x]       | [x]          | [x]   |
-| Dokus4me                     		 | [x]       | [x]          |       |
-| Filmpalast                     	 | [x]       | [x]          |       |
-| Flimerstube                     	 | [x]       | [x]          | [x]   |
-| HD Filme.top                     	 | [x]       | [x]          |       |
-| Kinofox                     	     | [x]       | [x]          |       |
-| KinoGer                     	     | [x]       | [x]          |       |
-| KinoKiste.tech                  	 | [x]       | [x]          |       |
-| Kinox                     	     | [x]       | [x]          |       |
-| MegaKino                       	 | [x]       | [x]          |       |
-| Movie4k                        	 | [x]       | [x]          |       |
-| Movieking                     	 | [x]       | [x]          |       |
-| Movietown                     	 | [x]       | [x]          |       |
-| Netzkino                       	 | [x]       | [x]          |       |
-| Serienstream                     	 | [x]       | [x]          | [x]   |
-| Streamworld                     	 | [x]       | [x]          |       |

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# 2022-01-24
+# 2022-04-26
 
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
@@ -14,7 +14,7 @@ SITE_NAME = 'NetzKino'
 SITE_ICON = 'netzkino.png'
 URL_MAIN = 'https://api.netzkino.de.simplecache.net/capi-2.0a/categories/%s.json?d=www&l=de-DE'
 URL_SEARCH = 'https://api.netzkino.de.simplecache.net/capi-2.0a/search?q=%s&d=www&l=de-DE'
-SITE_GLOBAL_SEARCH = False
+SITE_GLOBAL_SEARCH = True
 
 
 def load():

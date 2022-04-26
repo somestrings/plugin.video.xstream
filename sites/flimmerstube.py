@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# 2022-04-26
+
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
@@ -23,7 +26,7 @@ def load():
     password = cConfig().getSetting('flimmerstube.pass')
     if username == '' and password == '':
         import xbmcgui
-        xbmcgui.Dialog().ok('INFO', '[COLOR red]für diese Seite ist ein kostenloses Benutzerkonto nötig registrieren sie sich http://flimmerstube.com und tragen sie ihre Kontodaten in den xStream-Einstellungen ein[/COLOR]')
+        xbmcgui.Dialog().ok('INFO', '[COLOR red]Für diese Seite ist ein kostenloses Benutzerkonto nötig, bitte registrieren Sie sich unter http://flimmerstube.com und tragen Sie ihre Kontodaten in den xStream-Einstellungen ein.[/COLOR]')
     else:
         oRequest = cRequestHandler('http://flimmerstube.com/index/sub/')
         oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
