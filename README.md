@@ -19,7 +19,7 @@ Bei xStream handelt es sich um ein Video-Addon für Kodi, welches das streamen v
 Derzeit unterstützt die Version folgende Site Plugins:
 
 |  Site Plugin                       | Enthalten | Funktioniert | Login | Fehler Beschreibung   |
-|------------------------------------|:---------:|:------------:|:-----:|        				|
+|------------------------------------|:---------:|:------------:|:-----:|:---------------------:|
 | Aniworld                     		 | [x]       | [x]          | [x]   |        				|
 | Dokus4me                     		 | [x]       | [x]          |       |        				|
 | Filmpalast                     	 | [x]       | [x]          |       |        				|
