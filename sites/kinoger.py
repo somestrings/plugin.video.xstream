@@ -306,6 +306,8 @@ def showHosters():
                             a = decodeStr(u)
                             hoster = {'link': a, 'name': Qualy2(a) + cParser.urlparse(sUrl), 'resolveable': True}
                             hosters.append(hoster)
+                elif 'streamlare' in sUrl:
+                    continue
                 else:
                     hoster = {'link': sUrl + 'DIREKT', 'name': cParser.urlparse(sUrl)}
                     hosters.append(hoster)
