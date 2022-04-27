@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# 2022.04.24 DWH-WFC
+# 2022.04.27 heptamer
 
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
@@ -99,7 +99,6 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
 
 def showEpisodes():
-    #import web_pdb; web_pdb.set_trace()
     params = ParameterHandler()
     sThumbnail = params.getValue('sThumbnail')
     entryUrl = params.getValue('entryUrl')
