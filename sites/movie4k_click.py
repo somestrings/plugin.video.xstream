@@ -99,6 +99,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
 
 def showEpisodes():
+    #import web_pdb; web_pdb.set_trace()
     params = ParameterHandler()
     sThumbnail = params.getValue('sThumbnail')
     entryUrl = params.getValue('entryUrl')
@@ -132,7 +133,8 @@ def showEpisodes():
 def showHosters():
     hosters = []
     sHtmlContent = cRequestHandler(ParameterHandler().getValue('entryUrl')).request()
-    if ParameterHandler().getValue('sEpisodeNr') > 0:
+    if ParameterHandler().getValue('sEpisodeNr'):
+        pass
         pattern = '%s<.*?</ul>' % ParameterHandler().getValue('sEpisodeNr')
         isMatch, sHtmlContent = cParser.parseSingleResult(sHtmlContent, pattern)
     isMatch, aResult = cParser().parse(sHtmlContent, 'link="([^"]+)">([^<]+)')
