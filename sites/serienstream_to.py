@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 2022-04-29 Heptamer
+
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
@@ -6,13 +8,22 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
 #from resources.lib.jsnprotect import cHelper
 from resources.lib.config import cConfig
-
 SITE_IDENTIFIER = 'serienstream_to'
 SITE_NAME = 'SerienStream'
 SITE_ICON = 'serienstream.png'
+SITE_SETTINGS = '<setting default="s.to" enable="!eq(-2,false)" id="serienstream_to-domain" label="30051" type="labelenum" values="s.to|serienstream.to|serien.cam|190.115.18.20" />'
+domain = cConfig().getSetting('serienstream_to-domain')
 #SITE_SETTINGS = '<setting id="serienstream.user" type="text" label="30083" default="" /><setting id="serienstream.pass" type="text" option="hidden" label="30084" default="" />'
+SITE_GLOBAL_SEARCH = False
 
-URL_MAIN = 'http://190.115.18.20/'
+#URL_MAIN = 'https://serien.cam/'
+if domain == "190.115.18.20":
+    URL_MAIN = 'http://' + domain
+    proxy = 'true'
+else:
+    URL_MAIN = 'https://' + domain
+    proxy = 'false'
+
 URL_SERIES = URL_MAIN + '/serien'
 URL_NEW_SERIES = URL_MAIN + '/neu'
 URL_NEW_EPISODES = URL_MAIN + '/neue-episoden'
@@ -23,8 +34,12 @@ URL_LOGIN = URL_MAIN + '/login'
 def load():
     logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
-    params.setParam('sUrl', URL_SERIES)
-    cGui().addFolder(cGuiElement('Alle Serien', SITE_IDENTIFIER, 'showAllSeries'), params)
+    if proxy == 'true':
+        pass
+    else:
+        params.setParam('sUrl', URL_SERIES)
+        cGui().addFolder(cGuiElement('Alle Serien', SITE_IDENTIFIER, 'showAllSeries'), params)
+
     params.setParam('sUrl', URL_NEW_SERIES)
     cGui().addFolder(cGuiElement('Neue Serien', SITE_IDENTIFIER, 'showEntries'), params)
     params.setParam('sUrl', URL_NEW_EPISODES)
@@ -106,6 +121,7 @@ def showAllSeries(entryUrl=False, sGui=False, sSearchText=False):
     if not sGui:
         oGui.setView('tvshows')
         oGui.setEndOfDirectory()
+   
 
 
 def showNewEpisodes(entryUrl=False, sGui=False):
