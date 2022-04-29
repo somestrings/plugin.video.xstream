@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# 2022.04.24 DWH-WFC
+# 2022.04.27 heptamer
 
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
@@ -132,7 +132,8 @@ def showEpisodes():
 def showHosters():
     hosters = []
     sHtmlContent = cRequestHandler(ParameterHandler().getValue('entryUrl')).request()
-    if ParameterHandler().getValue('sEpisodeNr') > 0:
+    if ParameterHandler().getValue('sEpisodeNr'):
+        pass
         pattern = '%s<.*?</ul>' % ParameterHandler().getValue('sEpisodeNr')
         isMatch, sHtmlContent = cParser.parseSingleResult(sHtmlContent, pattern)
     isMatch, aResult = cParser().parse(sHtmlContent, 'link="([^"]+)">([^<]+)')
