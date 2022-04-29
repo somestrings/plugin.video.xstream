@@ -1,3 +1,11 @@
+3.5.32~nightly6
+  29.04.2022
+ - Fix Serienstream Eintrag Alle Serien
+ - Fix kkiste, movie4click invalid hosters  thx @dxsdev0
+ - Neues Plugin kinomax.me
+ - XCine entfernt
+ - movietown.org entfernt
+
 3.5.32~nightly5
   29.04.2022
  - Update Flimmerstube
