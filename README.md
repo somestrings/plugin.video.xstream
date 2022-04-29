@@ -36,8 +36,10 @@ Derzeit unterstützt die Version folgende Site Plugins:
 | Movie4k                        	 | [x]       | [x]          |       |               		|
 | Movieking                     	 | [x]       | [x]          |       |        				|
 | Netzkino                       	 | [x]       | [x]          |       |        				|
+| Puranime                         |    [x]              |   [x]                  |       |               |
 | Serienstream                     	 | [x]       | [x]          | [x]   |        				|
 | Streamworld                     	 | [x]       | [x]          |       |        				|
+| xCine                              |  [x]      |              |       |               |
 
 ***
 
