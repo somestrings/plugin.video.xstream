@@ -139,7 +139,10 @@ def showHosters():
     isMatch, aResult = cParser().parse(sHtmlContent, 'link="([^"]+)">([^<]+)')
     if isMatch:
         for sUrl, sName in aResult:
-            if 'railer' in sName: continue
+            if 'railer' in sName: 
+                continue
+            elif 'vod' in sUrl:
+                continue
             if sUrl.startswith('//'):
                 sUrl = 'https:' + sUrl
             hoster = {'link': sUrl, 'name': sName}
