@@ -20,18 +20,20 @@ Derzeit unterstützt die Version folgende Site Plugins:
 
 |  Site Plugin                       | Enthalten | Funktioniert | Login | Fehler Beschreibung   |
 |------------------------------------|:---------:|:------------:|:-----:|:---------------------:|
-| Aniworld                     		 | [x]       | [x]          | [x]   |        				|
+| Anicloud                     		 | [x]       | [x]          | [x]   |        				|
 | Dokus4me                     		 | [x]       | [x]          |       |        				|
 | Filmpalast                     	 | [x]       | [x]          |       |        				|
-| Flimerstube                     	 | [x]       | [x]          | [x]   |        				|
+| Flimmerstube                     	 | [x]       | [x]          | [x]   |        				|
 | HD Filme.top                     	 | [x]       | [x]          |       |        				|
 | Kinofox                     	     | [x]       | [x]          |       |        				|
 | KinoGer                     	     | [x]       | [x]          |       |						|
-| KKiste                     	     | [x]       | [x]          |       | Cloudflare ab und zu  |
+| Kinokiste                          | [x]       | [x]          |       |						|
 | KinoKiste.tech                  	 | [x]       | [x]          |       |       			    |
+| Kinomax.me                         | [x]       | [x]          |       |                       |
 | Kinox                     	     | [x]       | [x]          |       | UTF8        			|
+| KKiste                     	     | [x]       | [x]          |       | Cloudflare ab und zu  |
 | MegaKino                       	 | [x]       | [x]          |       |        				|
-| Movie4k                        	 | [x]       | [x]          |       | Serien        		|
+| Movie4k                        	 | [x]       | [x]          |       |               		|
 | Movieking                     	 | [x]       | [x]          |       |        				|
 | Netzkino                       	 | [x]       | [x]          |       |        				|
 | Serienstream                     	 | [x]       | [x]          | [x]   |        				|
