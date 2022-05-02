@@ -19,10 +19,10 @@ except ImportError:
 
 
 class cRequestHandler:
-    def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True, jspost=False):
+    def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True, jspost=False, ssl_verify=True):
         self._sUrl = sUrl
         self._sRealUrl = ''
-        self._USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0'
+        self._USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0'
         self._aParameters = {}
         self._headerEntries = {}
         self._profilePath = common.profilePath
@@ -35,6 +35,7 @@ class cRequestHandler:
         self.caching = caching
         self.ignoreErrors = ignoreErrors
         self.compression = compression
+        self._ssl_verify = ssl_verify
         self.jspost = jspost
         self.cacheTime = int(cConfig().getSetting('cacheTime', 600))
         self.requestTimeout = int(cConfig().getSetting('requestTimeout', 10))
@@ -79,16 +80,16 @@ class cRequestHandler:
     def __setDefaultHeader(self):
         self.addHeaderEntry('User-Agent', self._USER_AGENT)
         self.addHeaderEntry('Accept-Language', 'de,en-US;q=0.7,en;q=0.3')
-        self.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8')
+        self.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8')
         if self.compression:
             self.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
 
     def request(self):
-        sContent = ''
         self._sUrl = self._sUrl.replace(' ', '+')
         if self.caching and self.cacheTime > 0:
             sContent = self.readCache(self.getRequestUri())
             if sContent:
+                self._Status = '200'
                 return sContent
         cookieJar = LWPCookieJar(filename=self._cookiePath)
         try:
@@ -106,18 +107,19 @@ class cRequestHandler:
             else:
                 sParameters = urlencode(self._aParameters, True).encode()
 
-        # urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] - kinoger fsst
-        # https://coderedirect.com/questions/515348/python-3-urllib-ignore-ssl-certificate-verification
-        # ssl._create_default_https_context = ssl._create_unverified_context
-        import ssl
-        if sys.version_info[0] == 2:
-            ssl_context = ssl.create_default_context()
+        if self._ssl_verify:
+            handlers = [HTTPSHandler()]
         else:
-            ssl_context = ssl.create_default_context()
-            ssl_context.check_hostname = False
-            ssl_context.verify_mode = ssl.CERT_NONE
+            import ssl
+            if sys.version_info[0] == 2:
+                ssl_context = ssl.create_default_context()
+            else:
+                ssl_context = ssl.create_default_context()
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_NONE
+            handlers = [HTTPSHandler(context=ssl_context)]
 
-        handlers = [HTTPHandler(), HTTPSHandler(context=ssl_context), HTTPCookieProcessor(cookiejar=cookieJar), RedirectFilter()]
+        handlers += [HTTPHandler(), HTTPCookieProcessor(cookiejar=cookieJar), RedirectFilter()]
         opener = build_opener(*handlers)
         oRequest = Request(self._sUrl, sParameters if len(sParameters) > 0 else None)
 
@@ -129,11 +131,9 @@ class cRequestHandler:
         try:
             oResponse = opener.open(oRequest)
         except HTTPError as e:
-            if e.code == 503:
-                oResponse = None
-                if not oResponse:
-                    logger.error('Failed Cloudflare aktiv Url: ' + self._sUrl)
-            if e.code == 403:
+            oResponse = None
+            if str(e.code) == '403' or str(e.code) == '503':
+                self._Status = str(e.code)
                 data = e.fp.read()
                 if 'DDOS-GUARD' in str(data):
                     opener = build_opener(HTTPCookieProcessor(cookieJar))
@@ -142,7 +142,7 @@ class cRequestHandler:
                     if sys.version_info[0] == 2:
                         content = response.read()
                     else:
-                        content = response.read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+                        content = response.read().decode('utf-8', 'replace').encode('utf-8', 'replace').decode('utf-8', 'replace')
                     url2 = re.findall("Image.*?'([^']+)'; new", content)
                     url3 = urlparse(self._sUrl)
                     url3 = '%s://%s/%s' % (url3.scheme, url3.netloc, url2[0])
@@ -153,15 +153,16 @@ class cRequestHandler:
                     opener.addheaders = [('User-agent', self._USER_AGENT), ('Referer', self._sUrl)]
                     oResponse = opener.open(self._sUrl, sParameters if len(sParameters) > 0 else None)
                     if not oResponse:
-                        if not self.ignoreErrors:
-                            logger.error('Failed DDOS-GUARD Url: ' + self._sUrl)
-                            return ''
+                        logger.error('Failed DDOS-GUARD Url: ' + self._sUrl)
+                        return ''
+                elif 'cloudflare' in str(e.headers):
+                    logger.error('Failed Cloudflare aktiv Url: ' + self._sUrl)
+                    return 'CF-DDOS-GUARD aktiv'
                 else:
-                    return
-            elif not self.ignoreErrors:
-                xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url: {0} {1}'.format(self._sUrl, str(e)))
-                logger.error('HTTPError ' + str(e) + ' Url: ' + self._sUrl)
-                return ''
+                    if not self.ignoreErrors:
+                        xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url: {0} {1}'.format(self._sUrl, str(e)))
+                        logger.error('HTTPError ' + str(e) + ' Url: ' + self._sUrl)
+                    return ''
             else:
                 oResponse = e
         except URLError as e:
@@ -179,12 +180,12 @@ class cRequestHandler:
         if self._sResponseHeader.get('Content-Encoding') == 'gzip':
             sContent = gzip.GzipFile(fileobj=io.BytesIO(oResponse.read())).read()
             if sys.version_info[0] == 3:
-                sContent = sContent.decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+                sContent = sContent.decode('utf-8', 'replace').encode('utf-8', 'replace').decode('utf-8', 'replace')
         else:
             if sys.version_info[0] == 2:
                 sContent = oResponse.read()
             else:
-                sContent = oResponse.read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+                sContent = oResponse.read().decode('utf-8', 'replace').encode('utf-8', 'replace').decode('utf-8', 'replace')
         if 'lazingfast' in sContent:
             bf = cBF().resolve(self._sUrl, sContent, cookieJar, self._USER_AGENT, sParameters)
             if bf:
@@ -317,7 +318,7 @@ class cBF:
             if sys.version_info[0] == 2:
                 html = opener.open(aespage).read()
             else:
-                html = opener.open(aespage).read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+                html = opener.open(aespage).read().decode('utf-8', 'replace').encode('utf-8', 'replace').decode('utf-8', 'replace')
             cval = self.aes_decode(html)
             cdata = re.findall('cookie="([^="]+).*?domain[^>]=([^;]+)', html)
             if cval and cdata:
@@ -328,7 +329,7 @@ class cBF:
                 if sys.version_info[0] == 2:
                     return opener.open(url, sParameters if len(sParameters) > 0 else None).read()
                 else:
-                    return opener.open(url, sParameters if len(sParameters) > 0 else None).read().decode('utf-8').encode('utf-8', 'replace').decode('utf-8')
+                    return opener.open(url, sParameters if len(sParameters) > 0 else None).read().decode('utf-8', 'replace').encode('utf-8', 'replace').decode('utf-8', 'replace')
 
     def aes_decode(self, html):
         try:
@@ -350,5 +351,6 @@ class cBF:
 class RedirectFilter(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, hdrs, newurl):
         if 'notice.cuii' in newurl:
+            xbmcgui.Dialog().ok('Ihr Internetanbieter zensiert ihren Internetzugang', 'Um sich vor der Zensur zu schützen, empfehlen wir euren DNS Server auf die von Google 8.8.8.8 und 8.8.4.4 oder Cloudflare 1.1.1.1 und 1.0.0.1 umzustellen. Anleitungen finden sie per Googlesuche z.B. "Fritzbox DNS Server ändern"')
             return None
         return HTTPRedirectHandler.redirect_request(self, req, fp, code, msg, hdrs, newurl)
