@@ -1,3 +1,11 @@
+3.5.32~nightly7
+  01.05.2022
+- [kinoger] add hoster kinoger.pw
+- [kinox] add auto domain check
+- [general] Meldung bei nicht funktionierenden ResolveUrl
+- [requestHandler] diverse optimierungen
+- [requestHandler]  Zensurmeldung "Anleitung"
+
 3.5.32~nightly6
   29.04.2022
  - Fix Serienstream Eintrag Alle Serien
