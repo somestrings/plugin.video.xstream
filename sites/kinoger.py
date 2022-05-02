@@ -257,8 +257,27 @@ def showHosters():
                             for sQualy, sUrl2 in aResult:
                                 hoster = {'link': sUrl2, 'name': sQualy + ' ' + cParser.urlparse(sUrl), 'resolveable': True}
                                 hosters.append(hoster)
-
-                elif 'kinoger' in sUrl:
+                elif 'kinoger.pw' in sUrl:
+                    url = get_streamsburl('kinoger.pw', sUrl.replace('.html', '').split('/')[4])
+                    oRequest = cRequestHandler(url, caching=False)
+                    oRequest.addHeaderEntry('Referer', sUrl)
+                    oRequest.addHeaderEntry('watchsb', 'streamsb')
+                    sHtmlContent = oRequest.request()
+                    if sHtmlContent == '': continue
+                    isMatch, aResult = cParser.parse(sHtmlContent, 'file":"([^"]+)')
+                    if isMatch:
+                        oRequest = cRequestHandler(aResult[0], caching=False)
+                        oRequest.addHeaderEntry('Referer', 'https://kinoger.pw/')
+                        oRequest.addHeaderEntry('Origin', 'https://kinoger.pw')
+                        sHtmlContent = oRequest.request()
+                    if sHtmlContent == '': continue
+                    isMatch, aResult = cParser.parse(sHtmlContent, 'RESOLUTION=\d+x(\d+).*?(http[^"]+)#')
+                    if isMatch:
+                        for sQualy, sUrl in aResult:
+                            sUrl = sUrl + '|Origin=https%3A%2F%2Fkinoger.pw&Referer=https%3A%2F%2Fkinoger.pw%2F&Accept-Language=de%2Cen-US%3Bq%3D0.7%2Cen%3Bq%3D0.3&Accept=%2A%2F%2A&User-Agent=Mozilla%2F5.0+%28Windows+NT+10.0%3B+Win64%3B+x64%3B+rv%3A99.0%29+Gecko%2F20100101+Firefox%2F99.0'
+                            hoster = {'link': sUrl, 'name': 'Kinoger.PW ' + sQualy, 'resolveable': True}
+                            hosters.append(hoster)
+                elif 'kinoger.ru' in sUrl:
                     if '/e/' in sUrl:
                         from resources.lib import jsunpacker
                         oRequest = cRequestHandler(sUrl.replace('/e/', '/play/'), ignoreErrors=True)
@@ -270,15 +289,15 @@ def showHosters():
                             pattern = 'sources\s*:\s*\[{file:\s*"([^"]+)'
                             isMatch, sUrl2 = cParser.parse(sHtmlContent, pattern)
                             oRequest = cRequestHandler(sUrl2[0], ignoreErrors=True)
-                            oRequest.addHeaderEntry('Referer', 'https://kinoger.pw/')
-                            oRequest.addHeaderEntry('Origin', 'https://kinoger.pw')
+                            oRequest.addHeaderEntry('Referer', 'https://kinoger.ru/')
+                            oRequest.addHeaderEntry('Origin', 'https://kinoger.ru')
                             sHtmlContent = oRequest.request()
                             pattern = 'RESOLUTION=\d+x(\d+).*?(http[^"]+)#'
                             isMatch, aResult = cParser.parse(sHtmlContent, pattern)
                             for sQualy, sUrl in aResult:
-                                hoster = {'link': sUrl, 'name': sQualy + ' Kinoger', 'resolveable': True}
+                                hoster = {'link': sUrl, 'name': 'Kinoger.ru' + sQualy, 'resolveable': True}
                                 hosters.append(hoster)
-                    else:   # u'https://kinoger.re/v/elz45t-z8ymj7p8'
+                    else:
                         mediaId = sUrl.split("/")[-1:][0]
                         apiurl = 'https://kinoger.re/api/source/' + mediaId
                         oRequest = cRequestHandler(apiurl)
@@ -289,9 +308,8 @@ def showHosters():
                         pattern = '{"file":"(.+?)","label.+?([0-9px]+)"'
                         isMatch, aResult = cParser.parse(sHtmlContent, pattern)
                         for sUrl, sQualy in aResult:
-                            hoster = {'link': sUrl, 'name': sQualy + ' Kinoger', 'resolveable': True}
+                            hoster = {'link': sUrl, 'name': 'Kinoger.re ' + sQualy, 'resolveable': True}
                             hosters.append(hoster)
-
                 elif 'start.u' in sUrl:
                     import json
                     t = sUrl.split('/')
@@ -306,16 +324,30 @@ def showHosters():
                             a = decodeStr(u)
                             hoster = {'link': a, 'name': Qualy2(a) + cParser.urlparse(sUrl), 'resolveable': True}
                             hosters.append(hoster)
-                elif 'streamlare' in sUrl:
-                    continue
                 else:
                     hoster = {'link': sUrl + 'DIREKT', 'name': cParser.urlparse(sUrl)}
                     hosters.append(hoster)
-            except:
+            except Exception:
                 pass
         if hosters:
             hosters.append('getHosterUrl')
         return hosters
+
+
+def get_streamsburl(host, media_id):
+    import binascii, random, string
+    # Copyright (c) 2019 vb6rocod
+
+    def makeid(length):
+        t = string.ascii_letters + string.digits
+        return ''.join([random.choice(t) for _ in range(length)])
+    x = '{0}||{1}||{2}||streamsb'.format(makeid(12), media_id, makeid(12))
+    c1 = binascii.hexlify(x.encode('utf8')).decode('utf8')
+    x = '{0}||{1}||{2}||streamsb'.format(makeid(12), makeid(12), makeid(12))
+    c2 = binascii.hexlify(x.encode('utf8')).decode('utf8')
+    x = '{0}||{1}||{2}||streamsb'.format(makeid(12), c2, makeid(12))
+    c3 = binascii.hexlify(x.encode('utf8')).decode('utf8')
+    return 'https://{0}/sources43/{1}/{2}'.format(host, c1, c3)
 
 
 def Qualy(q):
@@ -442,6 +474,6 @@ def time2minutes(time):
     if type(time) == bytes:
         time = time.decode()
     t = time.split(":")
-    minutes = float(t[0])*60 + float(t[1]) + float(t[2]) *0.05/3
+    minutes = float(t[0]) * 60 + float(t[1]) + float(t[2]) * 0.05 / 3
     minutes = str(minutes).split(".")[0] if '.' in str(minutes) else str(minutes)
-    return  minutes
+    return minutes
