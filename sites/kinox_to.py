@@ -11,10 +11,8 @@ import sys
 SITE_IDENTIFIER = 'kinox_to'
 SITE_NAME = 'KinoX'
 SITE_ICON = 'kinox.png'
-SITE_SETTINGS = '<setting default="www12.kinos.to" enable="!eq(-2,false)" id="kinox_to-domain" label="30051" type="labelenum" values="ww11.kinox.to|www12.kinos.to|www12.kinox.to|www12.kinoz.to|kinos.to|kinox.ai|kinox.am|kinox.bz|kinox.click|kinox.cloud|kinox.club|kinox.digital|kinox.direct|kinox.express|kinox.fun|kinox.fyi|kinox.gratis|kinox.io|kinox.lol|kinox.me|kinox.mobi|kinox.nu|kinox.party|kinox.pub|kinox.sg|kinox.sh|kinox.space|kinox.sx|kinox.to|kinox.tube|kinox.tv|kinox.wtf|kinoz.to" />'
-domain = cConfig().getSetting('kinox_to-domain')
 
-URL_MAIN = 'https://' + domain
+URL_MAIN = str(cConfig().getSetting('kinox-domain', 'https://kinox.to/'))
 URL_NEWS = URL_MAIN + '/index.php'
 URL_CINEMA_PAGE = URL_MAIN + '/Kino-Filme.html'
 URL_GENRE_PAGE = URL_MAIN + '/Genre.html'
@@ -33,10 +31,46 @@ URL_AJAX = URL_MAIN + '/aGET/List/'
 URL_LANGUAGE = URL_MAIN + '/aSET/PageLang/1'
 
 
+def checkDomain():
+    KD = 'https://kinoz.to', 'https://kinos.to', 'https://kinox.tv', 'https://kinox.io', 'https://kinox.am', 'https://kinox.sx', 'https://kinox.bz', 'https://kinox.gratis', 'https://kinox.mobi', 'https://kinox.sh', 'https://kinox.lol', 'https://kinox.wtf', 'https://kinox.fun', 'https://kinox.fyi', 'https://kinox.cloud', 'https://kinox.to', 'https://kinox.click', 'https://kinox.tube', 'https://kinox.club', 'https://kinox.digital', 'https://kinox.direct', 'https://kinox.pub', 'https://kinox.express', 'https://kinox.me'
+    import time
+    if int(cConfig().getSetting('kinoxhourblock', 0)) + 3600 < time.time():
+        i = 0
+        for sUrl in KD:
+            i = i + 1
+            if i == len(KD):
+                cConfig().setSetting('kinoxhourblock', str(time.time() + 3600))
+            oRequest = cRequestHandler(sUrl, caching=False)
+            oRequest.request()
+            st = str(oRequest.getStatus())
+            if st == '403':
+                continue
+            if st == '503':
+                continue
+            if oRequest.getStatus() == '301':
+                rurl = oRequest.getRealUrl()
+                oRequest = cRequestHandler(rurl, caching=False)
+                oRequest.request()
+                st = str(oRequest.getStatus())
+            if st == '200':
+                url = oRequest.getRealUrl()
+                if not url.startswith('http'):
+                    url = 'https://' + url
+                cConfig().setSetting('kinox-domain', str(url))
+                break
+        return st
+    return 403
+
+
 def load():
     logger.info('Load %s' % SITE_NAME)
     parms = ParameterHandler()
     oGui = cGui()
+    oRequest = cRequestHandler(URL_MAIN, ignoreErrors=True)
+    oRequest.request()
+    st = str(oRequest.getStatus())
+    if not st == '200':
+        checkDomain()
     parms.setParam('sUrl', URL_NEWS)
     parms.setParam('page', 1)
     parms.setParam('mediaType', 'news')
@@ -130,8 +164,6 @@ def __getHtmlContent(sUrl=None, ignoreErrors=False):
     oRequest = cRequestHandler(sUrl, ignoreErrors=ignoreErrors)
     oRequest.addHeaderEntry('Cookie', sPrefLang + 'ListDisplayYears=Always;')
     oRequest.addHeaderEntry('Referer', URL_MAIN)
-    oRequest.addHeaderEntry('Accept', '*/*')
-    oRequest.addHeaderEntry('Host', domain)
     return oRequest.request()
 
 
@@ -492,7 +524,6 @@ def ajaxCall():
             aResult = cParser().parse(aData['Content'].encode('utf-8'), pattern)
         else:
             aResult = cParser().parse(aData['Content'], pattern)
-        
 
         if aResult[0]:
             total = len(aResult[1])
@@ -561,9 +592,6 @@ def __getAjaxContent(sMediaType, iPage, iMediaTypePageId, metaOn, sCharacter='')
         oRequest.addParameters('Per_Page', '30')
         oRequest.addParameters('dir', 'desc')
     oRequest.addHeaderEntry('Cookie', sPrefLang + 'ListDisplayYears=Always;')
-    oRequest.addHeaderEntry('Referer', URL_MAIN)
-    oRequest.addHeaderEntry('Accept', '*/*')
-    oRequest.addHeaderEntry('Host', domain)
     return oRequest.request()
 
 
