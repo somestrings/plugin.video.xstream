@@ -14,7 +14,7 @@ SITE_NAME = 'NetzKino'
 SITE_ICON = 'netzkino.png'
 URL_MAIN = 'https://api.netzkino.de.simplecache.net/capi-2.0a/categories/%s.json?d=www&l=de-DE'
 URL_SEARCH = 'https://api.netzkino.de.simplecache.net/capi-2.0a/search?q=%s&d=www&l=de-DE'
-SITE_GLOBAL_SEARCH = True
+SITE_GLOBAL_SEARCH = False
 
 
 def load():
