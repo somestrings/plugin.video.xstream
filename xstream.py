@@ -10,8 +10,8 @@ import sys, xbmc, xbmcgui
 
 try:
     import resolveurl as resolver
-except:
-    import urlresolver as resolver
+except ImportError:
+    xbmcgui.Dialog().ok('ResolveUrl Error', 'Sie haben keinen funktionierenden ResolveUrl installiert, es können keine Videos abgespielt werden bitte neu installieren.')
 
 
 def run():
@@ -55,7 +55,6 @@ def parseUrl():
             return
     elif params.exist('remoteplayurl'):
         try:
-            #import urlresolver as resolver
             remotePlayUrl = params.getValue('remoteplayurl')
             sLink = resolver.resolve(remotePlayUrl)
             if sLink:
@@ -104,7 +103,6 @@ def parseUrl():
         oGui.updateDirectory()
     # If the resolver settings are called
     elif sSiteName == 'resolver':
-        #import urlresolver as resolver
         resolver.display_settings()
     # If UpdateManager are called (manual update)
     elif sSiteName == 'devUpdates':
@@ -352,7 +350,7 @@ def _pluginSearch(pluginEntry, sSearchText, oGui):
         plugin = __import__(pluginEntry['id'], globals(), locals())
         function = getattr(plugin, '_search')
         function(oGui, sSearchText)
-    except:
+    except Exception:
         logger.error(pluginEntry['name'] + ': search failed')
         import traceback
         logger.debug(traceback.format_exc())
