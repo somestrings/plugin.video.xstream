@@ -20,26 +20,27 @@ Derzeit unterstützt die Version folgende Site Plugins:
 
 |  Site Plugin                       | Enthalten | Funktioniert | Login | Fehler Beschreibung   |
 |------------------------------------|:---------:|:------------:|:-----:|:---------------------:|
-| Anicloud                     		 | [x]       | [x]          | [x]   |        				|
-| Dokus4me                     		 | [x]       | [x]          |       |        				|
-| Filmpalast                     	 | [x]       | [x]          |       |        				|
-| Flimmerstube                     	 | [x]       | [x]          | [x]   |        				|
-| HD Filme.top                     	 | [x]       | [x]          |       |        				|
-| Kinofox                     	     | [x]       | [x]          |       |        				|
-| KinoGer                     	     | [x]       | [x]          |       |						|
-| Kinokiste                          | [x]       | [x]          |       |						|
-| KinoKiste.tech                  	 | [x]       | [x]          |       |       			    |
+| Anicloud                     		   | [x]       | [x]          | [x]   |        				        |
+| Dokus4me                     		   | [x]       | [x]          |       |        			        	|
+| Filmpalast                     	   | [x]       | [x]          |       |        			        	|
+| Flimmerstube                     	 | [x]       | [x]          | [x]   |        			        	|
+| HD Filme.top                     	 | [x]       | [x]          |       |        			        	|
+| Kinofox                     	     | [x]       | [x]          |       |        				        |
+| KinoGer                     	     | [x]       | [x]          |       |						            |
+| Kinokiste                          | [x]       | [x]          |       |						            |
+| KinoKiste.tech                  	 | [x]       | [x]          |       |       			          |
 | Kinomax.me                         | [x]       | [x]          |       |                       |
-| Kinox                     	     | [x]       | [x]          |       | UTF8        			|
-| KKiste                     	     | [x]       | [x]          |       | Cloudflare ab und zu  |
-| MegaKino                       	 | [x]       | [x]          |       |        				|
-| Movie4k                        	 | [x]       | [x]          |       |               		|
-| Movieking                     	 | [x]       | [x]          |       |        				|
-| Netzkino                       	 | [x]       | [x]          |       |        				|
-| Puranime                         |    [x]              |   [x]                  |       |               |
-| Serienstream                     	 | [x]       | [x]          | [x]   |        				|
-| Streamworld                     	 | [x]       | [x]          |       |        				|
-| xCine                              |  [x]      |              |       |               |
+| Kinox                     	       | [x]       | [x]          |       | UTF8        			    |
+| KKiste                     	       | [x]       | [x]          |       | Cloudflare ab und zu  |
+| MegaKino                        	 | [x]       | [x]          |       |        				        |
+| Movie4k                         	 | [x]       | [x]          |       |               	    	|
+| Movieking                     	   | [x]       | [x]          |       |        				        |
+| Movietown_org                      | [x]       | [x]          |       |                       |
+| Netzkino                       	   | [x]       | [x]          |       |        				        |
+| Puranime                           | [x]       | [x]          |       |                       |
+| Serienstream                     	 | [x]       | [x]          | [x]   |        				        |
+| Streamworld                     	 | [x]       | [x]          |       |        				        |
+| xCine                              | [x]       |              |       |                       |
 
 ***
 
