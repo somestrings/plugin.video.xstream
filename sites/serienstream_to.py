@@ -34,11 +34,11 @@ URL_LOGIN = URL_MAIN + '/login'
 def load():
     logger.info('Load %s' % SITE_NAME)
     params = ParameterHandler()
-    if proxy == 'true':
-        pass
-    else:
-        params.setParam('sUrl', URL_SERIES)
-        cGui().addFolder(cGuiElement('Alle Serien', SITE_IDENTIFIER, 'showAllSeries'), params)
+#    if proxy == 'true':
+#        pass
+#    else:
+    params.setParam('sUrl', URL_SERIES)
+    cGui().addFolder(cGuiElement('Alle Serien', SITE_IDENTIFIER, 'showAllSeries'), params)
 
     params.setParam('sUrl', URL_NEW_SERIES)
     cGui().addFolder(cGuiElement('Neue Serien', SITE_IDENTIFIER, 'showEntries'), params)
