@@ -1,6 +1,8 @@
 3.5.32~nightly9
   05.05.2022
 - Serienstream: Menüpunkte Suche und Alle Serien wieder hinzugefügt bei Auswahl des Proxies
+- Xcine, Pureanime und Movietown ins Backup verschoben
+- Site Icons entfernt
 
 3.5.32~nightly8
   02.05.2022

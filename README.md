@@ -47,3 +47,5 @@ Derzeit unterstützt die Version folgende Site Plugins:
 [![Gitter](https://badges.gitter.im/streamxstream/community.svg)](https://gitter.im/streamxstream/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ### | [FAQ](https://github.com/streamxstream/xStream-FAQ/blob/master/xStream_Anleitung_FAQ.md)
+
+### | [Web Portal](https://streamxstream.github.io/xStreamRepoWeb/)
