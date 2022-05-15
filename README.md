@@ -38,6 +38,7 @@ Derzeit unterstützt die Version folgende Site Plugins:
 | Netzkino                       	 | [x]       | [x]          |       |        				|
 | Serienstream                     	 | [x]       | [x]          | [x]   |        				|
 | Streamworld                     	 | [x]       | [x]          |       |        				|
+| XCine                     	 	 | [x]       | [x]          |       |        				|
 
 ***
 

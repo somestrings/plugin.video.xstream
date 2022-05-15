@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.xstream" name="xStream" version="3.5.33~nightly1" provider-name="xStream-Team">
+<addon id="plugin.video.xstream" name="xStream" version="3.5.33~nightly2" provider-name="xStream-Team">
  <requires>
     <import addon="script.module.requests"/>
     <import addon="script.module.resolveurl" version="5.1.54"/>
     <import addon="script.module.six" version="1.11.0"/>
-    <!-- <import addon="repository.xstream" optional="true"/> -->
+    <import addon="repository.xstream" optional="true"/>
     <import addon="script.module.inputstreamhelper" version="0.3.3" optional="true"/>
     <!-- for remote debug -->
 	<!-- import addon="script.module.pydevd" optional="true"/> -->
@@ -49,6 +49,9 @@ Release 3.5.32
  - xCine
  - Pureanime
  - Movietown
+ 
+Nightly Versionen
+ - Siehe Changelog
    </news>
    <assets>
      <icon>icon.png</icon>

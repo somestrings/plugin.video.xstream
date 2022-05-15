@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+
+# 2022.05.15 DWH-WFC
+
 import os, base64, sys
+import shutil
 import json
 import requests
 from requests.auth import HTTPBasicAuth
@@ -19,21 +23,21 @@ else:
 PLUGIN_NAME = addon().getAddonInfo('name')  # ist z.B. 'xstream'
 
 
-# resolver
+# Resolver
 def resolverUpdate(silent=False):
-    username = 'jsergio123'
-    plugin_id = 'script.module.resolveurl'
+    username = 'Gujal00'
+    resolve_dir = 'ResolveURL'
+    resolve_id = 'script.module.resolveurl'
     branch = 'master'
     token =''
     try:
-        #return Update(username, plugin_id, branch, token, silent)
-        return True
+        return UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent)
     except Exception as e:
         log('Exception Raised: %s' % str(e), LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
+        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + resolve_id)
         return
 
-
+# xStream
 def xStreamUpdate(silent=False):
     username = 'streamxstream'
     plugin_id = 'plugin.video.xstream'
@@ -46,8 +50,52 @@ def xStreamUpdate(silent=False):
         Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
         return False
 
+# Update Resolver
+def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
+    REMOTE_PLUGIN_COMMITS = "https://api.github.com/repos/%s/%s/commits/%s" % (username, resolve_dir, branch)   # Github Commits
+    REMOTE_PLUGIN_DOWNLOADS = "https://api.github.com/repos/%s/%s/zipball/%s" % (username, resolve_dir, branch) # Github Downloads
+    PACKAGES_PATH = translatePath(os.path.join('special://home/addons/packages/'))  # Packages Ordner für Downloads
+    ADDON_PATH = translatePath(os.path.join('special://home/addons/packages/', '%s') % resolve_id)  # Addon Ordner in Packages
+    INSTALL_PATH = translatePath(os.path.join('special://home/addons/', '%s') % resolve_id) # Installation Ordner
+        
+    auth = HTTPBasicAuth(username, token)
+    log('%s - Search for update ' % resolve_id, LOGNOTICE)
+    try:
+        if sys.version_info[0] == 2:
+            ADDON_DIR = translatePath(os.path.join('special://userdata/addon_data/', '%s') % resolve_id).decode('utf-8')
+        else:
+            ADDON_DIR = translatePath(os.path.join('special://userdata/addon_data/', '%s') % resolve_id)
 
-# ---------------------------------------------------------------------------------------------------------------------------------------
+        LOCAL_PLUGIN_VERSION = os.path.join(ADDON_DIR, "update_sha")
+        LOCAL_FILE_NAME_PLUGIN = os.path.join(ADDON_DIR, 'update-' + resolve_id + '.zip')
+        if not os.path.exists(ADDON_DIR): os.mkdir(ADDON_DIR)
+        
+        if addon().getSetting('enforceUpdate') == 'true':
+            if os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
+            
+        commitXML = _getXmlString(REMOTE_PLUGIN_COMMITS, auth)  # Commit Update
+        if commitXML:
+            isTrue = commitUpdate(commitXML, LOCAL_PLUGIN_VERSION, REMOTE_PLUGIN_DOWNLOADS, PACKAGES_PATH, resolve_dir, LOCAL_FILE_NAME_PLUGIN, silent, auth)
+            
+            if isTrue is True:
+                if os.path.exists(INSTALL_PATH): shutil.rmtree(INSTALL_PATH)
+                if not os.path.exists(INSTALL_PATH): shutil.copytree(ADDON_PATH, INSTALL_PATH)
+                log('%s - Update successful.' % resolve_id, LOGNOTICE)
+                if silent is False: Dialog().ok(PLUGIN_NAME, resolve_id + ' - Update erfolgreich.')
+                return True
+            elif isTrue is None:
+                log('%s - no new update ' % resolve_id, LOGNOTICE)
+                if silent is False: Dialog().ok(PLUGIN_NAME, resolve_id + ' - Kein Update verfügbar.')
+                return None
+
+        log('%s - Updatesss error ' % resolve_id, LOGERROR)
+        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + resolve_id)
+        return False
+    except:
+        log('%s - Update error ' % resolve_id, LOGERROR)
+        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + resolve_id)
+
+# xStream Update
 def Update(username, plugin_id, branch, token, silent):
     REMOTE_PLUGIN_COMMITS = "https://api.github.com/repos/%s/%s/commits/%s" % (username, plugin_id, branch)
     REMOTE_PLUGIN_DOWNLOADS = "https://api.github.com/repos/%s/%s/zipball/%s" % (username, plugin_id, branch)

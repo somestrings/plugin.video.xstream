@@ -1,3 +1,8 @@
+3.5.33~nightly2
+- UpdateManager ResolveURL hinzugefügt
+- settings.xml überarbeitet
+- readme überarbeitet
+
 3.5.33~nightly1
 - [xcine] add site
 
