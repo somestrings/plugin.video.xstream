@@ -1,35 +1,53 @@
 # -*- coding: utf-8 -*-
-import cookielib, hashlib, httplib, os, socket, sys, time, urllib, urllib2, xbmcgui
-from resources.lib import logger, cookie_helper, common
-from resources.lib.cBFScrape import cBFScrape
-from resources.lib.cCFScrape import cCFScrape
 from resources.lib.config import cConfig
+from resources.lib.tools import logger
+from resources.lib import common
+import io, gzip, time, xbmcgui, re
+import socket, os, sys, hashlib, json
+try:
+    from urlparse import urlparse
+    from urllib import quote, urlencode
+    from urllib2 import HTTPError, URLError, HTTPHandler, HTTPSHandler, HTTPCookieProcessor, build_opener, Request, HTTPRedirectHandler
+    from cookielib import LWPCookieJar, Cookie
+    from httplib import HTTPException
+except ImportError:
+    from urllib.parse import quote, urlencode, urlparse
+    from urllib.error import HTTPError, URLError
+    from urllib.request import HTTPHandler, HTTPSHandler, HTTPCookieProcessor, build_opener, Request, HTTPRedirectHandler
+    from http.cookiejar import LWPCookieJar, Cookie
+    from http.client import HTTPException
+
 
 class cRequestHandler:
-    def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True):
-        self.__sUrl = sUrl
-        self.__sRealUrl = ''
-        self.__cType = 0
-        self.__aParameters = {}
-        self.__aResponses = {}
-        self.__headerEntries = {}
-        self.__cachePath = ''
+    def __init__(self, sUrl, caching=True, ignoreErrors=False, compression=True, jspost=False, ssl_verify=False):
+        self._sUrl = sUrl
+        self._sRealUrl = ''
+        self._USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0'
+        self._aParameters = {}
+        self._headerEntries = {}
+        self._profilePath = common.profilePath
+        self._cachePath = ''
         self._cookiePath = ''
+        self._Status = ''
+        self._sResponseHeader = ''
         self.ignoreDiscard(False)
         self.ignoreExpired(False)
         self.caching = caching
         self.ignoreErrors = ignoreErrors
         self.compression = compression
+        self._ssl_verify = ssl_verify
+        self.jspost = jspost
         self.cacheTime = int(cConfig().getSetting('cacheTime', 600))
-        self.requestTimeout = int(cConfig().getSetting('requestTimeout', 60))
+        self.requestTimeout = int(cConfig().getSetting('requestTimeout', 10))
         self.removeBreakLines(True)
         self.removeNewLines(True)
         self.__setDefaultHeader()
         self.setCachePath()
         self.__setCookiePath()
-        self.__sResponseHeader = ''
-        if self.requestTimeout >= 60 or self.requestTimeout <= 10:
-            self.requestTimeout = 60
+        socket.setdefaulttimeout(self.requestTimeout)
+
+    def getStatus(self):
+        return self._Status
 
     def removeNewLines(self, bRemoveNewLines):
         self.__bRemoveNewLines = bRemoveNewLines
@@ -37,159 +55,174 @@ class cRequestHandler:
     def removeBreakLines(self, bRemoveBreakLines):
         self.__bRemoveBreakLines = bRemoveBreakLines
 
-    def setRequestType(self, cType):
-        self.__cType = cType
-
     def addHeaderEntry(self, sHeaderKey, sHeaderValue):
-        self.__headerEntries[sHeaderKey] = sHeaderValue
+        self._headerEntries[sHeaderKey] = sHeaderValue
 
     def getHeaderEntry(self, sHeaderKey):
-        if sHeaderKey in self.__headerEntries:
-            return self.__headerEntries[sHeaderKey]
+        if sHeaderKey in self._headerEntries:
+            return self._headerEntries[sHeaderKey]
 
-    def addParameters(self, key, value, quote=False):
-        if not quote:
-            self.__aParameters[key] = value
+    def addParameters(self, key, value, Quote=False):
+        if not Quote:
+            self._aParameters[key] = value
         else:
-            self.__aParameters[key] = urllib.quote(str(value))
-
-    def addResponse(self, key, value):
-        self.__aResponses[key] = value
+            self._aParameters[key] = quote(str(value))
 
     def getResponseHeader(self):
-        return self.__sResponseHeader
+        return self._sResponseHeader
 
     def getRealUrl(self):
-        return self.__sRealUrl
-
-    def request(self):
-        self.__sUrl = self.__sUrl.replace(' ', '+')
-        return self.__callRequest()
+        return self._sRealUrl
 
     def getRequestUri(self):
-        return self.__sUrl + '?' + urllib.urlencode(self.__aParameters)
+        return self._sUrl + '?' + urlencode(self._aParameters)
 
     def __setDefaultHeader(self):
-        self.addHeaderEntry('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0')
-        self.addHeaderEntry('Accept-Language', 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3')
-        self.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
+        self.addHeaderEntry('User-Agent', self._USER_AGENT)
+        self.addHeaderEntry('Accept-Language', 'de,en-US;q=0.7,en;q=0.3')
+        self.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8')
         if self.compression:
-            self.addHeaderEntry('Accept-Encoding', 'gzip')
+            self.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
 
-    def __callRequest(self):
+    def request(self):
+        self._sUrl = self._sUrl.replace(' ', '+')
         if self.caching and self.cacheTime > 0:
             sContent = self.readCache(self.getRequestUri())
             if sContent:
+                self._Status = '200'
                 return sContent
-
-        cookieJar = cookielib.LWPCookieJar(filename=self._cookiePath)
+        cookieJar = LWPCookieJar(filename=self._cookiePath)
         try:
             cookieJar.load(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
         except Exception as e:
-            logger.info(e)
-
-        sParameters = urllib.urlencode(self.__aParameters, True)
-        handlers = [urllib2.HTTPHandler(), urllib2.HTTPSHandler(), urllib2.HTTPCookieProcessor(cookiejar=cookieJar)]
-
-        if (2, 7, 9) <= sys.version_info < (2, 7, 11):
-            handlers.append(newHTTPSHandler)
-        opener = urllib2.build_opener(*handlers)
-        if (len(sParameters) > 0):
-            oRequest = urllib2.Request(self.__sUrl, sParameters)
+            logger.debug(e)
+        if self.jspost:
+            if sys.version_info[0] == 2:
+                sParameters = json.dumps(self._aParameters)
+            else:
+                sParameters = json.dumps(self._aParameters).encode()
         else:
-            oRequest = urllib2.Request(self.__sUrl)
+            if sys.version_info[0] == 2:
+                sParameters = urlencode(self._aParameters, True)
+            else:
+                sParameters = urlencode(self._aParameters, True).encode()
 
-        for key, value in self.__headerEntries.items():
+        if self._ssl_verify:
+            handlers = [HTTPSHandler()]
+        else:
+            import ssl
+            if sys.version_info[0] == 2:
+                ssl_context = ssl.create_default_context()
+            else:
+                ssl_context = ssl.create_default_context()
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_NONE
+            handlers = [HTTPSHandler(context=ssl_context)]
+
+        handlers += [HTTPHandler(), HTTPCookieProcessor(cookiejar=cookieJar), RedirectFilter()]
+        opener = build_opener(*handlers)
+        oRequest = Request(self._sUrl, sParameters if len(sParameters) > 0 else None)
+
+        for key, value in self._headerEntries.items():
             oRequest.add_header(key, value)
+        if self.jspost:
+            oRequest.add_header('Content-Type', 'application/json')
         cookieJar.add_cookie_header(oRequest)
-        user_agent = self.__headerEntries.get('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0')
-
         try:
-            oResponse = opener.open(oRequest, timeout=self.requestTimeout)
-        except urllib2.HTTPError, e:
-            if e.code == 503 and e.headers.get("Server") == 'cloudflare':
-                html = e.read()
-                oResponse = self.__check_protection(html, user_agent, cookieJar)
-                if not oResponse:
-                    logger.error("Failed to get CF-Cookie for Url: " + self.__sUrl)
+            oResponse = opener.open(oRequest)
+        except HTTPError as e:
+            oResponse = None
+            if str(e.code) == '403' or str(e.code) == '503':
+                self._Status = str(e.code)
+                data = e.fp.read()
+                if 'DDOS-GUARD' in str(data):
+                    opener = build_opener(HTTPCookieProcessor(cookieJar))
+                    opener.addheaders = [('User-agent', self._USER_AGENT), ('Referer', self._sUrl)]
+                    response = opener.open('https://check.ddos-guard.net/check.js')
+                    if sys.version_info[0] == 2:
+                        content = response.read()
+                    else:
+                        content = response.read().decode('utf-8', 'replace').encode('utf-8', 'replace').decode('utf-8', 'replace')
+                    url2 = re.findall("Image.*?'([^']+)'; new", content)
+                    url3 = urlparse(self._sUrl)
+                    url3 = '%s://%s/%s' % (url3.scheme, url3.netloc, url2[0])
+                    opener = build_opener(HTTPCookieProcessor(cookieJar))
+                    opener.addheaders = [('User-agent', self._USER_AGENT), ('Referer', self._sUrl)]
+                    opener.open(url3).read()
+                    opener = build_opener(HTTPCookieProcessor(cookieJar))
+                    opener.addheaders = [('User-agent', self._USER_AGENT), ('Referer', self._sUrl)]
+                    oResponse = opener.open(self._sUrl, sParameters if len(sParameters) > 0 else None)
+                    if not oResponse:
+                        logger.error('Failed DDOS-GUARD Url: ' + self._sUrl)
+                        return ''
+                elif 'cloudflare' in str(e.headers):
+                    logger.error('Failed Cloudflare aktiv Url: ' + self._sUrl)
+                    return 'CF-DDOS-GUARD aktiv'
+                else:
+                    if not self.ignoreErrors:
+                        xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url: {0} {1}'.format(self._sUrl, str(e)))
+                        logger.error('HTTPError ' + str(e) + ' Url: ' + self._sUrl)
                     return ''
-            elif not self.ignoreErrors:
-                xbmcgui.Dialog().ok('xStream', 'Fehler beim Abrufen der Url:', self.__sUrl, str(e))
-                logger.error("HTTPError " + str(e) + " Url: " + self.__sUrl)
-                return ''
             else:
                 oResponse = e
-        except urllib2.URLError, e:
+        except URLError as e:
             if not self.ignoreErrors:
-                if hasattr(e.reason, 'args') and e.reason.args[0] == 1 and sys.version_info < (2, 7, 9):
-                    xbmcgui.Dialog().ok('xStream', str(e.reason), '', 'For this request is Python v2.7.9 or higher required.')
-                else:
-                    xbmcgui.Dialog().ok('xStream', str(e.reason))
-            logger.error("URLError " + str(e.reason) + " Url: " + self.__sUrl)
+                xbmcgui.Dialog().ok('xStream', str(e.reason))
+            logger.error('URLError ' + str(e.reason) + ' Url: ' + self._sUrl)
             return ''
-        except httplib.HTTPException, e:
+        except HTTPException as e:
             if not self.ignoreErrors:
                 xbmcgui.Dialog().ok('xStream', str(e))
-            logger.error("HTTPException " + str(e) + " Url: " + self.__sUrl)
+            logger.error('HTTPException ' + str(e) + ' Url: ' + self._sUrl)
             return ''
 
-        self.__sResponseHeader = oResponse.info()
-
-        if self.__sResponseHeader.get('Content-Encoding') == 'gzip':
-            import gzip
-            import StringIO
-            sContent = gzip.GzipFile(fileobj=StringIO.StringIO(oResponse.read())).read()
+        self._sResponseHeader = oResponse.info()
+        if self._sResponseHeader.get('Content-Encoding') == 'gzip':
+            sContent = gzip.GzipFile(fileobj=io.BytesIO(oResponse.read())).read()
+            if sys.version_info[0] == 3:
+                sContent = sContent.decode('utf-8', 'replace').encode('utf-8', 'replace').decode('utf-8', 'replace')
         else:
-            sContent = oResponse.read()
-
-        checked_response = self.__check_protection(sContent, user_agent, cookieJar)
-        if checked_response:
-            oResponse = checked_response
-            sContent = oResponse.read()
-        cookie_helper.check_cookies(cookieJar)
-        cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
-
-        if (self.__bRemoveNewLines == True):
-            sContent = sContent.replace("\n", "")
-            sContent = sContent.replace("\r\t", "")
-
-        if (self.__bRemoveBreakLines == True):
-            sContent = sContent.replace("&nbsp;", "")
-        self.__sRealUrl = oResponse.geturl()
-
+            if sys.version_info[0] == 2:
+                sContent = oResponse.read()
+            else:
+                sContent = oResponse.read().decode('utf-8', 'replace').encode('utf-8', 'replace').decode('utf-8', 'replace')
+        if 'lazingfast' in sContent:
+            bf = cBF().resolve(self._sUrl, sContent, cookieJar, self._USER_AGENT, sParameters)
+            if bf:
+                sContent = bf
+            else:
+                logger.error('Failed BF Url: ' + self._sUrl)
+        try:
+            cookieJar.save(ignore_discard=self.__bIgnoreDiscard, ignore_expires=self.__bIgnoreExpired)
+        except Exception as e:
+            logger.error('Failed save cookie: %s' % e)
+        if self.__bRemoveNewLines:
+            sContent = sContent.replace('\n', '').replace('\r\t', '')
+        if self.__bRemoveBreakLines:
+            sContent = sContent.replace('&nbsp;', '')
+        self._sRealUrl = oResponse.geturl()
+        self._Status = oResponse.getcode() if self._sUrl == self._sRealUrl else '301'
         oResponse.close()
         if self.caching and self.cacheTime > 0:
             self.writeCache(self.getRequestUri(), sContent)
         return sContent
 
-    def __check_protection(self, html, user_agent, cookie_jar):
-        oResponse = None
-        if 'cf-browser-verification' in html:
-            self.__sUrl = self.__sUrl.replace('https', 'http')
-            oResponse = cCFScrape().resolve(self.__sUrl, cookie_jar, user_agent)
-        elif 'Blazingfast.io' in html or 'xhr.open("GET","' in html:
-            oResponse = cBFScrape().resolve(self.__sUrl, cookie_jar, user_agent)
-        return oResponse
-
-    def getHeaderLocationUrl(self):
-        opened = urllib2.urlopen(self.__sUrl)
-        return opened.geturl()
-
     def __setCookiePath(self):
-        profilePath = common.profilePath
-        cookieFile = os.path.join(profilePath, 'cookies.txt')
+        cookieFile = os.path.join(self._profilePath, 'cookies')
         if not os.path.exists(cookieFile):
-            file = open(cookieFile, 'w')
-            file.close()
-        self._cookiePath = cookieFile
+            os.makedirs(cookieFile)
+        if 'dummy' not in self._sUrl:
+            cookieFile = os.path.join(cookieFile, urlparse(self._sUrl).netloc.replace('.', '_') + '.txt')
+            if not os.path.exists(cookieFile):
+                open(cookieFile, 'w').close()
+            self._cookiePath = cookieFile
 
     def getCookie(self, sCookieName, sDomain=''):
-        cookieJar = cookielib.LWPCookieJar()
+        cookieJar = LWPCookieJar()
         try:
             cookieJar.load(self._cookiePath, self.__bIgnoreDiscard, self.__bIgnoreExpired)
         except Exception as e:
-            logger.info(e)
-
+            logger.error(e)
         for entry in cookieJar:
             if entry.name == sCookieName:
                 if sDomain == '':
@@ -199,13 +232,13 @@ class cRequestHandler:
         return False
 
     def setCookie(self, oCookie):
-        cookieJar = cookielib.LWPCookieJar()
+        cookieJar = LWPCookieJar()
         try:
             cookieJar.load(self._cookiePath, self.__bIgnoreDiscard, self.__bIgnoreExpired)
+            cookieJar.set_cookie(oCookie)
+            cookieJar.save(self._cookiePath, self.__bIgnoreDiscard, self.__bIgnoreExpired)
         except Exception as e:
-            logger.info(e)
-        cookieJar.set_cookie(oCookie)
-        cookieJar.save(self._cookiePath, self.__bIgnoreDiscard, self.__bIgnoreExpired)
+            logger.error(e)
 
     def ignoreDiscard(self, bIgnoreDiscard):
         self.__bIgnoreDiscard = bIgnoreDiscard
@@ -213,79 +246,111 @@ class cRequestHandler:
     def ignoreExpired(self, bIgnoreExpired):
         self.__bIgnoreExpired = bIgnoreExpired
 
-    def setCachePath(self, cache=''):
-        if not cache:
-            profilePath = common.profilePath
-            cache = os.path.join(profilePath, 'htmlcache')
+    def setCachePath(self):
+        cache = os.path.join(self._profilePath, 'htmlcache')
         if not os.path.exists(cache):
             os.makedirs(cache)
-        self.__cachePath = cache
+        self._cachePath = cache
 
     def readCache(self, url):
-        h = hashlib.md5(url).hexdigest()
-        cacheFile = os.path.join(self.__cachePath, h)
+        content = ''
+        if sys.version_info[0] == 2:
+            h = hashlib.md5(url).hexdigest()
+        else:
+            h = hashlib.md5(url.encode('utf8')).hexdigest()
+        cacheFile = os.path.join(self._cachePath, h)
         fileAge = self.getFileAge(cacheFile)
         if 0 < fileAge < self.cacheTime:
             try:
-                fhdl = file(cacheFile, 'r')
-                content = fhdl.read()
-            except:
-                logger.info('Could not read Cache')
+                if sys.version_info[0] == 2:
+                    with open(cacheFile, 'r') as f:
+                        content = f.read()
+                else:
+                    with open(cacheFile, 'rb') as f:
+                        content = f.read().decode('utf8')
+            except Exception:
+                logger.error('Could not read Cache')
             if content:
                 logger.info('read html for %s from cache' % url)
                 return content
         return ''
 
     def writeCache(self, url, content):
-        h = hashlib.md5(url).hexdigest()
-        cacheFile = os.path.join(self.__cachePath, h)
         try:
-            fhdl = file(cacheFile, 'w')
-            fhdl.write(content)
-        except:
-            logger.info('Could not write Cache')
+            if sys.version_info[0] == 2:
+                h = hashlib.md5(url).hexdigest()
+                with open(os.path.join(self._cachePath, h), 'w') as f:
+                    f.write(content)
+            else:
+                h = hashlib.md5(url.encode('utf8')).hexdigest()
+                with open(os.path.join(self._cachePath, h), 'wb') as f:
+                    f.write(content.encode('utf8'))
+        except Exception:
+            logger.error('Could not write Cache')
 
     @staticmethod
     def getFileAge(cacheFile):
         try:
-            fileAge = time.time() - os.stat(cacheFile).st_mtime
-        except:
+            return time.time() - os.stat(cacheFile).st_mtime
+        except Exception:
             return 0
-        return fileAge
 
     def clearCache(self):
-        files = os.listdir(self.__cachePath)
+        files = os.listdir(self._cachePath)
         for file in files:
-            cacheFile = os.path.join(self.__cachePath, file)
-            fileAge = self.getFileAge(cacheFile)
-            if fileAge > self.cacheTime:
-                os.remove(cacheFile)
-
-    @staticmethod
-    def createUrl(Url, oRequest):
-        import urlparse
-        parsed_url = urlparse.urlparse(Url)
-        netloc = parsed_url.netloc[4:] if parsed_url.netloc.startswith('www.') else parsed_url.netloc
-        cfId = oRequest.getCookie('__cfduid', '.' + netloc)
-        cfClear = oRequest.getCookie('cf_clearance', '.' + netloc)
-        sUrl = ''
-        if cfId and cfClear and 'Cookie=Cookie:' not in sUrl:
-            delimiter = '&' if '|' in sUrl else '|'
-            sUrl = delimiter + "Cookie=Cookie: __cfduid=" + cfId.value + "; cf_clearance=" + cfClear.value
-        if 'User-Agent=' not in sUrl:
-            delimiter = '&' if '|' in sUrl else '|'
-            sUrl += delimiter + "User-Agent=" + oRequest.getHeaderEntry('User-Agent')
-        return sUrl
-
-# python 2.7.9 and 2.7.10 certificate workaround
-class newHTTPSHandler(urllib2.HTTPSHandler):
-    def do_open(self, conn_factory, req, **kwargs):
-        conn_factory = newHTTPSConnection
-        return urllib2.HTTPSHandler.do_open(self, conn_factory, req)
+            os.remove(os.path.join(self._cachePath, file))
 
 
-class newHTTPSConnection(httplib.HTTPSConnection):
-    def __init__(self, host, port=None, key_file=None, cert_file=None, strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT, source_address=None, context=None):
-        import ssl
-        context = ssl._create_unverified_context()
-        httplib.HTTPSConnection.__init__(self, host, port, key_file, cert_file, strict, timeout, source_address, context)
+class cBF:
+    def resolve(self, url, html, cookie_jar, user_agent, sParameters):
+        page = urlparse(url).scheme + '://' + urlparse(url).netloc
+        j = re.findall('<script[^>]src="([^"]+)', html)
+        if j:
+            opener = build_opener(HTTPCookieProcessor(cookie_jar))
+            opener.addheaders = [('User-agent', user_agent), ('Referer', url)]
+            opener.open(page + j[0])
+        a = re.findall('xhr\.open\("GET","([^,]+)",', html)
+        if a:
+            import random
+            aespage = page + a[0].replace('" + ww +"', str(random.randint(700, 1500)))
+            opener = build_opener(HTTPCookieProcessor(cookie_jar))
+            opener.addheaders = [('User-agent', user_agent), ('Referer', url)]
+            if sys.version_info[0] == 2:
+                html = opener.open(aespage).read()
+            else:
+                html = opener.open(aespage).read().decode('utf-8', 'replace').encode('utf-8', 'replace').decode('utf-8', 'replace')
+            cval = self.aes_decode(html)
+            cdata = re.findall('cookie="([^="]+).*?domain[^>]=([^;]+)', html)
+            if cval and cdata:
+                c = Cookie(version=0, name=cdata[0][0], value=cval, port=None, port_specified=False, domain=cdata[0][1], domain_specified=True, domain_initial_dot=False, path="/", path_specified=True, secure=False, expires=time.time() + 21600, discard=False, comment=None, comment_url=None, rest={})
+                cookie_jar.set_cookie(c)
+                opener = build_opener(HTTPCookieProcessor(cookie_jar))
+                opener.addheaders = [('User-agent', user_agent), ('Referer', url)]
+                if sys.version_info[0] == 2:
+                    return opener.open(url, sParameters if len(sParameters) > 0 else None).read()
+                else:
+                    return opener.open(url, sParameters if len(sParameters) > 0 else None).read().decode('utf-8', 'replace').encode('utf-8', 'replace').decode('utf-8', 'replace')
+
+    def aes_decode(self, html):
+        try:
+            import pyaes
+            keys = re.findall('toNumbers\("([^"]+)"', html)
+            if keys:
+                from binascii import hexlify, unhexlify
+                msg = unhexlify(keys[2])
+                key = unhexlify(keys[0])
+                iv = unhexlify(keys[1])
+                decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(key, iv))
+                plain_text = decrypter.feed(msg)
+                plain_text += decrypter.feed()
+                return hexlify(plain_text).decode()
+        except Exception as e:
+            logger.error(e)
+
+
+class RedirectFilter(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, hdrs, newurl):
+        if 'notice.cuii' in newurl:
+            xbmcgui.Dialog().ok('Ihr Internetanbieter zensiert ihren Internetzugang', 'Um sich vor der Zensur zu schützen, empfehlen wir euren DNS Server auf die von Google 8.8.8.8 und 8.8.4.4 oder Cloudflare 1.1.1.1 und 1.0.0.1 umzustellen. Anleitungen finden sie per Googlesuche z.B. "Fritzbox DNS Server ändern"')
+            return None
+        return HTTPRedirectHandler.redirect_request(self, req, fp, code, msg, hdrs, newurl)

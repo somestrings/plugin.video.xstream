@@ -1,58 +1,26 @@
-import sys
-import xbmc
-import xbmcplugin
+# -*- coding: utf-8 -*-
 from resources.lib import common
+import xbmcaddon
+
 
 class cConfig:
-
-    def __check(self):
-        try:
-            import xbmcaddon           
-            self.__bIsDharma = True            
-        except ImportError:
-            self.__bIsDharma = False
-
     def __init__(self):
-        self.__check()
-
-        if (self.__bIsDharma):
-            import xbmcaddon
-            self.__oSettings = xbmcaddon.Addon(common.addonID)
-            self.__aLanguage = self.__oSettings.getLocalizedString
-
-
-    def isDharma(self):
-        return self.__bIsDharma
-        
+        self.__addon = xbmcaddon.Addon(common.addonID)
+        self.__aLanguage = self.__addon.getLocalizedString
 
     def showSettingsWindow(self):
-        if (self.__bIsDharma):
-            self.__oSettings.openSettings()
-        else:
-            try:		
-                xbmcplugin.openSettings( sys.argv[ 0 ] )
-            except:
-                pass
+        self.__addon.openSettings()
 
     def getSetting(self, sName, default=''):
-        if (self.__bIsDharma):
-            result = self.__oSettings.getSetting(sName)
-
-            if result:
-                return result
-            else:
-                return default
+        result = self.__addon.getSetting(sName)
+        if result:
+            return result
         else:
-            try:                
-                return xbmcplugin.getSetting(sName)
-            except:
-                return default
+            return default
+
+    def setSetting(self, id, value):
+        if id and value:
+            self.__addon.setSetting(id, value)
 
     def getLocalizedString(self, sCode):
-        if (self.__bIsDharma):
-            return self.__aLanguage(sCode)
-        else:
-            try:		
-                 return xbmc.getLocalizedString(sCode)
-            except:
-                return ''
+        return self.__aLanguage(sCode)
