@@ -21,7 +21,7 @@ else:
     import zipfile
 # Text/Überschrift im Dialog
 PLUGIN_NAME = addon().getAddonInfo('name')  # ist z.B. 'xstream'
-
+HEADERMESSAGE = 'xStream Nightly Updater'
 
 # Resolver
 def resolverUpdate(silent=False):
@@ -34,7 +34,7 @@ def resolverUpdate(silent=False):
         return UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent)
     except Exception as e:
         log('Exception Raised: %s' % str(e), LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + resolve_id)
+        Dialog().ok(HEADERMESSAGE, 'Fehler beim Update vom ' + resolve_id)
         return
 
 # xStream
@@ -81,19 +81,19 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
                 if os.path.exists(INSTALL_PATH): shutil.rmtree(INSTALL_PATH)
                 if not os.path.exists(INSTALL_PATH): shutil.copytree(ADDON_PATH, INSTALL_PATH)
                 log('%s - Update successful.' % resolve_id, LOGNOTICE)
-                if silent is False: Dialog().ok(PLUGIN_NAME, resolve_id + ' - Update erfolgreich.')
+                Dialog().ok(HEADERMESSAGE,'Resolve URL wurde gerade aktualisiert. Solltest du Probleme beim Abspielen eines Stream´s oder eine Fehlermeldung das kein Resolver installiert ist bekommen, dann starte bitte Kodi neu und probiere es noch einmal.\n' + resolve_id + ' - Update erfolgreich.')
                 return True
             elif isTrue is None:
                 log('%s - no new update ' % resolve_id, LOGNOTICE)
-                if silent is False: Dialog().ok(PLUGIN_NAME, resolve_id + ' - Kein Update verfügbar.')
+                if silent is False: Dialog().ok(HEADERMESSAGE, resolve_id + ' - Kein Update verfügbar.')
                 return None
 
         log('%s - Updatesss error ' % resolve_id, LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + resolve_id)
+        Dialog().ok(HEADERMESSAGE, 'Fehler beim Update vom ' + resolve_id)
         return False
     except:
         log('%s - Update error ' % resolve_id, LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + resolve_id)
+        Dialog().ok(HEADERMESSAGE, 'Fehler beim Update vom ' + resolve_id)
 
 # xStream Update
 def Update(username, plugin_id, branch, token, silent):
