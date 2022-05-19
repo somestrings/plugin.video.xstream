@@ -25,11 +25,12 @@ HEADERMESSAGE = 'xStream Nightly Updater'
 
 # Resolver
 def resolverUpdate(silent=False):
-    username = 'Gujal00'
-    resolve_dir = 'ResolveURL'
+    username = 'fetchdevteam'
+    resolve_dir = 'snipsolver'
     resolve_id = 'script.module.resolveurl'
     branch = 'master'
-    token =''
+    token = ''
+
     try:
         return UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent)
     except Exception as e:
@@ -57,7 +58,7 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
     PACKAGES_PATH = translatePath(os.path.join('special://home/addons/packages/'))  # Packages Ordner für Downloads
     ADDON_PATH = translatePath(os.path.join('special://home/addons/packages/', '%s') % resolve_id)  # Addon Ordner in Packages
     INSTALL_PATH = translatePath(os.path.join('special://home/addons/', '%s') % resolve_id) # Installation Ordner
-        
+    
     auth = HTTPBasicAuth(username, token)
     log('%s - Search for update ' % resolve_id, LOGNOTICE)
     try:
@@ -78,10 +79,11 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
             isTrue = commitUpdate(commitXML, LOCAL_PLUGIN_VERSION, REMOTE_PLUGIN_DOWNLOADS, PACKAGES_PATH, resolve_dir, LOCAL_FILE_NAME_PLUGIN, silent, auth)
             
             if isTrue is True:
-                if os.path.exists(INSTALL_PATH): shutil.rmtree(INSTALL_PATH)
-                if not os.path.exists(INSTALL_PATH): shutil.copytree(ADDON_PATH, INSTALL_PATH)
+                shutil.make_archive(ADDON_PATH, 'zip', ADDON_PATH)
+                shutil.unpack_archive(ADDON_PATH + '.zip', INSTALL_PATH)
+                if os.path.exists(ADDON_PATH + '.zip'): os.remove(ADDON_PATH + '.zip')
                 log('%s - Update successful.' % resolve_id, LOGNOTICE)
-                Dialog().ok(HEADERMESSAGE,'Resolve URL wurde gerade aktualisiert. Solltest du Probleme beim Abspielen eines Stream´s oder eine Fehlermeldung das kein Resolver installiert ist bekommen, dann starte bitte Kodi neu und probiere es noch einmal.\n' + resolve_id + ' - Update erfolgreich.')
+                if silent is False: Dialog().ok(HEADERMESSAGE,'Resolve URL wurde gerade aktualisiert. Solltest du Probleme beim Abspielen eines Stream´s oder eine Fehlermeldung das kein Resolver installiert ist bekommen, dann starte bitte Kodi neu und probiere es noch einmal.\n' + resolve_id + ' - Update erfolgreich.')
                 return True
             elif isTrue is None:
                 log('%s - no new update ' % resolve_id, LOGNOTICE)
@@ -247,8 +249,8 @@ def devUpdates():  # für manuelles Updates vorgesehen
         resolverupdate = False
         pluginupdate = False
 
-        options = ['Beide', PLUGIN_NAME, 'ResolveUrl']
-        result = Dialog().select('Welches Update ausführen?', options)
+        options = ['Beide Addons aktualisieren', PLUGIN_NAME + ' aktualisieren', 'ResolveUrl aktualisieren']
+        result = Dialog().select(HEADERMESSAGE, options)
 
         if result == 0:
             resolverupdate = True
