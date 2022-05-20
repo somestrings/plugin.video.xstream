@@ -83,7 +83,7 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
                 shutil.unpack_archive(ADDON_PATH + '.zip', INSTALL_PATH)
                 if os.path.exists(ADDON_PATH + '.zip'): os.remove(ADDON_PATH + '.zip')
                 log('%s - Update successful.' % resolve_id, LOGNOTICE)
-                if silent is False: Dialog().ok(HEADERMESSAGE,'Resolve URL wurde gerade aktualisiert. Solltest du Probleme beim Abspielen eines Stream´s oder eine Fehlermeldung das kein Resolver installiert ist bekommen, dann starte bitte Kodi neu und probiere es noch einmal.\n' + resolve_id + ' - Update erfolgreich.')
+                if silent is False: Dialog().ok(HEADERMESSAGE, resolve_id + ' - Update erfolgreich.')
                 return True
             elif isTrue is None:
                 log('%s - no new update ' % resolve_id, LOGNOTICE)

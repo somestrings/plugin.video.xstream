@@ -11,7 +11,7 @@ import sys, xbmc, xbmcgui
 try:
     import resolveurl as resolver
 except ImportError:
-    xbmcgui.Dialog().ok('ResolveUrl Fehler', 'Entweder wurde gerade ResolveURL aktualisiert und Kodi sollte neu gestartet werden. Oder Sie haben keinen funktionierenden ResolveUrl installiert, und können somit keine Videos abspielen. Bitte ResolveURL installieren.')
+    xbmcgui.Dialog().ok('ResolveUrl Error', 'Sie haben keinen funktionierenden ResolveUrl installiert, es können keine Videos abgespielt werden bitte neu installieren.')
 
 
 def run():
