@@ -1,4 +1,7 @@
-3.5.34~nightly
+3.5.34~nightly1
+- Meldung Resolve URL Update
+- neues Icon und Fanart
+- Update Manager fixed
 
 3.5.33
   15.05.2022
