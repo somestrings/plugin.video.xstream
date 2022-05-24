@@ -67,11 +67,13 @@ def checkDependence(ADDONID):
         xbmc.log(__name__ + '  %s - Exception ' % e, LOGERROR)
 
 if os.path.isfile(NIGHTLY_VERSION_CONTROL) == False or xbmcaddon.Addon().getSetting('DevUpdateAuto') == 'true' or xbmcaddon.Addon().getSetting('enforceUpdate') == 'true':
+# Status Dialog der Nightly Updates    
     from resources.lib import updateManager
     status = updateManager.devAutoUpdates(True)
-    if status == True: infoDialog("Auto Update abgeschlossen", sound=False, icon='INFO', time=3000)
-    if status == False: infoDialog("Auto Update mit Fehler beendet", sound=True, icon='ERROR')
-    # if status == None: infoDialog("Keine neuen Updates gefunden", sound=False, icon='INFO', time=3000)
+    infoDialog("Suche nach Updates ...", sound=False, icon='INFO', time=8000)
+    if status == True: infoDialog("Update erfolgreich installiert.", sound=False, icon='INFO', time=4000)
+    if status == False: infoDialog("Update mit Fehlern beendet.", sound=True, icon='ERROR')
+    if status == None: infoDialog("Keine Updates gefunden.", sound=False, icon='INFO', time=4000)
     if xbmcaddon.Addon().getSetting('enforceUpdate') == 'true': xbmcaddon.Addon().setSetting('enforceUpdate', 'false')
 
 # "setting.xml" wenn notwendig Indexseiten aktualisieren

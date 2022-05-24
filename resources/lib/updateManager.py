@@ -48,7 +48,7 @@ def xStreamUpdate(silent=False):
         return Update(username, plugin_id, branch, token, silent)
     except Exception as e:
         log('Exception Raised: %s' % str(e), LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
+        Dialog().ok(HEADERMESSAGE, 'Fehler beim Update vom ' + plugin_id)
         return False
 
 # Update Resolver
@@ -60,7 +60,7 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
     INSTALL_PATH = translatePath(os.path.join('special://home/addons/', '%s') % resolve_id) # Installation Ordner
     
     auth = HTTPBasicAuth(username, token)
-    log('%s - Search for update ' % resolve_id, LOGNOTICE)
+    log(HEADERMESSAGE + ' - %s - Suche nach Aktualisierungen.' % resolve_id, LOGNOTICE)
     try:
         if sys.version_info[0] == 2:
             ADDON_DIR = translatePath(os.path.join('special://userdata/addon_data/', '%s') % resolve_id).decode('utf-8')
@@ -79,14 +79,16 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
             isTrue = commitUpdate(commitXML, LOCAL_PLUGIN_VERSION, REMOTE_PLUGIN_DOWNLOADS, PACKAGES_PATH, resolve_dir, LOCAL_FILE_NAME_PLUGIN, silent, auth)
             
             if isTrue is True:
+                log(HEADERMESSAGE + ' - %s - Aktualisierung wird heruntergeladen.' % resolve_id, LOGNOTICE)
                 shutil.make_archive(ADDON_PATH, 'zip', ADDON_PATH)
                 shutil.unpack_archive(ADDON_PATH + '.zip', INSTALL_PATH)
-                if os.path.exists(ADDON_PATH + '.zip'): os.remove(ADDON_PATH + '.zip')
-                log('%s - Update successful.' % resolve_id, LOGNOTICE)
+                log(HEADERMESSAGE + ' - %s - Aktualisierung wird installiert.' % resolve_id, LOGNOTICE)
+                if os.path.exists(ADDON_PATH + '.zip'): os.remove(ADDON_PATH + '.zip')                
                 if silent is False: Dialog().ok(HEADERMESSAGE, resolve_id + ' - Update erfolgreich.')
+                log(HEADERMESSAGE + ' - %s - Aktualisierung abgeschlossen.' % resolve_id, LOGNOTICE)
                 return True
             elif isTrue is None:
-                log('%s - no new update ' % resolve_id, LOGNOTICE)
+                log(HEADERMESSAGE + ' - %s - Keine Aktualisierung verfügbar.' % resolve_id, LOGNOTICE)
                 if silent is False: Dialog().ok(HEADERMESSAGE, resolve_id + ' - Kein Update verfügbar.')
                 return None
 
@@ -122,11 +124,12 @@ def Update(username, plugin_id, branch, token, silent):
             isTrue = commitUpdate(commitXML, LOCAL_PLUGIN_VERSION, REMOTE_PLUGIN_DOWNLOADS, path, plugin_id,
                                   LOCAL_FILE_NAME_PLUGIN, silent, auth)
             if isTrue is True:
-                log('%s - Update successful.' % plugin_id, LOGNOTICE)
+                log(HEADERMESSAGE + ' - %s - Aktualisierung wird installiert.' % plugin_id, LOGNOTICE)
                 if silent is False: Dialog().ok(PLUGIN_NAME, plugin_id + ' - Update erfolgreich.')
+                log(HEADERMESSAGE + ' - %s - Aktualisierung abgeschlossen.' % plugin_id, LOGNOTICE)
                 return True
             elif isTrue is None:
-                log('%s - no new update ' % plugin_id, LOGNOTICE)
+                log(HEADERMESSAGE + ' - %s - Keine Aktualisierung verfügbar.' % plugin_id, LOGNOTICE)
                 if silent is False: Dialog().ok(PLUGIN_NAME, plugin_id + ' - Kein Update verfügbar.')
                 return None
 
