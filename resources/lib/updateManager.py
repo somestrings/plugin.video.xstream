@@ -21,20 +21,21 @@ else:
     import zipfile
 # Text/Überschrift im Dialog
 PLUGIN_NAME = addon().getAddonInfo('name')  # ist z.B. 'xstream'
-
+HEADERMESSAGE = 'xStream Nightly Updater'
 
 # Resolver
 def resolverUpdate(silent=False):
-    username = 'Gujal00'
-    resolve_dir = 'ResolveURL'
+    username = 'fetchdevteam'
+    resolve_dir = 'snipsolver'
     resolve_id = 'script.module.resolveurl'
     branch = 'master'
-    token =''
+    token = ''
+
     try:
         return UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent)
     except Exception as e:
         log('Exception Raised: %s' % str(e), LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + resolve_id)
+        Dialog().ok(HEADERMESSAGE, 'Fehler beim Update vom ' + resolve_id)
         return
 
 # xStream
@@ -57,7 +58,7 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
     PACKAGES_PATH = translatePath(os.path.join('special://home/addons/packages/'))  # Packages Ordner für Downloads
     ADDON_PATH = translatePath(os.path.join('special://home/addons/packages/', '%s') % resolve_id)  # Addon Ordner in Packages
     INSTALL_PATH = translatePath(os.path.join('special://home/addons/', '%s') % resolve_id) # Installation Ordner
-        
+    
     auth = HTTPBasicAuth(username, token)
     log('%s - Search for update ' % resolve_id, LOGNOTICE)
     try:
@@ -78,22 +79,23 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
             isTrue = commitUpdate(commitXML, LOCAL_PLUGIN_VERSION, REMOTE_PLUGIN_DOWNLOADS, PACKAGES_PATH, resolve_dir, LOCAL_FILE_NAME_PLUGIN, silent, auth)
             
             if isTrue is True:
-                if os.path.exists(INSTALL_PATH): shutil.rmtree(INSTALL_PATH)
-                if not os.path.exists(INSTALL_PATH): shutil.copytree(ADDON_PATH, INSTALL_PATH)
+                shutil.make_archive(ADDON_PATH, 'zip', ADDON_PATH)
+                shutil.unpack_archive(ADDON_PATH + '.zip', INSTALL_PATH)
+                if os.path.exists(ADDON_PATH + '.zip'): os.remove(ADDON_PATH + '.zip')
                 log('%s - Update successful.' % resolve_id, LOGNOTICE)
-                if silent is False: Dialog().ok(PLUGIN_NAME, resolve_id + ' - Update erfolgreich.')
+                if silent is False: Dialog().ok(HEADERMESSAGE, resolve_id + ' - Update erfolgreich.')
                 return True
             elif isTrue is None:
                 log('%s - no new update ' % resolve_id, LOGNOTICE)
-                if silent is False: Dialog().ok(PLUGIN_NAME, resolve_id + ' - Kein Update verfügbar.')
+                if silent is False: Dialog().ok(HEADERMESSAGE, resolve_id + ' - Kein Update verfügbar.')
                 return None
 
         log('%s - Updatesss error ' % resolve_id, LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + resolve_id)
+        Dialog().ok(HEADERMESSAGE, 'Fehler beim Update vom ' + resolve_id)
         return False
     except:
         log('%s - Update error ' % resolve_id, LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + resolve_id)
+        Dialog().ok(HEADERMESSAGE, 'Fehler beim Update vom ' + resolve_id)
 
 # xStream Update
 def Update(username, plugin_id, branch, token, silent):
@@ -247,8 +249,8 @@ def devUpdates():  # für manuelles Updates vorgesehen
         resolverupdate = False
         pluginupdate = False
 
-        options = ['Beide', PLUGIN_NAME, 'ResolveUrl']
-        result = Dialog().select('Welches Update ausführen?', options)
+        options = ['Beide Addons aktualisieren', PLUGIN_NAME + ' aktualisieren', 'ResolveUrl aktualisieren']
+        result = Dialog().select(HEADERMESSAGE, options)
 
         if result == 0:
             resolverupdate = True
