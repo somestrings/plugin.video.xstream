@@ -8,8 +8,7 @@
 	<import addon="repository.resolveurl" optional="true"/>
     <import addon="script.module.inputstreamhelper" version="0.3.3" optional="true"/>
 	<!-- for remote debug -->
-	<!-- <import addon="script.module.pydevd" optional="true"/> -->
-	<!-- <import addon="script.module.web-pdb" version="1.5.6"/> -->
+	
  </requires>
  <extension point="xbmc.python.pluginsource" library="default.py">
    <provides>video</provides>
