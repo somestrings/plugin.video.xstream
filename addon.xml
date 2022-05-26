@@ -16,7 +16,7 @@
     <extension point="xbmc.service" library="service.py" start="startup" />
  <extension point="xbmc.addon.metadata">
    <summary lang="de">Watch xStream!</summary>
-   <description lang="de">Mit diesem Addon kannst du auf alle angebotenen Streams verschiedenster deutschen Quellen zugreifen</description>
+   <description lang="de">Mit diesem Addon kannst du auf angebotene Streams, verschiedener deutscher Quellen zugreifen</description>
    <disclaimer lang="de">Die von diesem Addon dargestellten Inhalte werden von den Erstellern des Addons weder gehostet oder verbreitet, noch stehen die Ersteller in irgendeiner Beziehung zu den Content-Anbietern.</disclaimer>
    <source>https://github.com/streamxstream/plugin.video.xstream</source>
    <license>GNU GPLv3</license>
