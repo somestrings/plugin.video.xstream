@@ -108,7 +108,7 @@ def Update(username, plugin_id, branch, token, silent):
     REMOTE_PLUGIN_COMMITS = "https://api.github.com/repos/%s/%s/commits/%s" % (username, plugin_id, branch)
     REMOTE_PLUGIN_DOWNLOADS = "https://api.github.com/repos/%s/%s/zipball/%s" % (username, plugin_id, branch)
     auth = HTTPBasicAuth(username, token)
-    log('%s - Search for update ' % plugin_id, LOGNOTICE)
+    log(HEADERMESSAGE + ' - %s - Suche nach Aktualisierungen.' % plugin_id, LOGNOTICE)
     try:
         if sys.version_info[0] == 2:
             ADDON_DIR = translatePath(os.path.join('special://userdata/addon_data/', '%s') % plugin_id).decode('utf-8')
@@ -141,7 +141,7 @@ def Update(username, plugin_id, branch, token, silent):
         Dialog().ok(PLUGIN_NAME, 'Fehler bei der Aktualisierung von ' + plugin_id)
         return False
     except:
-        log('%s - Update error ' % plugin_id, LOGERROR)
+        log(HEADERMESSAGE + ' - %s - Fehler bei der Aktualisierung' % plugin_id, LOGERROR)
         Dialog().ok(PLUGIN_NAME, 'Fehler bei der Aktualisierung von ' + plugin_id)
 
 
