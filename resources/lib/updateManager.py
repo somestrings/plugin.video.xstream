@@ -28,7 +28,7 @@ def resolverUpdate(silent=False):
     username = 'fetchdevteam'
     resolve_dir = 'snipsolver'
     resolve_id = 'script.module.resolveurl'
-    branch = 'master'
+    branch = 'release'
     token = ''
 
     try:
