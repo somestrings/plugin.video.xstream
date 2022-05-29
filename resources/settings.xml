@@ -1,10 +1,16 @@
 <settings> 
 	<category label="30020">
 		<setting label="30030" type="lsep" />
-		<setting default="true" id="DevUpdateAuto" label="Nightly Update (automatisch)" type="bool" />
-		<setting default="true" id="githubUpdateXstream" label="30010" type="bool" visible="eq(-1,true)" />
-		<setting default="true" id="githubUpdateResolver" label="30015" type="bool" visible="eq(-2,true)" />
-		<setting default="false" id="enforceUpdate" label="[B][COLOR red]Aktualisierung einmalig erzwingen[/COLOR][/B] (Nightly Update)" type="bool" />
+		<setting default="false" id="DevUpdateAuto" label="Automatische Updates aktivieren" type="bool" />
+		<setting default="false" id="githubUpdateXstream" label="30010" type="bool" visible="eq(-1,true)"/>
+		<setting default="release" id="xstream.branch" label="Wähle xStream Github Branch" type="labelenum" values="release|nightly" visible="eq(-1,true)"/>
+		<setting type="text" label="[COLOR green]Release - Stabile Version[/COLOR]" enable="eq(-1,0)" visible="eq(-2,true)"/>
+		<setting type="text" label="[COLOR orange]Nightly - Version mit Hotfixes, kann aber denoch Fehler enthalten.[/COLOR]" enable="eq(-2,1)" visible="eq(-3,true)"/>
+		<setting default="false" id="githubUpdateResolver" label="30015" type="bool" visible="eq(-5,true)"/>
+		<setting default="release" id="resolver.branch" label="Wähle Resolver Github Branch" type="labelenum" values="release|nightly" visible="eq(-1,true)"/>
+		<setting type="text" label="[COLOR green]Release - Version direkt von Guial00´s Github. [/COLOR]" enable="eq(-1,0)" visible="eq(-2,true)"/>
+		<setting type="text" label="[COLOR orange]Nightly - Version mit Hotfixes vom xStream Team.[/COLOR]" enable="eq(-2,1)" visible="eq(-3,true)"/>
+		<!--<setting default="false" id="enforceUpdate" label="Manuelles Update aktivieren (nur einmalig)" type="bool" />-->
 		<setting default="true" id="newSetting" label="newSetting" type="bool" visible="false" />
 		<setting type="sep" />
 		<setting label="30031" type="lsep" />
