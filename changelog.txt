@@ -2,6 +2,8 @@
 - Meldung Resolve URL Update
 - neues Icon und Fanart
 - Update Manager fixed
+- kinox fixed
+- kinoger Hoster fixed THX Anis
 
 3.5.33
   15.05.2022
