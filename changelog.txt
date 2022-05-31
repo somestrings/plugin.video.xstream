@@ -4,6 +4,7 @@
 - Update Manager fixed
 - kinox fixed
 - kinoger Hoster fixed THX Anis
+- My.JDownloader fixed THX Anis
 
 3.5.33
   15.05.2022

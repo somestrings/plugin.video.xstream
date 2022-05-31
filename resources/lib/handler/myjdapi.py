@@ -318,9 +318,6 @@ class Myjdapi:
         return decrypted_data
 
     def __encrypt(self, secret_token, data):
-        data = PAD(data)
-        length = 16 - (len(data) % 16)
-        data += chr(length) * length
         init_vector = secret_token[:len(secret_token) // 2]
         key = secret_token[len(secret_token) // 2:]
         encryptor = pyaes.Encrypter(pyaes.AESModeOfOperationCBC(key, init_vector))
