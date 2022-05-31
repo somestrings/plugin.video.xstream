@@ -32,7 +32,7 @@ URL_LANGUAGE = URL_MAIN + '/aSET/PageLang/1'
 
 
 def checkDomain():
-    KD = 'https://ww11.kinox.to', 'https://www12.kinos.to', 'https://www12.kinox.to', 'https://www12.kinoz.to', 'https://kinoz.to', 'https://kinos.to', 'https://kinox.tv', 'https://kinox.io', 'https://kinox.am', 'https://kinox.sx', 'https://kinox.bz', 'https://kinox.gratis', 'https://kinox.mobi', 'https://kinox.sh', 'https://kinox.lol', 'https://kinox.wtf', 'https://kinox.fun', 'https://kinox.fyi', 'https://kinox.cloud', 'https://kinox.to', 'https://kinox.click', 'https://kinox.tube', 'https://kinox.club', 'https://kinox.digital', 'https://kinox.direct', 'https://kinox.pub', 'https://kinox.express', 'https://kinox.me'
+    KD = 'https://kinoz.to', 'https://kinos.to', 'https://kinox.tv', 'https://kinox.io', 'https://kinox.am', 'https://kinox.sx', 'https://kinox.bz', 'https://kinox.gratis', 'https://kinox.mobi', 'https://kinox.sh', 'https://kinox.lol', 'https://kinox.wtf', 'https://kinox.fun', 'https://kinox.fyi', 'https://kinox.cloud', 'https://kinox.to', 'https://kinox.click', 'https://kinox.tube', 'https://kinox.club', 'https://kinox.digital', 'https://kinox.direct', 'https://kinox.pub', 'https://kinox.express', 'https://kinox.me'
     import time
     if int(cConfig().getSetting('kinoxhourblock', 0)) + 3600 < time.time():
         i = 0
