@@ -13,9 +13,9 @@ Diese werden auch als Site-Plugins bezeichnet, welche auf die eigentlichen Quell
 
 Wir suchen derzeit noch Entwickler die das Projekt unterstützen möchten:
 
-Jeder der mithelfen kann und möchte, wird gebeten seine fertigen Fixes einzureichen
-Wird ein Fix zu einer Seite eingereicht oder ein neuer Scrapper zu einer Seite, so werden diese weiterhin eingepflegt
-Fixes an Seiten bzw. neue Seiten am besten als PullRequest einreichen (oder auf Gitter)
+Jeder der mithelfen kann und möchte, wird gebeten seine fertigen Fixes einzureichen.
+Wird ein Fix zu einer Seite eingereicht oder ein neuer Scrapper zu einer Seite, so werden diese weiterhin eingepflegt.
+Fixes an Seiten bzw. neue Seiten am besten als PullRequest einreichen (oder auf Gitter).
 
 ***
 
@@ -45,12 +45,12 @@ Derzeit unterstützt die Version folgende Site Plugins:
 
 ***
 
-Habt Ihr Fragen rund um xStream findet Ihr sicher eure Antworten in unserer FAQ
+Habt Ihr Fragen rund um xStream findet Ihr sicher eure Antworten in unserer FAQ.
 ### | [FAQ](https://github.com/streamxstream/xStream-FAQ/blob/master/xStream_Anleitung_FAQ.md)
 
 ***
 
-Für alles weitere findet Ihr vielleicht auch Informationen auf unserer Webseite
+Für alles weitere findet Ihr vielleicht auch Informationen auf unserer Webseite.
 ### | [Web Portal](https://streamxstream.github.io/xStreamRepoWeb/)
 
 ***
