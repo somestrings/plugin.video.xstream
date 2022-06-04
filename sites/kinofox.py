@@ -8,7 +8,7 @@ from resources.lib.gui.gui import cGui
 SITE_IDENTIFIER = 'kinofox'
 SITE_NAME = 'KinoFox'
 SITE_ICON = 'kinofox.png'
-URL_MAIN = 'https://kinofox.de'
+URL_MAIN = 'https://kinofox.su'
 #URL_KINO = URL_MAIN + '/kinofilme-stream'
 URL_SEARCH = URL_MAIN + '/index.php?do=search'
 
