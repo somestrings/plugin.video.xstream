@@ -56,4 +56,5 @@ Für alles weitere findet Ihr vielleicht auch Informationen auf unserer Webseite
 ***
 
 Oder nutzt unseren Chat wenn Ihr irgendwelche anderen Fragen um xStream beantwortet haben möchtet.
+
 [![Gitter](https://badges.gitter.im/streamxstream/community.svg)](https://gitter.im/streamxstream/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
