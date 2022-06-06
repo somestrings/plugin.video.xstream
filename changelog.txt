@@ -1,15 +1,18 @@
-3.5.34~nightly3
-- Update Domains kinofox, kkiste
+3.5.35~nightly
 
-3.5.34~nightly2
+3.5.34
+  05.06.2022
+  Update:
+
+- Resolver Branch Auswahl   
+- Update Domains kinofox, kkiste
 - kinox fixed
 - kinoger Hoster fixed THX Anis
 - My.JDownloader fixed THX Anis
-
-3.5.34~nightly1
 - Meldung Resolve URL Update
 - neues Icon und Fanart
 - Update Manager fixed
+- Meldung Resolve URL Update
 
 3.5.33
   15.05.2022

@@ -1,10 +1,13 @@
 <settings> 
 	<category label="30020">
 		<setting label="30030" type="lsep" />
-		<setting default="true" id="DevUpdateAuto" label="Nightly Update (automatisch)" type="bool" />
-		<setting default="true" id="githubUpdateXstream" label="30010" type="bool" visible="eq(-1,true)" />
-		<setting default="true" id="githubUpdateResolver" label="30015" type="bool" visible="eq(-2,true)" />
-		<setting default="false" id="enforceUpdate" label="[B][COLOR red]Aktualisierung einmalig erzwingen[/COLOR][/B] (Nightly Update)" type="bool" />
+		<setting default="false" id="DevUpdateAuto" label="Automatische Updates aktivieren" type="bool" />
+		<setting default="false" id="githubUpdateXstream" label="30010" type="bool" visible="eq(-1,true)" />
+		<setting default="false" id="githubUpdateResolver" label="30015" type="bool" visible="eq(-2,true)" />
+		<setting default="release" id="resolver.branch" label="W&#228;hle Resolver Github Branch" type="labelenum" values="release|nightly" visible="eq(-1,true)" />
+		<setting type="text" label="[COLOR green]Release - Version direkt von Guial00&#180;s Github. [/COLOR]" enable="eq(-1,0)" visible="eq(-2,true)" />
+		<setting type="text" label="[COLOR orange]Nightly - Version mit Hotfixes vom xStream Team.[/COLOR]" enable="eq(-2,1)" visible="eq(-3,true)" />
+		<setting default="false" id="enforceUpdate" label="Manuelles Update aktivieren (nur einmalig)" type="bool" />
 		<setting default="true" id="newSetting" label="newSetting" type="bool" visible="false" />
 		<setting type="sep" />
 		<setting label="30031" type="lsep" />
@@ -97,13 +100,13 @@
 		<setting type="lsep" label="SerienStream" />
 		<setting default="true" type="bool" id="plugin_serienstream_to" label="30050" />
 		<setting default="false" type="bool" id="global_search_serienstream_to" label="30052" enable="!eq(-1,false)" />
-		<setting default="s.to" enable="!eq(-2,false)" id="serienstream_to-domain" label="30051" type="labelenum" values="s.to|serienstream.to|serien.cam|190.115.18.20" />
+		<setting default="190.115.18.20" enable="!eq(-2,false)" id="serienstream_to-domain" label="30051" type="labelenum" values="s.to|serienstream.to|serien.cam|190.115.18.20" />
 		<setting type="sep" />
 		<setting type="lsep" label="Streamworld" />
 		<setting default="true" type="bool" id="plugin_streamworld" label="30050" />
 		<setting default="true" type="bool" id="global_search_streamworld" label="30052" enable="!eq(-1,false)" />
 		<setting type="sep" />
-		<setting type="lsep" label="xCine" />
+		<setting type="lsep" label="XCine" />
 		<setting default="true" type="bool" id="plugin_xcine" label="30050" />
 		<setting default="true" type="bool" id="global_search_xcine" label="30052" enable="!eq(-1,false)" />
 		<setting type="sep" />

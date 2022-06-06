@@ -1,8 +1,7 @@
-## Mit der Version 3.5.31 wird um Unterstützung gebeten
 
-Jeder der mithelfen kann, wird gebeten seine fertigen Fixes einzureichen
+Jeder der mithelfen kann und möchte, wird gebeten seine fertigen Fixes einzureichen
 
-Wird ein Fix zu einer Seite eingereicht oder ein neuer Scrapper zu einer Seite, so wird dies auch weiterhin eingepflegt
+Wird ein Fix zu einer Seite eingereicht oder ein neuer Scrapper zu einer Seite, so werden diese weiterhin eingepflegt
 
 Fixes an Seiten bzw. neue Seiten am besten als PullRequest einreichen (oder auf Gitter)
 
@@ -11,7 +10,11 @@ Fixes an Seiten bzw. neue Seiten am besten als PullRequest einreichen (oder auf 
 
 ## Willkommen bei xStream für Kodi!
 
-Bei xStream handelt es sich um ein Video-Addon für Kodi, welches das streamen von Filmen und Serien über eine intuitive und optisch ansprechende Benutzeroberfläche ermöglicht. Sowohl der Funktionsumfang von xStream als auch das Angebot an Streaming-Inhalten wird von den beteiligten Entwicklern stetig weiterentwickelt bzw. um neue Webseiten erweitert. Diese werden auch als Site-Plugins bezeichnet, welche auf die eigentlichen Quellen verweisen die für das bereitgestellte Angebot verantworlich sind! 
+Bei xStream handelt es sich um ein Video-Addon für Kodi, welches das streamen von Filmen und Serien über eine intuitive und optisch ansprechende Benutzeroberfläche ermöglicht
+
+Sowohl der Funktionsumfang von xStream als auch das Angebot an Streaming-Inhalten wird von den beteiligten Entwicklern stetig weiterentwickelt bzw. um neue Webseiten erweitert
+
+Diese werden auch als Site-Plugins bezeichnet, welche auf die eigentlichen Quellen verweisen die für das bereitgestellte Angebot verantworlich sind! 
 
 ***
 

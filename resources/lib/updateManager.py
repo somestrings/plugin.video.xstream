@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 
-# 2022.05.15 DWH-WFC
+# 2022.05.26 DWH-WFC
 
 import os, base64, sys
 import shutil
 import json
 import requests
+import xbmc, xbmcvfs
+
+from xbmcaddon import Addon
 from requests.auth import HTTPBasicAuth
 from xbmcgui import Dialog
-from xbmcaddon import Addon as addon
+
 if sys.version_info[0] == 2:
     from xbmc import translatePath, LOGNOTICE, LOGERROR, log, executebuiltin, getCondVisibility, getInfoLabel
 else:
@@ -20,22 +23,23 @@ if getCondVisibility('system.platform.android') and int(getInfoLabel('System.Bui
 else:
     import zipfile
 # Text/Überschrift im Dialog
-PLUGIN_NAME = addon().getAddonInfo('name')  # ist z.B. 'xstream'
-HEADERMESSAGE = 'xStream Nightly Updater'
+PLUGIN_NAME = Addon().getAddonInfo('name')  # ist z.B. 'xstream'
+PLUGIN_ID = Addon().getAddonInfo('id')
+HEADERMESSAGE = 'xStream Update Manager'
 
 # Resolver
 def resolverUpdate(silent=False):
     username = 'fetchdevteam'
     resolve_dir = 'snipsolver'
     resolve_id = 'script.module.resolveurl'
-    branch = 'release'
+    branch = Addon().getSetting('resolver.branch')
     token = ''
 
     try:
         return UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent)
     except Exception as e:
         log('Exception Raised: %s' % str(e), LOGERROR)
-        Dialog().ok(HEADERMESSAGE, 'Fehler beim Update vom ' + resolve_id)
+        Dialog().ok(HEADERMESSAGE, 'Fehler bei der Aktualisierung von ' + resolve_id)
         return
 
 # xStream
@@ -48,7 +52,7 @@ def xStreamUpdate(silent=False):
         return Update(username, plugin_id, branch, token, silent)
     except Exception as e:
         log('Exception Raised: %s' % str(e), LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
+        Dialog().ok(HEADERMESSAGE, 'Fehler bei der Aktualisierung von ' + plugin_id)
         return False
 
 # Update Resolver
@@ -60,7 +64,7 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
     INSTALL_PATH = translatePath(os.path.join('special://home/addons/', '%s') % resolve_id) # Installation Ordner
     
     auth = HTTPBasicAuth(username, token)
-    log('%s - Search for update ' % resolve_id, LOGNOTICE)
+    log(HEADERMESSAGE + ' - %s - Suche nach Aktualisierungen.' % resolve_id, LOGNOTICE)
     try:
         if sys.version_info[0] == 2:
             ADDON_DIR = translatePath(os.path.join('special://userdata/addon_data/', '%s') % resolve_id).decode('utf-8')
@@ -71,7 +75,7 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
         LOCAL_FILE_NAME_PLUGIN = os.path.join(ADDON_DIR, 'update-' + resolve_id + '.zip')
         if not os.path.exists(ADDON_DIR): os.mkdir(ADDON_DIR)
         
-        if addon().getSetting('enforceUpdate') == 'true':
+        if Addon().getSetting('enforceUpdate') == 'true':
             if os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
             
         commitXML = _getXmlString(REMOTE_PLUGIN_COMMITS, auth)  # Commit Update
@@ -79,30 +83,32 @@ def UpdateResolve(username, resolve_dir, resolve_id, branch, token, silent):
             isTrue = commitUpdate(commitXML, LOCAL_PLUGIN_VERSION, REMOTE_PLUGIN_DOWNLOADS, PACKAGES_PATH, resolve_dir, LOCAL_FILE_NAME_PLUGIN, silent, auth)
             
             if isTrue is True:
+                log(HEADERMESSAGE + ' - %s - Aktualisierung wird heruntergeladen.' % resolve_id, LOGNOTICE)
                 shutil.make_archive(ADDON_PATH, 'zip', ADDON_PATH)
                 shutil.unpack_archive(ADDON_PATH + '.zip', INSTALL_PATH)
-                if os.path.exists(ADDON_PATH + '.zip'): os.remove(ADDON_PATH + '.zip')
-                log('%s - Update successful.' % resolve_id, LOGNOTICE)
+                log(HEADERMESSAGE + ' - %s - Aktualisierung wird installiert.' % resolve_id, LOGNOTICE)
+                if os.path.exists(ADDON_PATH + '.zip'): os.remove(ADDON_PATH + '.zip')                
                 if silent is False: Dialog().ok(HEADERMESSAGE, resolve_id + ' - Update erfolgreich.')
+                log(HEADERMESSAGE + ' - %s - Aktualisierung abgeschlossen.' % resolve_id, LOGNOTICE)
                 return True
             elif isTrue is None:
-                log('%s - no new update ' % resolve_id, LOGNOTICE)
+                log(HEADERMESSAGE + ' - %s - Keine Aktualisierung verfügbar.' % resolve_id, LOGNOTICE)
                 if silent is False: Dialog().ok(HEADERMESSAGE, resolve_id + ' - Kein Update verfügbar.')
                 return None
 
-        log('%s - Updatesss error ' % resolve_id, LOGERROR)
-        Dialog().ok(HEADERMESSAGE, 'Fehler beim Update vom ' + resolve_id)
+        log(HEADERMESSAGE + ' - %s - Fehler bei der Aktualisierung' % resolve_id, LOGERROR)
+        Dialog().ok(HEADERMESSAGE, 'Fehler bei der Aktualisierung von ' + resolve_id)
         return False
     except:
-        log('%s - Update error ' % resolve_id, LOGERROR)
-        Dialog().ok(HEADERMESSAGE, 'Fehler beim Update vom ' + resolve_id)
+        log(HEADERMESSAGE + ' - %s - Fehler bei der Aktualisierung' % resolve_id, LOGERROR)
+        Dialog().ok(HEADERMESSAGE, 'Fehler bei der Aktualisierung von ' + resolve_id)
 
 # xStream Update
 def Update(username, plugin_id, branch, token, silent):
     REMOTE_PLUGIN_COMMITS = "https://api.github.com/repos/%s/%s/commits/%s" % (username, plugin_id, branch)
     REMOTE_PLUGIN_DOWNLOADS = "https://api.github.com/repos/%s/%s/zipball/%s" % (username, plugin_id, branch)
     auth = HTTPBasicAuth(username, token)
-    log('%s - Search for update ' % plugin_id, LOGNOTICE)
+    log(HEADERMESSAGE + ' - %s - Suche nach Aktualisierungen.' % plugin_id, LOGNOTICE)
     try:
         if sys.version_info[0] == 2:
             ADDON_DIR = translatePath(os.path.join('special://userdata/addon_data/', '%s') % plugin_id).decode('utf-8')
@@ -113,7 +119,7 @@ def Update(username, plugin_id, branch, token, silent):
         LOCAL_FILE_NAME_PLUGIN = os.path.join(ADDON_DIR, 'update-' + plugin_id + '.zip')
         if not os.path.exists(ADDON_DIR): os.mkdir(ADDON_DIR)
         # ka - Update erzwingen
-        if addon().getSetting('enforceUpdate') == 'true':
+        if Addon().getSetting('enforceUpdate') == 'true':
             if os.path.exists(LOCAL_PLUGIN_VERSION): os.remove(LOCAL_PLUGIN_VERSION)
 
         path = translatePath(os.path.join('special://home/addons/', '%s') % plugin_id)
@@ -122,27 +128,28 @@ def Update(username, plugin_id, branch, token, silent):
             isTrue = commitUpdate(commitXML, LOCAL_PLUGIN_VERSION, REMOTE_PLUGIN_DOWNLOADS, path, plugin_id,
                                   LOCAL_FILE_NAME_PLUGIN, silent, auth)
             if isTrue is True:
-                log('%s - Update successful.' % plugin_id, LOGNOTICE)
+                log(HEADERMESSAGE + ' - %s - Aktualisierung wird installiert.' % plugin_id, LOGNOTICE)
                 if silent is False: Dialog().ok(PLUGIN_NAME, plugin_id + ' - Update erfolgreich.')
+                log(HEADERMESSAGE + ' - %s - Aktualisierung abgeschlossen.' % plugin_id, LOGNOTICE)
                 return True
             elif isTrue is None:
-                log('%s - no new update ' % plugin_id, LOGNOTICE)
+                log(HEADERMESSAGE + ' - %s - Keine Aktualisierung verfügbar.' % plugin_id, LOGNOTICE)
                 if silent is False: Dialog().ok(PLUGIN_NAME, plugin_id + ' - Kein Update verfügbar.')
                 return None
 
-        log('%s - Update error ' % plugin_id, LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
+        log(HEADERMESSAGE + ' - %s - Fehler bei der Aktualisierung' % plugin_id, LOGERROR)
+        Dialog().ok(PLUGIN_NAME, 'Fehler bei der Aktualisierung von ' + plugin_id)
         return False
     except:
-        log('%s - Update error ' % plugin_id, LOGERROR)
-        Dialog().ok(PLUGIN_NAME, 'Fehler beim Update vom ' + plugin_id)
+        log(HEADERMESSAGE + ' - %s - Fehler bei der Aktualisierung' % plugin_id, LOGERROR)
+        Dialog().ok(PLUGIN_NAME, 'Fehler bei der Aktualisierung von ' + plugin_id)
 
 
 def commitUpdate(onlineFile, offlineFile, downloadLink, LocalDir, plugin_id, localFileName, silent, auth):
     try:
         jsData = json.loads(onlineFile)
         if not os.path.exists(offlineFile) or open(offlineFile).read() != jsData['sha']:
-            log('%s - start update ' % plugin_id, LOGNOTICE)
+            log(HEADERMESSAGE + ' - %s - starte Aktualisierung' % plugin_id, LOGNOTICE)
             isTrue = doUpdate(LocalDir, downloadLink, plugin_id, localFileName, auth)
             if isTrue is True:
                 try:
@@ -230,9 +237,9 @@ def zipfolder(foldername, target_dir):
 def devAutoUpdates(silent=False):
     try:
         status1 = status2 = None
-        if addon().getSetting('githubUpdateXstream') == 'true' or addon().getSetting('enforceUpdate') == 'true':
+        if Addon().getSetting('githubUpdateXstream') == 'true' or Addon().getSetting('enforceUpdate') == 'true':
             status1 = xStreamUpdate(silent)
-        if addon().getSetting('githubUpdateResolver') == 'true' or addon().getSetting('enforceUpdate') == 'true':
+        if Addon().getSetting('githubUpdateResolver') == 'true' or Addon().getSetting('enforceUpdate') == 'true':
             status2 = resolverUpdate(silent)
         if status1 == status2:
             return status1
@@ -244,7 +251,7 @@ def devAutoUpdates(silent=False):
         log(e)
 
 
-def devUpdates():  # für manuelles Updates vorgesehen
+def devUpdates():  # für manuelles Updates vorgesehen vorerst deaktiviert in der settings.xml
     try:
         resolverupdate = False
         pluginupdate = False
@@ -271,7 +278,7 @@ def devUpdates():  # für manuelles Updates vorgesehen
             except:
                 pass
         # ka - reset enforce Update
-        if addon().getSetting('enforceUpdate') == 'true': addon().setSetting('enforceUpdate', 'false')
+        if Addon().getSetting('enforceUpdate') == 'true': Addon().setSetting('enforceUpdate', 'false')
         return
     except Exception as e:
         log(e)
