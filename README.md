@@ -29,7 +29,7 @@ Habt Ihr Fragen rund um xStream findet Ihr sicher eure Antworten in unserer FAQ.
 
 ***
 
-Für alles weitere findet Ihr vielleicht auch Informationen auf unserer Webseite.
+Für alles weitere findet Ihr auch Informationen auf unserer Webseite die ihr auch als Quelle in Kodi einbinden könnt.
 ### | [Web Portal](https://streamxstream.github.io/xStreamRepoWeb/)
 
 ***
