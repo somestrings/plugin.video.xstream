@@ -3,7 +3,7 @@
 
 ![xStream logo](https://raw.githubusercontent.com/streamxstream/xStream-FAQ/master/Logo%20FAQ.png)
 
-Bei xStream handelt es sich um ein Video-Addon für Kodi, welches das streamen von Filmen und Serien über eine intuitive und optisch ansprechende Benutzeroberfläche ermöglicht
+Bei xStream handelt es sich um ein Video-Addon für Kodi, welches das Streamen von Filmen und Serien über eine intuitive und optisch ansprechende Benutzeroberfläche ermöglicht
 
 Sowohl der Funktionsumfang von xStream als auch das Angebot an Streaming-Inhalten wird von den beteiligten Entwicklern stetig weiterentwickelt bzw. um neue Webseiten erweitert
 
@@ -32,7 +32,7 @@ Derzeit unterstützt die Version folgende Site Plugins:
 | KinoGer                     	     | [x]       | [x]          |       |						|
 | Kinokiste                          | [x]       | [x]          |       |						|
 | KinoKiste.tech                  	 | [x]       | [x]          |       |       			    |
-| Kinomax.me                         | [x]       | [x]          |       | Cloudflare aktiv                      |
+| Kinomax.me                         | [x]       | [x]          |       | 				        |
 | Kinox                     	     | [x]       | [x]          |       |         			    |
 | KKiste                     	     | [x]       | [x]          |       | Cloudflare ab und zu  |
 | MegaKino                        	 | [x]       | [x]          |       |        				|
