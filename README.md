@@ -3,9 +3,9 @@
 
 ![xStream logo](https://raw.githubusercontent.com/streamxstream/xStream-FAQ/master/Logo%20FAQ.png)
 
-Bei xStream handelt es sich um ein Video-Addon für Kodi, welches das Streamen von Filmen und Serien über eine intuitive und optisch ansprechende Benutzeroberfläche ermöglicht
+Bei xStream handelt es sich um ein Video-Addon für Kodi, welches das Streamen von Filmen und Serien über eine intuitive und optisch ansprechende Benutzeroberfläche ermöglicht.
 
-Sowohl der Funktionsumfang von xStream als auch das Angebot an Streaming-Inhalten wird von den beteiligten Entwicklern stetig weiterentwickelt bzw. um neue Webseiten erweitert
+Sowohl der Funktionsumfang von xStream als auch das Angebot an Streaming-Inhalten wird von den beteiligten Entwicklern stetig weiterentwickelt bzw. um neue Webseiten erweitert.
 
 Diese werden auch als Site-Plugins bezeichnet, welche auf die eigentlichen Quellen verweisen die für das bereitgestellte Angebot verantworlich sind! 
 
