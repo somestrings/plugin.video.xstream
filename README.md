@@ -19,29 +19,8 @@ Fixes an Seiten bzw. neue Seiten am besten als PullRequest einreichen (oder auf 
 
 ***
 
-Derzeit unterstützt die Version folgende Site Plugins:
-
-|  Site Plugin                       | Enthalten | Funktioniert | Login | Fehler Beschreibung   |
-|------------------------------------|:---------:|:------------:|:-----:|:---------------------:|
-| Anicloud                     		 | [x]       | [x]          | [x]   |        				|
-| Dokus4me                     		 | [x]       | [x]          |       |        			    |
-| Filmpalast                     	 | [x]       | [x]          |       |        			    |
-| Flimmerstube                     	 | [x]       | [x]          | [x]   |        			    |
-| HD Filme.top                     	 | [x]       | [x]          |       |        			    |
-| Kinofox                     	     | [x]       | [x]          |       |        				|
-| KinoGer                     	     | [x]       | [x]          |       |						|
-| Kinokiste                          | [x]       | [x]          |       |						|
-| KinoKiste.tech                  	 | [x]       | [x]          |       |       			    |
-| Kinomax.me                         | [x]       | [x]          |       | 				        |
-| Kinox                     	     | [x]       | [x]          |       |         			    |
-| KKiste                     	     | [x]       | [x]          |       | Cloudflare ab und zu  |
-| MegaKino                        	 | [x]       | [x]          |       |        				|
-| Movie4k                         	 | [x]       | [x]          |       |               	    |
-| Movieking                     	 | [x]       | [x]          |       |        				|
-| Netzkino                       	 | [x]       | [x]          |       |        				|
-| Serienstream                     	 | [x]       | [x]          | [x]   |        				|
-| Streamworld                     	 | [x]       | [x]          |       |        				|
-| XCine                     	 	 | [x]       | [x]          |       |        				|
+Derzeit unterstützt die xStream Version folgende Site Plugins bei der Stream Suche.
+### | [Site Plugins](https://github.com/streamxstream/xStream-FAQ/blob/master/xStream_Anleitung_FAQ.md#11-verf%C3%BCgbare-webseiten)
 
 ***
 
