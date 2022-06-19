@@ -122,7 +122,6 @@ class cPluginHandler:
 
             # for pluginID in sorted(pluginData):
             for pluginID in index:
-                #import web_pdb; web_pdb.set_trace()
                 plugin = pluginData[pluginID]
                 subEl = ET.SubElement(pluginElem, 'setting', {'type': 'lsep', 'label': plugin['name']})
                 subEl.tail = '\n    '
