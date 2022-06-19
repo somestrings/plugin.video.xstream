@@ -1,3 +1,7 @@
+3.5.35~nightly2
+- Wenn Globale Suche in einem Site-Plugin abgeschaltet wurde steht diese Option 
+  jetzt auch nicht mehr in den Xsteam Settings zur Verfügung
+
 3.5.35~nightly1
 - Status Update Information xStream / Resolver
 
