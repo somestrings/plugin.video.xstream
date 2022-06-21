@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-
-# 2022-01-21 / 1
+#
+# 2022-06-21 Heptamer Site für Globale Suche freigegeben
 
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
@@ -21,7 +21,7 @@ URL_THUMBNAIL = 'https://image.tmdb.org/t/p/w300%s'
 URL_WATCH = 'https://api.tmdb.club/data/watch/?_id=%s'
 ORIGIN = 'https://movie2k.ag'
 REFERER = ORIGIN + '/'
-SITE_GLOBAL_SEARCH = False
+#SITE_GLOBAL_SEARCH = False
 
 
 def load():
