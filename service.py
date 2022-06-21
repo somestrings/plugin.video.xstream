@@ -70,8 +70,8 @@ def checkDependence(ADDONID):
         xbmc.log(__name__ + '  %s - Exception ' % e, LOGERROR)
 
 # check if Autoupdate is activated before installing updates
-if xbmcaddon.Addon().getSetting('DevUpdateAuto') == 'true':
-    if os.path.isfile(NIGHTLY_VERSION_CONTROL) == False or xbmcaddon.Addon().getSetting('githubUpdateXstream') == 'true' or xbmcaddon.Addon().getSetting('githubUpdateResolver') == 'true' or xbmcaddon.Addon().getSetting('enforceUpdate') == 'true':
+if xbmcaddon.Addon().getSetting('DevUpdateAuto') == 'true' or xbmcaddon.Addon().getSetting('enforceUpdate') == 'true':
+    if os.path.isfile(NIGHTLY_VERSION_CONTROL) == False or xbmcaddon.Addon().getSetting('githubUpdateXstream') == 'true' or xbmcaddon.Addon().getSetting('githubUpdateResolver') == 'true':
 # Status Dialog der Auto Updates    
         from resources.lib import updateManager
         status1 = updateManager.xStreamUpdate(True)
