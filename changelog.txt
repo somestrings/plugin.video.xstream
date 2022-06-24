@@ -1,3 +1,6 @@
+3.5.35~nightly4
+- Domain Updates Movie4k und Kkiste
+
 3.5.35~nightly3
 -[Fix] Updates wurden auch bei deaktiviertem Updatemanager gesucht und installiert  
 -[kinokiste] In globale Suche integriert 
