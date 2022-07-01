@@ -1,3 +1,6 @@
+3.5.35~nightly5
+- [Fix] Anicloud -> Aniworld
+
 3.5.35~nightly4
 - Domain Updates Movie4k und Kkiste
 
