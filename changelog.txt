@@ -1,3 +1,6 @@
+3.5.35~nightly6
+- [Fix] XCine - Suchfilter Einzelepisoden nicht abspielbar, korrgiert
+
 3.5.35~nightly5
 - [Fix] Anicloud -> Aniworld
 
