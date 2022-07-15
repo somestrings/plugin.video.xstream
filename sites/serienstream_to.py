@@ -3,6 +3,7 @@
 #
 #
 
+from operator import truediv
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
@@ -332,9 +333,9 @@ def showSearch():
     cGui().setEndOfDirectory()
 
 
-def _search(oGui, sSearchText, sGui=False):
-    import xbmcgui, json
-    oGui = sGui if sGui else cGui()
+def _search(oGui, sSearchText):
+    import json
+    oGui = cGui()
     params = ParameterHandler()
     params.getValue('sSearchText')
 
@@ -347,8 +348,8 @@ def _search(oGui, sSearchText, sGui=False):
 
     sHtmlContent = oRequest.request()
     if not sHtmlContent:
-            xbmcgui.Dialog().ok('Serienstream', 'Ungültige Suchparameter oder Suche lieferte kein Ergebnis. Bitte erneut probieren.')
             return
+
 
     sst = sSearchText.lower()
 
