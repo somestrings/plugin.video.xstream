@@ -1,3 +1,6 @@
+3.5.35~nightly8
+- [s.to] Anpassungen Suchfunktion
+
 3.5.35~nightly7
 - [S.to] Neue Suche implementiert und Globale Suche aktiviert
 
