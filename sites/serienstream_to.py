@@ -334,7 +334,7 @@ def showSearch():
 
 
 def _search(oGui, sSearchText):
-    import json
+    from json import loads
     oGui = cGui()
     params = ParameterHandler()
     params.getValue('sSearchText')
@@ -353,7 +353,7 @@ def _search(oGui, sSearchText):
 
     sst = sSearchText.lower()
 
-    j = json.loads(sHtmlContent)
+    j = loads(sHtmlContent)
     total = len(j)
     for a in j:
         if 'support' in a.get('link'):
