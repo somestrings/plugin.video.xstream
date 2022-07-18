@@ -1,30 +1,18 @@
-3.5.35~nightly8-1
+3.5.36~nightly
+
+
+3.5.35
+  18.07.2022
+  Update
 - [s.to] Optimierungen Suchfunktion
-
-3.5.35~nightly8
-- [s.to] Anpassungen Suchfunktion
-
-3.5.35~nightly7
 - [S.to] Neue Suche implementiert und Globale Suche aktiviert
-
-3.5.35~nightly6
 - [Fix] XCine - Suchfilter Einzelepisoden nicht abspielbar, korrgiert
-
-3.5.35~nightly5
 - [Fix] Anicloud -> Aniworld
-
-3.5.35~nightly4
 - Domain Updates Movie4k und Kkiste
-
-3.5.35~nightly3
 -[Fix] Updates wurden auch bei deaktiviertem Updatemanager gesucht und installiert  
 -[kinokiste] In globale Suche integriert 
-
-3.5.35~nightly2
 - Wenn Globale Suche in einem Site-Plugin abgeschaltet wurde steht diese Option 
   jetzt auch nicht mehr in den Xsteam Settings zur Verfügung
-
-3.5.35~nightly1
 - Status Update Information xStream / Resolver
 
 3.5.34
