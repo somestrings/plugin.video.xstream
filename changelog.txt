@@ -1,5 +1,23 @@
+3.5.36~nightly
+
+
+3.5.35
+  18.07.2022
+  Update
+- [s.to] Optimierungen Suchfunktion
+- [S.to] Neue Suche implementiert und Globale Suche aktiviert
+- [Fix] XCine - Suchfilter Einzelepisoden nicht abspielbar, korrgiert
+- [Fix] Anicloud -> Aniworld
+- Domain Updates Movie4k und Kkiste
+-[Fix] Updates wurden auch bei deaktiviertem Updatemanager gesucht und installiert  
+-[kinokiste] In globale Suche integriert 
+- Wenn Globale Suche in einem Site-Plugin abgeschaltet wurde steht diese Option 
+  jetzt auch nicht mehr in den Xsteam Settings zur Verfügung
+- Status Update Information xStream / Resolver
+
 3.5.34
-Release 05.06.2022
+  05.06.2022
+  Update:
 
 - Resolver Branch Auswahl   
 - Update Domains kinofox, kkiste
@@ -9,20 +27,7 @@ Release 05.06.2022
 - Meldung Resolve URL Update
 - neues Icon und Fanart
 - Update Manager fixed
-
-
-3.5.34~nightly3
-- Update Domains kinofox, kkiste
-
-3.5.34~nightly2
-- kinox fixed
-- kinoger Hoster fixed THX Anis
-- My.JDownloader fixed THX Anis
-
-3.5.34~nightly1
 - Meldung Resolve URL Update
-- neues Icon und Fanart
-- Update Manager fixed
 
 3.5.33
   15.05.2022

@@ -4,6 +4,7 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
+import re
 
 SITE_IDENTIFIER = 'xcine'
 SITE_NAME = 'XCine'
@@ -84,7 +85,7 @@ def showEntries(entryUrl=False, sGui=False, sSearchText=False):
 
     total = len(aResult)
     for sUrl, sThumbnail, sName in aResult:
-        isTvshow = True if 'taffel' in sName or 'taffel' in sUrl else False
+        isTvshow = True if 'taffel' in sName or 'taffel' in sUrl or 'serien' in sUrl else False
         sName = sName.replace(' stream', '')
         if sSearchText and not cParser().search(sSearchText, sName):
             continue

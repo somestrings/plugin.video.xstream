@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+#
+# 2022-06-19 Heptamer
+
 from resources.lib.config import cConfig
 from resources.lib.tools import logger
 from resources.lib import common
@@ -127,12 +130,21 @@ class cPluginHandler:
                 attrib['label'] = '30050'
                 subEl = ET.SubElement(pluginElem, 'setting', attrib)
                 subEl.tail = '\n    '
-                attrib = {'default': str(plugin['globalsearch']).lower(), 'type': 'bool'}
-                attrib['id'] = 'global_search_%s' % pluginID
-                attrib['label'] = '30052'
-                attrib['enable'] = '!eq(-1,false)'
-                subEl = ET.SubElement(pluginElem, 'setting', attrib)
-                subEl.tail = '\n    '
+                #Prüfen ob der Parameter SITE_GLOBAL_SEARCH auf False steht, wenn ja, ausblenden
+                if plugin['globalsearch'] == False :
+                    attrib = {'default': str(plugin['globalsearch']).lower(), 'type': 'bool'}
+                    attrib['id'] = 'global_search_%s' % pluginID
+                    attrib['label'] = '30052'
+                    attrib['visible'] = 'eq(-1,false)'
+                    subEl = ET.SubElement(pluginElem, 'setting', attrib)
+                    subEl.tail = '\n    '
+                else:
+                    attrib = {'default': str(plugin['globalsearch']).lower(), 'type': 'bool'}
+                    attrib['id'] = 'global_search_%s' % pluginID
+                    attrib['label'] = '30052'
+                    attrib['enable'] = '!eq(-1,false)'
+                    subEl = ET.SubElement(pluginElem, 'setting', attrib)
+                    subEl.tail = '\n    '
 
                 if 'settings' in plugin:
                     customSettings = []

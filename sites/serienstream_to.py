@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-# 2022-04-29 Heptamer
+# 2022-07-14 Heptamer - Neue Suche eingebaut ab zeile 335, Globale Suche aktiviert
+#
+#
 
+from operator import truediv
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.tools import logger, cParser
@@ -8,13 +11,14 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
 #from resources.lib.jsnprotect import cHelper
 from resources.lib.config import cConfig
+
 SITE_IDENTIFIER = 'serienstream_to'
 SITE_NAME = 'SerienStream'
 SITE_ICON = 'serienstream.png'
 SITE_SETTINGS = '<setting default="s.to" enable="!eq(-2,false)" id="serienstream_to-domain" label="30051" type="labelenum" values="s.to|serienstream.to|serien.cam|190.115.18.20" />'
 domain = cConfig().getSetting('serienstream_to-domain')
 #SITE_SETTINGS = '<setting id="serienstream.user" type="text" label="30083" default="" /><setting id="serienstream.pass" type="text" option="hidden" label="30084" default="" />'
-SITE_GLOBAL_SEARCH = False
+SITE_GLOBAL_SEARCH = True
 
 #URL_MAIN = 'https://serien.cam/'
 if domain == "190.115.18.20":
@@ -29,6 +33,7 @@ URL_NEW_SERIES = URL_MAIN + '/neu'
 URL_NEW_EPISODES = URL_MAIN + '/neue-episoden'
 URL_POPULAR = URL_MAIN + '/beliebte-serien'
 URL_LOGIN = URL_MAIN + '/login'
+URL_SEARCH = 'https://s.to/ajax/search'
 
 
 def load():
@@ -329,4 +334,44 @@ def showSearch():
 
 
 def _search(oGui, sSearchText):
-    showAllSeries(URL_SERIES, oGui, sSearchText)
+    from json import loads
+    oGui = cGui()
+    params = ParameterHandler()
+    params.getValue('sSearchText')
+
+
+    oRequest = cRequestHandler(URL_SEARCH, caching=True)
+    oRequest.addHeaderEntry('X-Requested-With', 'XMLHttpRequest')
+    oRequest.addHeaderEntry('Referer', 'https://s.to/search')
+    oRequest.addHeaderEntry('Origin', 'https://s.to')
+    oRequest.addParameters('keyword', sSearchText)
+
+    sHtmlContent = oRequest.request()
+    if not sHtmlContent:
+            return
+
+
+    sst = sSearchText.lower()
+
+    j = loads(sHtmlContent)
+    total = len(j)
+    for a in j:
+        if 'support' in a.get('link'):
+            continue
+        sName = a.get('title').replace('/', '').replace('<em>', '')
+        
+        sLink = a.get('link')
+        if a.get('description'):
+            sDesc = a.get('description').replace('/', '').replace('<em>', '')
+        else:
+            sDesc = ' '
+        
+        if not sst in sName.lower() or 'pisode' in sName:
+            continue
+        else:
+            oGuiElement = cGuiElement(sName, SITE_IDENTIFIER, 'showSeasons')
+            oGuiElement.setMediaType('tvshow')
+            oGuiElement.setDescription(sDesc)
+            params.setParam('sUrl', URL_MAIN + sLink)
+            params.setParam('TVShowTitle', sName)
+            oGui.addFolder(oGuiElement, params, True, total)
