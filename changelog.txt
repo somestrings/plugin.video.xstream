@@ -1,4 +1,6 @@
-3.5.36~nightly
+3.5.36~nightly1
+  08.08.22
+  - Einige Site-Icons erneuert. Alle Icons sind jetzt 512x512px. THX @peat80
 
 
 3.5.35
