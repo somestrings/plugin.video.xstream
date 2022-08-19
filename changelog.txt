@@ -1,7 +1,10 @@
+3.5.36~nightly2
+  19.08.22
+  - Domain Updates von HDFilme, Kinomax, KKiste
+
 3.5.36~nightly1
   08.08.22
   - Einige Site-Icons erneuert. Alle Icons sind jetzt 512x512px. THX @peat80
-
 
 3.5.35
   18.07.2022
