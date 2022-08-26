@@ -1,6 +1,7 @@
 3.5.36~nightly3
   26.08.22
   - [Flimmerstube] Einige Filme konnten nicht abgespielt werden
+  - XCine entfernt
 
 3.5.36~nightly2
   19.08.22
