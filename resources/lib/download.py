@@ -14,7 +14,10 @@ except ImportError:
 
 class cDownload:
     def __createProcessDialog(self, downloadDialogTitle):
-        oDialog = xbmcgui.DialogProgress()
+        if cConfig().getSetting('backgrounddownload') == 'true':
+            oDialog = xbmcgui.DialogProgressBG()
+        else:
+            oDialog = xbmcgui.DialogProgress()
         oDialog.create(downloadDialogTitle)
         self.__oDialog = oDialog
 
@@ -96,7 +99,7 @@ class cDownload:
             avgSpd = 5
         value = self.__sTitle, str('%s/%s@%dKB/s' % (self.__formatFileSize(currentLoaded), self.__formatFileSize(iTotalSize), avgSpd))
         self.__oDialog.update(iPercent, str(value))
-        if self.__oDialog.iscanceled():
+        if cConfig().getSetting('backgrounddownload') == 'false' and self.__oDialog.iscanceled():
             self.__processIsCanceled = True
             self.__oDialog.close()
 
