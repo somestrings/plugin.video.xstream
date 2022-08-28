@@ -135,7 +135,7 @@
 	<category label="30023">
 		<setting label="30080" />
 		<setting default="" id="download-folder" label="30081" type="folder" />
-		<setting default="false" id="backgrounddownload" label="Im Hintergrund downloaden" type="bool" />
+		<setting default="false" id="backgrounddownload" label="30085" type="bool" />
 		<setting label="30070" type="sep" />
 		<setting default="false" id="jd_enabled" label="30071" type="bool" />
 		<setting default="127.0.0.1" enable="!eq(-1,false)" id="jd_host" label="30072" type="text" />
