@@ -224,6 +224,10 @@ msgctxt "#30084"
 msgid "Password"
 msgstr ""
 
+msgctxt "#30085"
+msgid "Enable background downloads"
+msgid ""
+
 msgctxt "#30090"
 msgid "My.JDownloader"
 msgstr ""
